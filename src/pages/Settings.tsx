@@ -114,7 +114,10 @@ export default function Settings() {
         <div className="p-6 space-y-8">
           
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Telephony Configuration</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Telephony Configuration</h3>
+              {!isAdmin && <span className="px-2 py-1 bg-red-50 text-red-700 text-xs font-bold rounded border border-red-100">VIEW ONLY</span>}
+            </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">SIP Provider WSS URL</label>
@@ -164,7 +167,10 @@ export default function Settings() {
           </div>
 
           <div className="border-t border-gray-200 pt-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Call Routing & Recording</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Call Routing & Recording</h3>
+              {!isAdmin && <span className="px-2 py-1 bg-red-50 text-red-700 text-xs font-bold rounded border border-red-100">VIEW ONLY</span>}
+            </div>
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="flex items-center h-5">

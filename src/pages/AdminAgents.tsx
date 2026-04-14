@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 export default function AdminAgents() {
   const { token } = useAppStore();
   const [agents, setAgents] = useState<any[]>([]);
+  const [telephonyLines, setTelephonyLines] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Modals
@@ -17,7 +18,7 @@ export default function AdminAgents() {
   const [agentActivity, setAgentActivity] = useState<{calls: any[], tasks: any[]}>({ calls: [], tasks: [] });
   
   // Forms
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', extension: '', assignedNumber: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addError, setAddError] = useState('');
 
@@ -33,8 +34,18 @@ export default function AdminAgents() {
       .catch(console.error);
   };
 
+  const fetchTelephonyLines = () => {
+    fetch('/api/admin/telephony-lines', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setTelephonyLines(data))
+      .catch(console.error);
+  };
+
   useEffect(() => {
     fetchAgents();
+    fetchTelephonyLines();
   }, [token]);
 
   const handleAddAgent = async (e: React.FormEvent) => {
@@ -61,7 +72,7 @@ export default function AdminAgents() {
       if (res.ok) {
         setIsAddModalOpen(false);
         setAddError('');
-        setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '' });
+        setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
         fetchAgents();
       } else {
         // Show the error returned by the API (e.g. duplicate email)
@@ -90,7 +101,8 @@ export default function AdminAgents() {
           name: formData.name,
           email: formData.email,
           extension: formData.extension,
-          assignedNumber: formData.assignedNumber
+          assignedNumber: formData.assignedNumber,
+          telephonyLineId: formData.telephonyLineId || null
         })
       });
       if (res.ok) {
@@ -141,7 +153,8 @@ export default function AdminAgents() {
       email: agent.user.email,
       password: '',
       extension: agent.extension || '',
-      assignedNumber: agent.assignedNumber || ''
+      assignedNumber: agent.assignedNumber || '',
+      telephonyLineId: agent.telephonyLineId || ''
     });
     setIsEditModalOpen(true);
   };
@@ -152,7 +165,7 @@ export default function AdminAgents() {
         <h2 className="text-2xl font-bold text-gray-900">Agents</h2>
         <button 
           onClick={() => {
-            setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '' });
+            setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
             setAddError('');
             setIsAddModalOpen(true);
           }}
@@ -197,8 +210,8 @@ export default function AdminAgents() {
                     <span className="font-medium text-gray-900">{agent.extension || 'None'}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Direct Number</span>
-                    <span className="font-medium text-gray-900">{agent.assignedNumber || 'None'}</span>
+                    <span className="text-gray-500">Business Line</span>
+                    <span className="font-medium text-blue-600">{agent.telephonyLine?.number || 'Not Assigned'}</span>
                   </div>
                 </div>
               </div>
@@ -259,6 +272,19 @@ export default function AdminAgents() {
                   <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                 </div>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Business Line</label>
+                <select 
+                  value={formData.telephonyLineId} 
+                  onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">No Line Assigned</option>
+                  {telephonyLines.map(line => (
+                    <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
+                  ))}
+                </select>
+              </div>
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium">Cancel</button>
                 <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
@@ -298,6 +324,19 @@ export default function AdminAgents() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Direct Number</label>
                   <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Business Line</label>
+                <select 
+                  value={formData.telephonyLineId} 
+                  onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">No Line Assigned</option>
+                  {telephonyLines.map(line => (
+                    <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
+                  ))}
+                </select>
               </div>
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium">Cancel</button>
