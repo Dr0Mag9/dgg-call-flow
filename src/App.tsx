@@ -14,6 +14,7 @@ import Dialer from './pages/Dialer';
 import CallHistory from './pages/CallHistory';
 import Settings from './pages/Settings';
 import CRMOverview from './pages/CRMOverview';
+import AdminTelephony from './pages/AdminTelephony';
 import Tasks from './pages/Tasks';
 import StudyLibrary from './pages/StudyLibrary';
 
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/crm" element={<CRMOverview />} />
           <Route path="admin/agents" element={<AdminAgents />} />
+          <Route path="admin/telephony" element={<AdminTelephony />} />
           <Route path="admin/history" element={<CallHistory />} />
           <Route path="admin/settings" element={<Settings />} />
           

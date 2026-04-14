@@ -27,6 +27,7 @@ export default function DashboardLayout() {
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'CRM Overview', href: '/admin/crm', icon: Users },
     { name: 'Agents', href: '/admin/agents', icon: Users },
+    { name: 'Telephony', href: '/admin/telephony', icon: Phone },
     { name: 'Call History', href: '/admin/history', icon: History },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];

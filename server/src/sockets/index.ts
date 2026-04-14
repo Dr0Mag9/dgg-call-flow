@@ -50,6 +50,31 @@ export function registerSocketHandlers() {
       }
     });
 
+    socket.on('gateway:auth', async (apiKey: string) => {
+      try {
+        const gateway = await prisma.gatewayDevice.findUnique({ where: { apiKey } });
+        if (!gateway) {
+          socket.emit('gateway:error', { message: 'Invalid API Key' });
+          return;
+        }
+
+        socket.data.gatewayId = gateway.id;
+        socket.data.isGateway = true;
+        socket.join(`gateway_${gateway.id}`);
+
+        await prisma.gatewayDevice.update({
+          where: { id: gateway.id },
+          data: { status: 'ONLINE', lastSeen: new Date() },
+        });
+
+        logger.info(`[Socket] Gateway connected: ${gateway.name} (${gateway.id})`);
+        socket.emit('gateway:ready', { success: true });
+        broadcast('gateway_status_changed', { gatewayId: gateway.id, status: 'ONLINE' });
+      } catch (err) {
+        socket.emit('gateway:error', { message: 'Auth failed' });
+      }
+    });
+
     socket.on('disconnect', async () => {
       const userId = socket.data.userId as string | undefined;
       const role = socket.data.role as string | undefined;
@@ -72,6 +97,22 @@ export function registerSocketHandlers() {
         logger.error('socket disconnect agent cleanup', {
           message: e instanceof Error ? e.message : String(e),
         });
+      }
+
+      // Gateway Cleanup
+      const gatewayId = socket.data.gatewayId as string | undefined;
+      const isGateway = socket.data.isGateway as boolean | undefined;
+      if (gatewayId && isGateway) {
+        try {
+          await prisma.gatewayDevice.update({
+            where: { id: gatewayId },
+            data: { status: 'OFFLINE', lastSeen: new Date() },
+          });
+          broadcast('gateway_status_changed', { gatewayId, status: 'OFFLINE' });
+          logger.info(`[Socket] Gateway disconnected: ${gatewayId}`);
+        } catch (err) {
+          logger.error('socket disconnect gateway cleanup', err);
+        }
       }
     });
   });

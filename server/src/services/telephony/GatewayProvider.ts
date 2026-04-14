@@ -1,56 +1,61 @@
 import { TelephonyService, CallRequest } from './TelephonyService.js';
 import { prisma } from '../../config/prisma.js';
-import { broadcast } from '../notification.service.js';
+import { getIo } from '../../services/websocket.service.js';
+import { logger } from '../../utils/logger.js';
 
 export class GatewayProvider implements TelephonyService {
   async initiateOutboundCall(req: CallRequest) {
-    console.log(`[Gateway Provider] Initiating call to ${req.phoneNumber} on line ${req.lineId}`);
-    
-    // Look up the physical gateway device required for this line
-    const line = await prisma.telephonyLine.findUnique({ 
+    logger.info(`[Gateway Provider] Preparing call to ${req.phoneNumber} on line ${req.lineId}`);
+
+    // 1. Find the line and its assigned gateway
+    const line = await prisma.telephonyLine.findUnique({
       where: { id: req.lineId },
       include: { gateway: true }
     });
 
-    if (!line || !line.gateway) {
-      return { success: false, error: 'No associated gateway device found for this line.' };
+    if (!line || !line.gatewayId || line.providerType !== 'GATEWAY') {
+      return { success: false, error: 'Invalid gateway line configuration' };
     }
 
-    // Emit a command over WebSocket to the Android Gateway App wrapper
-    broadcast('gateway_command', {
-      gatewayId: line.gateway.id,
+    if (line.gateway?.status !== 'ONLINE') {
+      return { success: false, error: 'Target gateway device is offline' };
+    }
+
+    // 2. Relay the signal via Socket.io
+    const io = getIo();
+    const gatewayRoom = `gateway_${line.gatewayId}`;
+    
+    // Check if anyone is in the room
+    const socketsInRoom = await io.in(gatewayRoom).fetchSockets();
+    if (socketsInRoom.length === 0) {
+      return { success: false, error: 'No active socket connection for gateway' };
+    }
+
+    logger.info(`[Gateway Provider] Emitting dial command to gateway ${line.gatewayId}`);
+    
+    io.to(gatewayRoom).emit('gateway:command', {
       command: 'DIAL',
       phoneNumber: req.phoneNumber,
-      callId: req.callId
+      callId: req.callId,
+      timestamp: new Date().toISOString()
     });
 
-    return { success: true, externalId: `gw_${Date.now()}` };
-  }
-
-  async registerIncomingCall(payload: any) {
-    console.log('[Gateway Provider] Incoming call', payload);
-  }
-
-  async answerCall(callId: string) {
-    // For gateway mode, the PC agent might answer but the gateway handles audio
-    broadcast('gateway_command', { command: 'ANSWER', callId });
+    return { 
+      success: true, 
+      externalId: `gw_sig_${Date.now()}` 
+    };
   }
 
   async endCall(callId: string) {
-    broadcast('gateway_command', { command: 'END', callId });
-  }
-
-  async muteCall(callId: string, muted: boolean) {
-    broadcast('gateway_command', { command: 'MUTE', callId, muted });
-  }
-
-  async holdCall(callId: string, hold: boolean) {
-    broadcast('gateway_command', { command: 'HOLD', callId, hold });
+    const io = getIo();
+    // Broadcast to all gateways involved in this call (usually just one)
+    io.emit('gateway:command', {
+      command: 'HANGUP',
+      callId
+    });
   }
 
   async transferCall(callId: string, targetNumber: string) {
     console.warn(`[Gateway Provider] Call transfer for ${callId} to ${targetNumber} via native Android gateway is limited`);
   }
 }
-
-export const gatewayProvider = new GatewayProvider();

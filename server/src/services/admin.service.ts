@@ -43,8 +43,35 @@ export function listAgents() {
 
 export function listTelephonyLines() {
   return prisma.telephonyLine.findMany({
+    include: { gateway: true },
     orderBy: { number: 'asc' },
   });
+}
+
+export async function createTelephonyLine(data: any) {
+  return prisma.telephonyLine.create({ data });
+}
+
+export async function deleteTelephonyLine(id: string) {
+  return prisma.telephonyLine.delete({ where: { id } });
+}
+
+export async function listGateways() {
+  return prisma.gatewayDevice.findMany({
+    orderBy: { lastSeen: 'desc' },
+  });
+}
+
+export async function createGateway(name: string) {
+  const crypto = await import('crypto');
+  const apiKey = `gw_${crypto.randomBytes(24).toString('hex')}`;
+  return prisma.gatewayDevice.create({
+    data: { name, apiKey, status: 'OFFLINE' }
+  });
+}
+
+export async function deleteGateway(id: string) {
+  return prisma.gatewayDevice.delete({ where: { id } });
 }
 
 export async function createAgent(data: {

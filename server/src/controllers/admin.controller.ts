@@ -21,6 +21,17 @@ const updateAgentSchema = z.object({
   telephonyLineId: z.string().uuid().nullable().optional(),
 });
 
+const createLineSchema = z.object({
+  number: z.string().min(1),
+  providerType: z.enum(['SIP', 'GATEWAY']),
+  providerRef: z.string().optional(),
+  gatewayId: z.string().uuid().optional().nullable(),
+});
+
+const gatewaySchema = z.object({
+  name: z.string().min(1),
+});
+
 export async function dashboard(_req: Request, res: Response) {
   const stats = await adminService.getDashboardStats();
   return res.json(stats);
@@ -36,6 +47,51 @@ export async function listTelephonyLines(_req: Request, res: Response) {
   return res.json(lines);
 }
 
+export async function createTelephonyLine(req: Request, res: Response) {
+  const parsed = createLineSchema.safeParse(req.body);
+  if (!parsed.success) return sendError(res, 400, 'Invalid line data');
+  try {
+    const line = await adminService.createTelephonyLine(parsed.data);
+    return res.status(201).json(line);
+  } catch (e) {
+    return sendError(res, 400, 'Failed to create telephony line');
+  }
+}
+
+export async function deleteTelephonyLine(req: Request, res: Response) {
+  try {
+    await adminService.deleteTelephonyLine(req.params.id);
+    return res.status(204).end();
+  } catch (e) {
+    return sendError(res, 400, 'Failed to delete telephony line');
+  }
+}
+
+export async function listGateways(_req: Request, res: Response) {
+  const gateways = await adminService.listGateways();
+  return res.json(gateways);
+}
+
+export async function createGateway(req: Request, res: Response) {
+  const parsed = gatewaySchema.safeParse(req.body);
+  if (!parsed.success) return sendError(res, 400, 'Invalid gateway data');
+  try {
+    const gateway = await adminService.createGateway(parsed.data.name);
+    return res.status(201).json(gateway);
+  } catch (e) {
+    return sendError(res, 400, 'Failed to create gateway');
+  }
+}
+
+export async function deleteGateway(req: Request, res: Response) {
+  try {
+    await adminService.deleteGateway(req.params.id);
+    return res.status(204).end();
+  } catch (e) {
+    return sendError(res, 400, 'Failed to delete gateway');
+  }
+}
+
 export async function createAgent(req: Request, res: Response) {
   const parsed = createAgentSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -46,7 +102,6 @@ export async function createAgent(req: Request, res: Response) {
     return res.status(201).json(user);
   } catch (e: any) {
     logger.error('createAgent', { message: e instanceof Error ? e.message : String(e) });
-    // Prisma unique constraint violation (duplicate email)
     if (e?.code === 'P2002') {
       return sendError(res, 409, 'An agent with this email already exists.');
     }

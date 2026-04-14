@@ -168,7 +168,7 @@ export default function Settings() {
 
           <div className="border-t border-gray-200 pt-8">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Call Routing & Recording</h3>
+              <h3 className="text-lg font-medium text-gray-900">Call Routing</h3>
               {!isAdmin && <span className="px-2 py-1 bg-red-50 text-red-700 text-xs font-bold rounded border border-red-100">VIEW ONLY</span>}
             </div>
             <div className="space-y-4">
@@ -186,22 +186,6 @@ export default function Settings() {
                 <div className="ml-3 text-sm">
                   <label htmlFor="route_available" className="font-medium text-gray-700">Route to longest idle agent</label>
                   <p className="text-gray-500">Incoming calls will be routed to the agent who has been waiting the longest.</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="flex items-center h-5">
-                  <input 
-                    id="auto_record" 
-                    type="checkbox" 
-                    disabled={!isAdmin}
-                    checked={systemSettings.auto_record === 'true'}
-                    onChange={e => updateSystemSetting('auto_record', e.target.checked)}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded disabled:opacity-50" 
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="auto_record" className="font-medium text-gray-700">Auto Call Recording</label>
-                  <p className="text-gray-500">Automatically record all calls for training and marketing purposes.</p>
                 </div>
               </div>
             </div>
