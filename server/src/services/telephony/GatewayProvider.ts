@@ -56,15 +56,15 @@ export class GatewayProvider implements TelephonyService {
   }
 
   async muteCall(callId: string, muted: boolean) {
-    logger.warn(`[Gateway Provider] Mute (${muted}) not supported on gateway bridge`);
+    logger.warn(`[Gateway Provider] Mute (${muted}) not supported on gateway bridge for call ${callId}`);
   }
 
   async holdCall(callId: string, hold: boolean) {
-    logger.warn(`[Gateway Provider] Hold (${hold}) not supported on gateway bridge`);
+    logger.warn(`[Gateway Provider] Hold (${hold}) not supported on gateway bridge for call ${callId}`);
   }
 
   async transferCall(callId: string, targetNumber: string) {
-    logger.warn(`[Gateway Provider] Transfer to ${targetNumber} not supported on gateway bridge`);
+    logger.warn(`[Gateway Provider] Transfer of call ${callId} to ${targetNumber} not supported on gateway bridge`);
   }
 }
 
