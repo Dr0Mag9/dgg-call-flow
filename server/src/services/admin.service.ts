@@ -35,8 +35,15 @@ export function listAgents() {
   return prisma.agent.findMany({
     include: {
       user: { select: { id: true, name: true, email: true, status: true, isActive: true } },
+      telephonyLine: true,
     },
     orderBy: { user: { createdAt: 'desc' } },
+  });
+}
+
+export function listTelephonyLines() {
+  return prisma.telephonyLine.findMany({
+    orderBy: { number: 'asc' },
   });
 }
 
@@ -46,6 +53,7 @@ export async function createAgent(data: {
   password: string;
   extension?: string;
   assignedNumber?: string;
+  telephonyLineId?: string;
 }) {
   const passwordHash = await hashPassword(data.password);
   // Normalize optional fields: empty strings → undefined (stored as NULL)
@@ -63,16 +71,17 @@ export async function createAgent(data: {
         create: {
           extension,
           assignedNumber,
+          telephonyLineId: data.telephonyLineId || undefined,
         },
       },
     },
-    include: { agent: true },
+    include: { agent: { include: { telephonyLine: true } } },
   });
 }
 
 export async function updateAgent(
   agentId: string,
-  data: { name?: string; email?: string; extension?: string; assignedNumber?: string },
+  data: { name?: string; email?: string; extension?: string; assignedNumber?: string; telephonyLineId?: string | null },
 ) {
   const agent = await prisma.agent.findUnique({ where: { id: agentId } });
   if (!agent) return null;
@@ -82,6 +91,7 @@ export async function updateAgent(
     data: {
       extension: data.extension,
       assignedNumber: data.assignedNumber,
+      telephonyLineId: data.telephonyLineId,
       user: {
         update: {
           ...(data.name !== undefined && { name: data.name.trim() }),
@@ -89,7 +99,7 @@ export async function updateAgent(
         },
       },
     },
-    include: { user: true },
+    include: { user: true, telephonyLine: true },
   });
 }
 

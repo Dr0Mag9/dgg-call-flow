@@ -10,6 +10,7 @@ const createAgentSchema = z.object({
   password: z.string().min(8).max(256),
   extension: z.string().max(32).optional(),
   assignedNumber: z.string().max(64).optional(),
+  telephonyLineId: z.string().uuid().optional(),
 });
 
 const updateAgentSchema = z.object({
@@ -17,6 +18,7 @@ const updateAgentSchema = z.object({
   email: z.string().email().optional(),
   extension: z.string().max(32).optional(),
   assignedNumber: z.string().max(64).optional(),
+  telephonyLineId: z.string().uuid().nullable().optional(),
 });
 
 export async function dashboard(_req: Request, res: Response) {
@@ -27,6 +29,11 @@ export async function dashboard(_req: Request, res: Response) {
 export async function listAgents(_req: Request, res: Response) {
   const agents = await adminService.listAgents();
   return res.json(agents);
+}
+
+export async function listTelephonyLines(_req: Request, res: Response) {
+  const lines = await adminService.listTelephonyLines();
+  return res.json(lines);
 }
 
 export async function createAgent(req: Request, res: Response) {
