@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String // "ADMIN" or "AGENT"
+  status       String   @default("OFFLINE") // "ONLINE", "OFFLINE", "BUSY"
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  agent        Agent?
+}
+
+model Agent {
+  id              String            @id @default(uuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  extension       String?
+  assignedNumber  String?
+  status          String            @default("OFFLINE")
+  lastSeenAt      DateTime          @default(now())
+  calls           Call[]
+  routingRules    CallRoutingRule[]
+  assignedClients Client[]
+  clientNotes     ClientNote[]
+  clientTasks     ClientTask[]
+  dispositions    CallDisposition[]
+}
+
+model Client {
+  id              String   @id @default(uuid())
+  name            String
+  phone           String   @unique
+  email           String?
+  city            String?
+  company         String?
+  matterType      String?
+  source          String?
+  stage           String   @default("New Lead")
+  score           Int      @default(0)
+  priority        String   @default("Medium")
+  status          String   @default("Active")
+  assignedAgentId String?
+  assignedAgent   Agent?   @relation(fields: [assignedAgentId], references: [id])
+  nextFollowUpAt  DateTime?
+  lastContactedAt DateTime?
+  lastOutcome     String?
+  tags            String?
+  notes           ClientNote[]
+  tasks           ClientTask[]
+  studyMaterials  StudyMaterial[]
+  predictions     LeadPrediction[]
+  calls           Call[]
+  dispositions    CallDisposition[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ClientNote {
+  id        String   @id @default(uuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  callId    String?
+  call      Call?    @relation(fields: [callId], references: [id])
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id])
+  content   String
+  noteType  String
+  isPrivate Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ClientTask {
+  id          String   @id @default(uuid())
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id])
+  title       String
+  description String?
+  dueAt       DateTime
+  status      String   @default("PENDING")
+  taskType    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StudyMaterial {
+  id          String   @id @default(uuid())
+  title       String
+  category    String
+  description String?
+  content     String?
+  fileUrl     String?
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LeadPrediction {
+  id             String   @id @default(uuid())
+  clientId       String
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  score          Int
+  recommendation String
+  urgency        String
+  reasonJson     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model CallDisposition {
+  id             String   @id @default(uuid())
+  callId         String   @unique
+  call           Call     @relation(fields: [callId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+  outcome        String
+  stageAfterCall String?
+  nextFollowUpAt DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Call {
+  id           String           @id @default(uuid())
+  direction    String
+  status       String // includes REJECTED for telephony simulation
+  agentId      String?
+  agent        Agent?           @relation(fields: [agentId], references: [id])
+  clientId     String?
+  client       Client?          @relation(fields: [clientId], references: [id])
+  phoneNumber  String
+  startedAt    DateTime         @default(now())
+  endedAt      DateTime?
+  duration     Int?
+  recordingUrl String?
+  notes        String?
+  createdAt    DateTime         @default(now())
+  events       CallEvent[]
+  clientNotes  ClientNote[]
+  disposition  CallDisposition?
+}
+
+model CallEvent {
+  id        String   @id @default(uuid())
+  callId    String
+  call      Call     @relation(fields: [callId], references: [id], onDelete: Cascade)
+  eventType String
+  payload   String?
+  createdAt DateTime @default(now())
+}
+
+model CallRoutingRule {
+  id         String   @id @default(uuid())
+  name       String
+  priority   Int      @default(0)
+  agentId    String?
+  agent      Agent?   @relation(fields: [agentId], references: [id])
+  active     Boolean  @default(true)
+  ruleConfig String
+  createdAt  DateTime @default(now())
+}
+
+model Webhook {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  secret    String?
+  events    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

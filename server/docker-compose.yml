@@ -1,0 +1,16 @@
+# Local PostgreSQL for development (optional). Production: use a managed DB or install Postgres on the VPS.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: callflow
+      POSTGRES_PASSWORD: callflow
+      POSTGRES_DB: callflow
+    ports:
+      - '5432:5432'
+    volumes:
+      - callflow_pgdata:/var/lib/postgresql/data
+
+volumes:
+  callflow_pgdata:

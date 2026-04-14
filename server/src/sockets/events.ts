@@ -1,0 +1,20 @@
+/** Socket.IO event names used by the server (aligned with the React client). */
+export const SocketEvents = {
+  authenticate: 'authenticate',
+  authenticated: 'authenticated',
+  unauthorized: 'unauthorized',
+  agent_status_changed: 'agent_status_changed',
+  client_created: 'client_created',
+  client_updated: 'client_updated',
+  note_created: 'note_created',
+  task_created: 'task_created',
+  task_updated: 'task_updated',
+  task_completed: 'task_completed',
+  call_started: 'call_started',
+  call_connected: 'call_connected',
+  call_ended: 'call_ended',
+  incoming_call: 'incoming_call',
+  call_created: 'call_created',
+  call_updated: 'call_updated',
+  disposition_saved: 'disposition_saved',
+} as const;
