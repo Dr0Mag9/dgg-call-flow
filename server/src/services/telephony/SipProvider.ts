@@ -1,5 +1,4 @@
 import { TelephonyService, CallRequest } from './TelephonyService.js';
-import { prisma } from '../../config/prisma.js';
 
 export class SipProvider implements TelephonyService {
   async initiateOutboundCall(req: CallRequest) {

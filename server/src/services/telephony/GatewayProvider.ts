@@ -49,7 +49,7 @@ export class GatewayProvider implements TelephonyService {
   }
 
   async transferCall(callId: string, targetNumber: string) {
-    console.warn('[Gateway Provider] Call transfer via native Android gateway is limited');
+    console.warn(`[Gateway Provider] Call transfer for ${callId} to ${targetNumber} via native Android gateway is limited`);
   }
 }
 

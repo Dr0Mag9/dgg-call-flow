@@ -72,7 +72,7 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
       where: { id: call.id },
       data: { status: 'FAILED' }
     });
-    return { ok: false as const, error: result.error || 'Telephony provider failed to initiate call' };
+    return { ok: false as const, error: (result as { error?: string }).error || 'Telephony provider failed to initiate call' };
   }
 
   // Update call with provider ref
