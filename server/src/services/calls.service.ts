@@ -197,12 +197,7 @@ export async function hangupCall(callId: string) {
     ? Math.floor((Date.now() - existingCall.startedAt.getTime()) / 1000)
     : 0;
 
-  const autoRecordSetting = await prisma.systemSetting.findUnique({ where: { key: 'auto_record' } });
-  const isAutoRecordEnabled = autoRecordSetting?.value === 'true';
-  const recordingUrl =
-    isAutoRecordEnabled && !existingCall.recordingUrl
-      ? `https://storage.googleapis.com/my-advocate-recordings/call_${callId}.mp3`
-      : existingCall.recordingUrl;
+  const recordingUrl = existingCall.recordingUrl;
 
   const call = await prisma.call.update({
     where: { id: callId },
