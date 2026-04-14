@@ -235,6 +235,17 @@ export async function saveDisposition(
     });
   }
 
+  // Create a ClientNote so it appears in the Client Drawer notes tab
+  await prisma.clientNote.create({
+    data: {
+      clientId: call.clientId,
+      callId,
+      agentId: agent.id,
+      content: `Call Outcome: ${body.outcome}${body.notes ? '\n\n' + body.notes.trim() : ''}`,
+      noteType: 'Call Record',
+    }
+  });
+
   broadcast('disposition_saved', disposition);
   fireWebhooks('disposition_saved', disposition).catch(() => undefined);
 

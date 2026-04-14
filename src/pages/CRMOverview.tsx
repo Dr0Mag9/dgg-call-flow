@@ -146,14 +146,15 @@ export default function CRMOverview() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Contact</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Follow-up</th>
                 <th className="px-6 py-3 relative"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
-                <tr><td colSpan={8} className="px-6 py-8 text-center text-gray-500">Loading clients...</td></tr>
+                <tr><td colSpan={9} className="px-6 py-8 text-center text-gray-500">Loading clients...</td></tr>
               ) : filteredClients.length === 0 ? (
-                <tr><td colSpan={8} className="px-6 py-8 text-center text-gray-500">No clients found</td></tr>
+                <tr><td colSpan={9} className="px-6 py-8 text-center text-gray-500">No clients found</td></tr>
               ) : (
                 filteredClients.map((client) => (
                   <tr 
@@ -204,6 +205,9 @@ export default function CRMOverview() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {client.lastContactedAt ? format(new Date(client.lastContactedAt), 'MMM d, yyyy') : 'Never'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                      {client.nextFollowUpAt ? format(new Date(client.nextFollowUpAt), 'MMM d, h:mm a') : '--'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button className="text-gray-400 hover:text-gray-600">

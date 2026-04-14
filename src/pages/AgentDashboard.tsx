@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Phone, Clock, PhoneMissed, PhoneIncoming, CheckSquare, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, startOfDay } from 'date-fns';
 import Dialer from './Dialer';
 
 export default function AgentDashboard() {
   const { user, token, setSelectedClient, setClientDrawerOpen } = useAppStore();
   const [calls, setCalls] = useState<any[]>([]);
+  const [allCalls, setAllCalls] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
 
   useEffect(() => {
@@ -14,7 +15,10 @@ export default function AgentDashboard() {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
-      .then(data => setCalls(data.slice(0, 5)))
+      .then(data => {
+        setAllCalls(data);
+        setCalls(data.slice(0, 5));
+      })
       .catch(console.error);
 
     fetch('/api/tasks', {
@@ -133,15 +137,25 @@ export default function AgentDashboard() {
               <dl className="space-y-4">
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-500">Calls Today</dt>
-                  <dd className="text-sm font-medium text-gray-900">12</dd>
+                  <dd className="text-sm font-medium text-gray-900">
+                    {allCalls.filter(c => new Date(c.startedAt) >= startOfDay(new Date())).length}
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-500">Avg Duration</dt>
-                  <dd className="text-sm font-medium text-gray-900">4m 12s</dd>
+                  <dd className="text-sm font-medium text-gray-900">
+                    {(() => {
+                      const totalSec = allCalls.reduce((acc, c) => acc + (c.duration || 0), 0);
+                      const avg = allCalls.length ? Math.floor(totalSec / allCalls.length) : 0;
+                      return `${Math.floor(avg / 60)}m ${avg % 60}s`;
+                    })()}
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-500">Missed</dt>
-                  <dd className="text-sm font-medium text-red-600">1</dd>
+                  <dd className="text-sm font-medium text-red-600">
+                    {allCalls.filter(c => c.status === 'MISSED').length}
+                  </dd>
                 </div>
               </dl>
             </div>

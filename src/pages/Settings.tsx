@@ -117,12 +117,48 @@ export default function Settings() {
             <h3 className="text-lg font-medium text-gray-900 mb-4">Telephony Configuration</h3>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">SIP Provider URL</label>
-                <input disabled={!isAdmin} type="text" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" defaultValue="wss://sip.example.com" />
+                <label className="block text-sm font-medium text-gray-700">SIP Provider WSS URL</label>
+                <input 
+                  disabled={!isAdmin} 
+                  type="text" 
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
+                  defaultValue={systemSettings.sip_wss_url || ''} 
+                  onBlur={(e) => updateSystemSetting('sip_wss_url', e.target.value)}
+                  placeholder="wss://sip.example.com" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">SIP Domain / Proxy</label>
+                <input 
+                  disabled={!isAdmin} 
+                  type="text" 
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
+                  defaultValue={systemSettings.sip_domain || ''} 
+                  onBlur={(e) => updateSystemSetting('sip_domain', e.target.value)}
+                  placeholder="sip.example.com" 
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Main Business Number</label>
-                <input disabled={!isAdmin} type="text" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" defaultValue="+15550000000" />
+                <input 
+                  disabled={!isAdmin} 
+                  type="text" 
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
+                  defaultValue={systemSettings.main_business_number || ''} 
+                  onBlur={(e) => updateSystemSetting('main_business_number', e.target.value)}
+                  placeholder="+15550000000" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">SIP Default Password</label>
+                <input 
+                  disabled={!isAdmin} 
+                  type="password" 
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
+                  defaultValue={systemSettings.sip_default_password || ''} 
+                  onBlur={(e) => updateSystemSetting('sip_default_password', e.target.value)}
+                  placeholder="Password for SIP extensions" 
+                />
               </div>
             </div>
           </div>
@@ -264,9 +300,7 @@ export default function Settings() {
 
           {isAdmin && (
             <div className="border-t border-gray-200 pt-8 flex justify-end">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                Save Changes
-              </button>
+              <span className="text-sm text-gray-500 pt-2 mr-4">All settings auto-save as you type.</span>
             </div>
           )}
 
