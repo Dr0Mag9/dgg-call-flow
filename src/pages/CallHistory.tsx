@@ -59,6 +59,7 @@ export default function CallHistory() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client / Number</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agent</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Line</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recording</th>
@@ -68,9 +69,9 @@ export default function CallHistory() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
-                <tr><td colSpan={7} className="px-6 py-8 text-center text-gray-500">Loading call history...</td></tr>
+                <tr><td colSpan={9} className="px-6 py-8 text-center text-gray-500">Loading call history...</td></tr>
               ) : filteredCalls.length === 0 ? (
-                <tr><td colSpan={7} className="px-6 py-8 text-center text-gray-500">No calls found</td></tr>
+                <tr><td colSpan={9} className="px-6 py-8 text-center text-gray-500">No calls found</td></tr>
               ) : (
                 filteredCalls.map((call) => (
                   <tr key={call.id} className="hover:bg-gray-50">
@@ -87,6 +88,10 @@ export default function CallHistory() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{call.agent?.user?.name || 'Unassigned'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 font-mono">{call.assignedLine || '--'}</div>
+                      {call.providerType && <div className="text-xs text-gray-500 text-center bg-gray-100 rounded px-1 mt-1 inline-block">{call.providerType}</div>}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{format(new Date(call.startedAt), 'MMM d, yyyy')}</div>

@@ -4,6 +4,8 @@ import { logger } from '../utils/logger.js';
 import { broadcast, emitToAdmins, emitToUser } from './notification.service.js';
 import { fireWebhooks } from './webhooks.service.js';
 import { pickInboundAgent } from './callRouting.service.js';
+import { sipProvider } from './telephony/SipProvider.js';
+import { gatewayProvider } from './telephony/GatewayProvider.js';
 
 const outboundTimers = new Map<string, NodeJS.Timeout>();
 
@@ -31,8 +33,16 @@ export async function listCalls(userId: string, role: string) {
 }
 
 export async function createOutboundCall(userId: string, phoneNumber: string, clientId?: string) {
-  const agent = await prisma.agent.findUnique({ where: { userId } });
+  const agent = await prisma.agent.findUnique({ 
+    where: { userId },
+    include: { telephonyLine: true }
+  });
+  
   if (!agent) return { ok: false as const, error: 'Agent not found' };
+  
+  if (!agent.telephonyLine) {
+    return { ok: false as const, error: 'No authorized Indian business line assigned to this agent.' };
+  }
 
   const call = await prisma.call.create({
     data: {
@@ -41,17 +51,46 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
       phoneNumber: phoneNumber.trim(),
       clientId: clientId || undefined,
       agentId: agent.id,
+      assignedLine: agent.telephonyLine.number,
+      callerIdShown: agent.telephonyLine.number,
+      providerType: agent.telephonyLine.providerType,
     },
     include: { client: true, agent: { include: { user: { select: { name: true } } } }, disposition: true },
   });
 
-  emitToUser(userId, 'call_started', call);
-  emitToAdmins('call_created', call);
-  fireWebhooks('call_started', call).catch(() => undefined);
+  const provider = agent.telephonyLine.providerType === 'GATEWAY' ? gatewayProvider : sipProvider;
+  
+  const result = await provider.initiateOutboundCall({
+    callId: call.id,
+    agentId: agent.id,
+    phoneNumber: phoneNumber.trim(),
+    lineId: agent.telephonyLine.id
+  });
 
+  if (!result.success) {
+    await prisma.call.update({
+      where: { id: call.id },
+      data: { status: 'FAILED' }
+    });
+    return { ok: false as const, error: result.error || 'Telephony provider failed to initiate call' };
+  }
+
+  // Update call with provider ref
+  const updatedCall = await prisma.call.update({
+    where: { id: call.id },
+    data: { providerRef: result.externalId },
+    include: { client: true, agent: { include: { user: { select: { name: true } } } }, disposition: true },
+  });
+
+  emitToUser(userId, 'call_started', updatedCall);
+  emitToAdmins('call_created', updatedCall);
+  fireWebhooks('call_started', updatedCall).catch(() => undefined);
+
+  // In a real integration, the provider events (SIP progression or Gateway WS events) 
+  // will handle the CONNECTED state transition. For mock flow, we retain the schedule out.
   scheduleOutboundConnect(call.id, userId);
 
-  return { ok: true as const, call };
+  return { ok: true as const, call: updatedCall };
 }
 
 function scheduleOutboundConnect(callId: string, userId: string) {

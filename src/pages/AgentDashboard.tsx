@@ -3,6 +3,7 @@ import { useAppStore } from '../store/useAppStore';
 import { Phone, Clock, PhoneMissed, PhoneIncoming, CheckSquare, Calendar } from 'lucide-react';
 import { format, startOfDay } from 'date-fns';
 import Dialer from './Dialer';
+import TelephonyStatusPanel from '../components/TelephonyStatusPanel';
 
 export default function AgentDashboard() {
   const { user, token, setSelectedClient, setClientDrawerOpen } = useAppStore();
@@ -53,6 +54,8 @@ export default function AgentDashboard() {
           </div>
         </div>
       </div>
+
+      <TelephonyStatusPanel />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         

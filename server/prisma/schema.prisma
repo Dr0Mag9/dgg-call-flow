@@ -26,6 +26,8 @@ model Agent {
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   extension       String?
   assignedNumber  String?
+  telephonyLineId String?
+  telephonyLine   TelephonyLine?    @relation(fields: [telephonyLineId], references: [id])
   status          String            @default("OFFLINE")
   lastSeenAt      DateTime          @default(now())
   calls           Call[]
@@ -148,9 +150,13 @@ model Call {
   phoneNumber  String
   startedAt    DateTime         @default(now())
   endedAt      DateTime?
-  duration     Int?
-  recordingUrl String?
-  notes        String?
+  duration      Int?
+  recordingUrl  String?
+  assignedLine  String?
+  callerIdShown String?
+  providerType  String? // "SIP" or "GATEWAY"
+  providerRef   String?
+  notes         String?
   createdAt    DateTime         @default(now())
   events       CallEvent[]
   clientNotes  ClientNote[]
@@ -192,5 +198,29 @@ model SystemSetting {
   id        String   @id @default(uuid())
   key       String   @unique
   value     String
+  updatedAt DateTime @updatedAt
+}
+
+model TelephonyLine {
+  id           String   @id @default(uuid())
+  number       String   @unique
+  providerType String   // "SIP" or "GATEWAY"
+  providerRef  String?
+  status       String   @default("ACTIVE")
+  gatewayId    String?
+  gateway      GatewayDevice? @relation(fields: [gatewayId], references: [id])
+  agents       Agent[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model GatewayDevice {
+  id        String   @id @default(uuid())
+  name      String
+  apiKey    String   @unique
+  status    String   @default("OFFLINE")
+  lastSeen  DateTime @default(now())
+  lines     TelephonyLine[]
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
