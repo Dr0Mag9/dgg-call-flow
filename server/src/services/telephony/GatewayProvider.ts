@@ -7,7 +7,6 @@ export class GatewayProvider implements TelephonyService {
   async initiateOutboundCall(req: CallRequest) {
     logger.info(`[Gateway Provider] Preparing call to ${req.phoneNumber} on line ${req.lineId}`);
 
-    // 1. Find the line and its assigned gateway
     const line = await prisma.telephonyLine.findUnique({
       where: { id: req.lineId },
       include: { gateway: true }
@@ -21,11 +20,9 @@ export class GatewayProvider implements TelephonyService {
       return { success: false, error: 'Target gateway device is offline' };
     }
 
-    // 2. Relay the signal via Socket.io
     const io = getIo();
     const gatewayRoom = `gateway_${line.gatewayId}`;
     
-    // Check if anyone is in the room
     const socketsInRoom = await io.in(gatewayRoom).fetchSockets();
     if (socketsInRoom.length === 0) {
       return { success: false, error: 'No active socket connection for gateway' };
@@ -46,16 +43,29 @@ export class GatewayProvider implements TelephonyService {
     };
   }
 
+  async registerIncomingCall(payload: any) {
+    logger.info('[Gateway Provider] Incoming call registration via gateway not yet implemented', payload);
+  }
+
+  async answerCall(callId: string) {
+    getIo().emit('gateway:command', { command: 'ANSWER', callId });
+  }
+
   async endCall(callId: string) {
-    const io = getIo();
-    // Broadcast to all gateways involved in this call (usually just one)
-    io.emit('gateway:command', {
-      command: 'HANGUP',
-      callId
-    });
+    getIo().emit('gateway:command', { command: 'HANGUP', callId });
+  }
+
+  async muteCall(callId: string, muted: boolean) {
+    logger.warn(`[Gateway Provider] Mute (${muted}) not supported on gateway bridge`);
+  }
+
+  async holdCall(callId: string, hold: boolean) {
+    logger.warn(`[Gateway Provider] Hold (${hold}) not supported on gateway bridge`);
   }
 
   async transferCall(callId: string, targetNumber: string) {
-    console.warn(`[Gateway Provider] Call transfer for ${callId} to ${targetNumber} via native Android gateway is limited`);
+    logger.warn(`[Gateway Provider] Transfer to ${targetNumber} not supported on gateway bridge`);
   }
 }
+
+export const gatewayProvider = new GatewayProvider();

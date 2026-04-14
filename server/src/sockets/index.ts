@@ -111,7 +111,9 @@ export function registerSocketHandlers() {
           broadcast('gateway_status_changed', { gatewayId, status: 'OFFLINE' });
           logger.info(`[Socket] Gateway disconnected: ${gatewayId}`);
         } catch (err) {
-          logger.error('socket disconnect gateway cleanup', err);
+          logger.error('socket disconnect gateway cleanup', {
+            message: err instanceof Error ? err.message : String(err)
+          });
         }
       }
     });
