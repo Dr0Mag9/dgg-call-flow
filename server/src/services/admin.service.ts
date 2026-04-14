@@ -71,7 +71,7 @@ export async function createAgent(data: {
         create: {
           extension,
           assignedNumber,
-          telephonyLineId: data.telephonyLineId || undefined,
+          ...(data.telephonyLineId && { telephonyLineId: data.telephonyLineId }),
         },
       },
     },
@@ -91,7 +91,7 @@ export async function updateAgent(
     data: {
       extension: data.extension,
       assignedNumber: data.assignedNumber,
-      telephonyLineId: data.telephonyLineId,
+      ...(data.telephonyLineId !== undefined && { telephonyLineId: data.telephonyLineId as any }),
       user: {
         update: {
           ...(data.name !== undefined && { name: data.name.trim() }),
