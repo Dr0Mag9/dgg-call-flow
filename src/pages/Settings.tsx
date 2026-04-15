@@ -107,44 +107,44 @@ export default function Settings() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-black text-pearl tracking-tight">System Core</h2>
-          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.2em] mt-1">Global Configuration & Protocols</p>
+          <h2 className="text-xl font-black text-pearl tracking-tight font-serif italic uppercase underline decoration-gold/30">System Nexus</h2>
+          <p className="text-gold-light/40 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">Global Configuration & Core Protocols</p>
         </div>
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="luxury-card overflow-hidden border-gold/10"
       >
-        <div className="p-10 space-y-12 bg-navy/20">
+        <div className="p-6 space-y-10 bg-navy/20">
           
           <section>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
-                  <PhoneCall className="w-5 h-5 text-gold" />
+                <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
+                  <PhoneCall className="w-4 h-4 text-gold" />
                 </div>
-                <h3 className="text-xl font-bold text-pearl tracking-tight uppercase tracking-widest text-sm">Telephony Infrastructure</h3>
+                <h3 className="text-sm font-black text-pearl tracking-tight uppercase tracking-[0.2em]">Telephony Infrastructure</h3>
               </div>
-              {!isAdmin && <span className="px-3 py-1 bg-red-500/10 text-red-400 text-[10px] font-black rounded-lg border border-red-500/20 tracking-widest">RESTRICTED ACCESS</span>}
+              {!isAdmin && <span className="px-2 py-0.5 bg-red-500/10 text-red-400 text-[8px] font-black rounded border border-red-500/20 tracking-widest">RESTRICTED</span>}
             </div>
             
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {[
                 { label: "SIP Provider WSS URL", key: "sip_wss_url", placeholder: "wss://sip.vault.com", type: "text" },
                 { label: "SIP Domain / Proxy", key: "sip_domain", placeholder: "sip.vault.com", type: "text" },
                 { label: "Main Business Number", key: "main_business_number", placeholder: "+1-800-GOLD-LINE", type: "text" },
                 { label: "SIP Default Secure Key", key: "sip_default_password", placeholder: "Enter Encryption Key", type: "password" },
               ].map((field) => (
-                <div key={field.key} className="space-y-2">
-                  <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">{field.label}</label>
+                <div key={field.key} className="space-y-1.5">
+                  <label className="block text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">{field.label}</label>
                   <input 
                     disabled={!isAdmin} 
                     type={field.type} 
-                    className="w-full bg-navy/40 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10 disabled:opacity-30 disabled:cursor-not-allowed" 
+                    className="w-full bg-navy/40 border border-gold/10 rounded-xl p-2.5 text-xs text-pearl focus:ring-1 focus:ring-gold/30 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10 italic disabled:opacity-30" 
                     defaultValue={systemSettings[field.key] || ''} 
                     onBlur={(e) => updateSystemSetting(field.key, e.target.value)}
                     placeholder={field.placeholder} 
@@ -152,48 +152,50 @@ export default function Settings() {
                 </div>
               ))}
             </div>
-          </section>section
+          </section>
+section
 
-          <section className="border-t border-gold/10 pt-12">
-            <div className="flex items-center justify-between mb-8">
+          <section className="border-t border-gold/10 pt-10">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
-                  <Cpu className="w-5 h-5 text-gold" />
+                <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
+                  <Cpu className="w-4 h-4 text-gold" />
                 </div>
-                <h3 className="text-xl font-bold text-pearl tracking-tight uppercase tracking-widest text-sm">Autonomous Intelligence</h3>
+                <h3 className="text-sm font-black text-pearl tracking-tight uppercase tracking-[0.2em]">Autonomous Intelligence</h3>
               </div>
-              {!isAdmin && <span className="px-3 py-1 bg-red-500/10 text-red-400 text-[10px] font-black rounded-lg border border-red-500/20 tracking-widest">RESTRICTED ACCESS</span>}
+              {!isAdmin && <span className="px-2 py-0.5 bg-red-500/10 text-red-400 text-[8px] font-black rounded border border-red-500/20 tracking-widest">RESTRICTED</span>}
             </div>
             
-            <div className="luxury-card p-6 bg-gold/5 border-gold/20">
+            <div className="luxury-card p-4 bg-gold/5 border-gold/10">
               <div className="flex items-start">
-                <div className="flex items-center h-6">
+                <div className="flex items-center h-5">
                   <input 
                     id="route_available" 
                     type="checkbox" 
                     disabled={!isAdmin}
                     checked={systemSettings.route_available === 'true'}
                     onChange={e => updateSystemSetting('route_available', e.target.checked)}
-                    className="w-5 h-5 rounded-lg border-2 border-gold/20 bg-navy text-gold focus:ring-gold/20 transition-all cursor-pointer disabled:opacity-20" 
+                    className="w-4 h-4 rounded-lg border-2 border-gold/20 bg-navy text-gold focus:ring-gold/20 cursor-pointer disabled:opacity-20" 
                   />
                 </div>
-                <div className="ml-4">
-                  <label htmlFor="route_available" className="text-sm font-bold text-pearl uppercase tracking-widest">Proprietary Load Balancing</label>
-                  <p className="text-gold-light/40 text-xs mt-1 leading-relaxed">Incoming signals will be autonomously routed to the executor with the highest idle state efficiency.</p>
+                <div className="ml-3">
+                  <label htmlFor="route_available" className="text-[10px] font-black text-pearl uppercase tracking-widest">Proprietary Load Balancing</label>
+                  <p className="text-gold-light/30 text-[9px] mt-0.5 leading-relaxed font-bold italic">Incoming signals will be autonomously routed via peak-efficiency algorithms.</p>
                 </div>
               </div>
             </div>
-          </section>section
+          </section>
+section
 
-          <section className="border-t border-gold/10 pt-12">
-            <div className="flex justify-between items-center mb-8">
+          <section className="border-t border-gold/10 pt-10">
+            <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
-                  <Globe className="w-5 h-5 text-gold" />
+                <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
+                  <Globe className="w-4 h-4 text-gold" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-pearl tracking-tight uppercase tracking-widest text-sm">External API Bridges</h3>
-                  <p className="text-gold-light/40 text-[10px] font-bold uppercase tracking-widest mt-1">Real-time Wealth Data Sync</p>
+                  <h3 className="text-sm font-black text-pearl tracking-tight uppercase tracking-[0.2em]">External API Bridges</h3>
+                  <p className="text-gold-light/40 text-[8px] font-bold uppercase tracking-widest mt-0.5">Real-time Wealth Data Sync</p>
                 </div>
               </div>
               {isAdmin && !isAdding && (
@@ -201,9 +203,9 @@ export default function Settings() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsAdding(true)}
-                  className="luxury-button text-[10px] py-2 px-4 flex items-center gap-2"
+                  className="luxury-button text-[9px] py-2 px-4 flex items-center gap-2"
                 >
-                  <Plus className="w-4 h-4" /> Link New Terminal
+                  <Plus className="w-3.5 h-3.5" /> Link Terminal
                 </motion.button>
               )}
             </div>
@@ -305,12 +307,12 @@ export default function Settings() {
           </section>section
 
           {isAdmin && (
-            <div className="pt-12 flex justify-end items-center gap-4">
+            <div className="pt-8 flex justify-end items-center gap-4">
               <div className="flex flex-col items-end">
-                <span className="text-[10px] text-gold-deep font-black tracking-widest uppercase mb-1">Status Report</span>
-                <span className="text-xs text-gold-light/40 font-bold italic">Protocols are autonomously synchronized in real-time.</span>
+                <span className="text-[9px] text-gold-deep font-black tracking-widest uppercase mb-0.5 underline decoration-gold/20">Integrity Report</span>
+                <span className="text-[8px] text-gold-light/30 font-bold italic uppercase tracking-tighter">Sync Active • Protocols Stable</span>
               </div>
-              <ShieldCheck className="w-10 h-10 text-gold/40" />
+              <ShieldCheck className="w-7 h-7 text-gold/30" />
             </div>
           )}
 

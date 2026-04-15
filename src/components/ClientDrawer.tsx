@@ -168,125 +168,128 @@ export default function ClientDrawer() {
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+        className="fixed inset-0 bg-navy/60 backdrop-blur-md z-40 transition-opacity duration-500"
         onClick={() => setClientDrawerOpen(false)}
       />
-      <div className="fixed inset-y-0 right-0 w-[600px] bg-white shadow-2xl z-50 flex flex-col transform transition-transform duration-300 ease-in-out">
+      <div className="fixed inset-y-0 right-0 w-[550px] bg-navy/40 backdrop-blur-3xl border-l border-gold/30 shadow-2xl z-50 flex flex-col transform transition-transform duration-500 ease-in-out relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-transparent pointer-events-none" />
+        
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-start bg-slate-50">
-          <div className="flex gap-4">
-            <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-2xl font-bold">
+        <div className="px-6 py-4 border-b border-gold/10 flex justify-between items-start bg-navy/40 relative overflow-hidden group">
+          <img src="/assets/@digitalgrowthgurus (1).jpg" className="absolute -right-4 -top-4 w-32 h-32 opacity-5 rotate-12 pointer-events-none group-hover:opacity-10 transition-opacity duration-1000" alt="" />
+          <div className="flex gap-5 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-light via-gold to-gold-deep border border-gold/40 flex items-center justify-center text-navy text-2xl font-black shadow-[0_0_20px_rgba(212,175,55,0.4)]">
               {selectedClient.name.charAt(0)}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{selectedClient.name}</h2>
-              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                <span className="flex items-center gap-1"><Building className="w-4 h-4" /> {selectedClient.company || 'No Company'}</span>
-                <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-500" /> Score: {selectedClient.score}</span>
+              <h2 className="text-xl font-black text-pearl tracking-tighter italic gold-text-gradient uppercase">{selectedClient.name}</h2>
+              <div className="flex items-center gap-4 mt-1 text-[10px] font-black uppercase tracking-widest text-gold-light/40">
+                <span className="flex items-center gap-1.5"><Building className="w-3.5 h-3.5 text-gold/60" /> {selectedClient.company || 'Private Asset'}</span>
+                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-gold/10 border border-gold/20 text-gold shimmer-text"><Star className="w-3 h-3 fill-gold" /> Rank: {selectedClient.score}</span>
               </div>
             </div>
           </div>
           <button 
             onClick={() => setClientDrawerOpen(false)}
-            className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+            className="p-2 hover:bg-gold/10 rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20 text-gold/40 hover:text-gold relative z-10"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Quick Actions */}
-        <div className="px-6 py-4 border-b border-gray-200 flex gap-3 bg-white">
+        <div className="px-6 py-3 border-b border-gold/10 flex gap-3 bg-navy/20 relative z-10">
           <button 
             onClick={handleCall}
             disabled={!!activeCall}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors disabled:opacity-50"
+            className="flex-1 luxury-button py-2 flex items-center justify-center gap-2 text-xs transition-all disabled:opacity-30 disabled:grayscale"
           >
-            <Phone className="w-5 h-5" /> Call Now
+            <Phone className="w-4 h-4" /> Call Now
           </button>
           <button 
             onClick={() => setIsEmailModalOpen(true)}
-            className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors"
+            className="flex-1 bg-gold/5 border border-gold/20 hover:border-gold/40 text-gold-light py-2 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all hover:bg-gold/10"
           >
-            <Mail className="w-5 h-5" /> Email
+            <Mail className="w-4 h-4" /> Email
           </button>
           <button 
             onClick={() => setIsMeetingModalOpen(true)}
-            className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors border border-gray-200"
+            className="flex-1 bg-gold/5 border border-gold/20 hover:border-gold/40 text-gold-light py-2 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all hover:bg-gold/10"
           >
-            <Calendar className="w-5 h-5" /> Meeting
+            <Calendar className="w-4 h-4" /> Meeting
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="px-6 border-b border-gray-200 bg-white">
+        <div className="px-6 border-b border-gold/10 bg-navy/20 relative z-10">
           <nav className="flex gap-6">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 text-sm font-medium border-b-2 transition-colors ${
+                className={`py-3 text-[10px] font-black uppercase tracking-[0.2em] border-b border-transparent transition-all relative ${
                   activeTab === tab.id 
-                    ? 'border-blue-600 text-blue-600' 
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'text-gold' 
+                    : 'text-gold-light/20 hover:text-gold-light'
                 }`}
               >
                 {tab.name}
+                {activeTab === tab.id && (
+                  <motion.div 
+                    layoutId="drawer-tab"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold shadow-[0_0_10px_rgba(212,175,55,0.8)]"
+                  />
+                )}
               </button>
             ))}
           </nav>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <div className="flex-1 overflow-y-auto bg-navy/10 p-4 custom-scrollbar relative z-10">
           {loading ? (
-            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>
+            <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold/40"></div></div>
           ) : !clientDetails ? (
-            <div className="text-center py-10 text-gray-500">Failed to load details</div>
+            <div className="text-center py-10 text-gold-light/20 font-black uppercase tracking-widest text-[10px] italic">Failed to synchronise asset details</div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               
               {/* OVERVIEW TAB */}
               {activeTab === 'overview' && (
                 <>
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Contact Information</h3>
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-6">
-                      <div>
-                        <span className="block text-xs text-gray-500 mb-1">Phone</span>
-                        <span className="text-sm font-medium text-gray-900">{clientDetails.phone}</span>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-gray-500 mb-1">Email</span>
-                        <span className="text-sm font-medium text-gray-900">{clientDetails.email || '--'}</span>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-gray-500 mb-1">City</span>
-                        <span className="text-sm font-medium text-gray-900">{clientDetails.city || '--'}</span>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-gray-500 mb-1">Matter Type</span>
-                        <span className="text-sm font-medium text-gray-900">{clientDetails.matterType || '--'}</span>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-gray-500 mb-1">Source</span>
-                        <span className="text-sm font-medium text-gray-900">{clientDetails.source || '--'}</span>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-gray-500 mb-1">Assigned Agent</span>
-                        <span className="text-sm font-medium text-gray-900">{clientDetails.assignedAgent?.user?.name || 'Unassigned'}</span>
-                      </div>
+                  <div className="luxury-card-gold p-4 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-gold/10 transition-colors" />
+                    <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                       <CheckCircle className="w-3.5 h-3.5" /> Contact Information
+                    </h3>
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-6 relative z-10">
+                      {[
+                        { label: 'Coordinates (Phone)', value: clientDetails.phone },
+                        { label: 'Digital Identity (Email)', value: clientDetails.email || '--' },
+                        { label: 'Regional Sector (City)', value: clientDetails.city || '--' },
+                        { label: 'Matter Category', value: clientDetails.matterType || '--' },
+                        { label: 'Acquisition Source', value: clientDetails.source || '--' },
+                        { label: 'Assigned Executor', value: clientDetails.assignedAgent?.user?.name || 'Unassigned' },
+                      ].map((item) => (
+                        <div key={item.label}>
+                          <span className="block text-[8px] font-black text-gold-light/30 uppercase tracking-widest mb-1">{item.label}</span>
+                          <span className="text-[11px] font-black text-pearl italic tracking-tight">{item.value}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Pipeline Status</h3>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-medium text-gray-700">Current Stage</span>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">{clientDetails.stage}</span>
+                  <div className="luxury-card-gold p-4 relative overflow-hidden group">
+                    <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                       <Activity className="w-3.5 h-3.5" /> Pipeline Status
+                    </h3>
+                    <div className="flex items-center justify-between mb-3 relative z-10">
+                      <span className="text-[10px] font-black text-pearl/60 uppercase tracking-widest">Current Stage</span>
+                      <span className="px-3 py-1 bg-gold/10 text-gold rounded-lg text-[9px] font-black uppercase tracking-[0.2em] border border-gold/20 shimmer-text">{clientDetails.stage}</span>
                     </div>
                     {/* Visual Pipeline */}
-                    <div className="flex h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="w-1/4 bg-blue-500"></div>
+                    <div className="flex h-1.5 bg-navy rounded-full overflow-hidden border border-gold/10 relative z-10">
+                      <div className="w-1/3 bg-gradient-to-r from-gold via-gold-light to-gold shadow-[0_0_10px_rgba(212,175,55,0.5)]"></div>
                     </div>
                   </div>
                 </>
@@ -295,51 +298,51 @@ export default function ClientDrawer() {
               {/* NOTES TAB */}
               {activeTab === 'notes' && (
                 <div className="space-y-4">
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                  <div className="luxury-card-gold p-3 border-gold/40">
                     <textarea 
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
-                      placeholder="Add a note..." 
-                      className="w-full border-0 focus:ring-0 p-0 text-sm resize-none"
-                      rows={3}
+                      placeholder="Append secure transmission note..." 
+                      className="w-full bg-transparent border-0 focus:ring-0 p-0 text-xs text-pearl resize-none placeholder:text-gold-light/10 italic"
+                      rows={2}
                     />
-                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-gold/10">
                       <select 
                         value={noteType}
                         onChange={(e) => setNoteType(e.target.value)}
-                        className="text-sm border-gray-300 rounded-md py-1 pl-2 pr-8"
+                        className="text-[9px] font-black uppercase tracking-widest bg-navy/40 border-gold/20 rounded-lg py-1 pl-2 pr-8 text-gold-light outline-none focus:border-gold/50"
                       >
-                        <option value="general">General Note</option>
-                        <option value="objection">Objection</option>
-                        <option value="pricing">Pricing</option>
+                        <option value="general">Protocol Note</option>
+                        <option value="objection">Resistance Encountered</option>
+                        <option value="pricing">Value Conflict</option>
                       </select>
                       <button 
                         onClick={handleSaveNote}
                         disabled={isSavingNote || !newNote.trim()}
-                        className="bg-blue-600 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                        className="luxury-button py-1.5 px-4 text-[9px] font-black flex items-center gap-2"
                       >
-                        <Send className="w-4 h-4" /> {isSavingNote ? 'Saving...' : 'Save Note'}
+                        <Send className="w-3.5 h-3.5" /> {isSavingNote ? 'Syncing...' : 'Sync Note'}
                       </button>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {clientDetails.notes?.map((note: any) => (
-                      <div key={note.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                      <div key={note.id} className="luxury-card p-3 border-gold/10 group hover:border-gold/30 transition-all">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold">
+                            <div className="w-5 h-5 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-[8px] font-black text-gold uppercase">
                               {note.agent?.user?.name?.charAt(0) || '?'}
                             </div>
-                            <span className="text-sm font-medium text-gray-900">{note.agent?.user?.name || 'Unknown'}</span>
-                            <span className="text-xs text-gray-500">• {format(new Date(note.createdAt), 'MMM d, h:mm a')}</span>
+                            <span className="text-[9px] font-black text-pearl/80 uppercase tracking-widest">{note.agent?.user?.name || 'NODE'}</span>
+                            <span className="text-[8px] text-gold-light/20 font-black">• {format(new Date(note.createdAt), 'MMM d, h:mm a')}</span>
                           </div>
-                          <span className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-600 uppercase tracking-wider font-medium">{note.noteType}</span>
+                          <span className="text-[7px] px-1.5 py-0.5 bg-gold/5 border border-gold/10 rounded text-gold-light/40 uppercase tracking-[0.2em] font-black italic">{note.noteType}</span>
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                        <p className="text-[10px] text-pearl/70 leading-relaxed font-medium">{note.content}</p>
                       </div>
                     ))}
-                    {clientDetails.notes?.length === 0 && <p className="text-center text-gray-500 py-4">No notes yet.</p>}
+                    {clientDetails.notes?.length === 0 && <p className="text-center text-gold-light/10 text-[9px] font-black uppercase tracking-widest py-4 italic">No protocol logs found.</p>}
                   </div>
                 </div>
               )}
@@ -347,51 +350,49 @@ export default function ClientDrawer() {
               {/* TASKS TAB */}
               {activeTab === 'tasks' && (
                 <div className="space-y-4">
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="text-sm font-semibold text-gray-900">Add Task</h4>
-                    </div>
-                    <form onSubmit={handleScheduleMeeting} className="space-y-3">
+                  <div className="luxury-card-gold p-3 border-gold/40">
+                    <h4 className="text-[9px] font-black text-gold uppercase tracking-[0.3em] mb-3">Schedule Task</h4>
+                    <form onSubmit={handleScheduleMeeting} className="space-y-2">
                       <input 
                         required
                         type="text"
                         value={meetingTitle}
                         onChange={e => setMeetingTitle(e.target.value)}
-                        placeholder="Task title..."
-                        className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Task designation..."
+                        className="w-full bg-navy/40 border border-gold/20 rounded-lg p-2 text-xs text-pearl focus:border-gold/50 outline-none"
                       />
-                      <div className="flex gap-3">
+                      <div className="flex gap-2">
                         <input 
                           required
                           type="datetime-local"
                           value={meetingDate}
                           onChange={e => setMeetingDate(e.target.value)}
-                          className="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="flex-1 bg-navy/40 border border-gold/20 rounded-lg p-2 text-[10px] text-pearl focus:border-gold/50 outline-none"
                         />
                         <button 
                           type="submit"
                           disabled={isSavingMeeting || !meetingTitle || !meetingDate}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
+                          className="luxury-button px-4 text-[9px] font-black whitespace-nowrap"
                         >
-                          {isSavingMeeting ? 'Adding...' : 'Add Task'}
+                          {isSavingMeeting ? 'Assigning...' : 'Assign'}
                         </button>
                       </div>
                     </form>
                   </div>
 
                   {clientDetails.tasks?.length === 0 ? (
-                    <p className="text-center text-gray-500 py-4">No tasks scheduled.</p>
+                    <p className="text-center text-gold-light/10 text-[9px] font-black uppercase tracking-widest py-4 italic">No pending assignments.</p>
                   ) : (
                     clientDetails.tasks?.map((task: any) => (
-                      <div key={task.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-start gap-3">
-                        <CheckSquare className={`w-5 h-5 mt-0.5 ${task.status === 'COMPLETED' ? 'text-green-500' : 'text-gray-400'}`} />
-                        <div>
-                          <h4 className={`text-sm font-medium ${task.status === 'COMPLETED' ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                      <div key={task.id} className="luxury-card p-3 border-gold/10 flex items-start gap-3">
+                        <CheckSquare className={`w-4 h-4 mt-0.5 ${task.status === 'COMPLETED' ? 'text-gold' : 'text-gold-light/20'}`} />
+                        <div className="flex-1">
+                          <h4 className={`text-[10px] font-black uppercase tracking-widest ${task.status === 'COMPLETED' ? 'text-gold-light/20 line-through' : 'text-pearl'}`}>
                             {task.title}
                           </h4>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {format(new Date(task.dueAt), 'MMM d, h:mm a')}</span>
-                            <span className="uppercase tracking-wider font-medium">{task.taskType}</span>
+                          <div className="flex items-center gap-3 mt-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-gold-light/30">
+                            <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {format(new Date(task.dueAt), 'MMM d, h:mm a')}</span>
+                            <span className="text-gold italic">{task.taskType}</span>
                           </div>
                         </div>
                       </div>
@@ -404,17 +405,17 @@ export default function ClientDrawer() {
               {activeTab === 'calls' && (
                 <div className="space-y-4">
                   {clientDetails.calls?.length === 0 ? (
-                    <p className="text-center text-gray-500 py-4">No call history.</p>
+                    <p className="text-center text-gold-light/10 text-[9px] font-black uppercase tracking-widest py-4 italic">No transmission history.</p>
                   ) : (
                     clientDetails.calls?.map((call: any) => (
-                      <div key={call.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                      <div key={call.id} className="luxury-card p-3 border-gold/10 flex items-center justify-between group hover:border-gold/30 transition-all">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-full ${call.direction === 'INBOUND' ? 'bg-indigo-100 text-indigo-600' : 'bg-purple-100 text-purple-600'}`}>
-                            <Phone className="w-4 h-4" />
+                          <div className={`p-2 rounded-lg border ${call.direction === 'INBOUND' ? 'bg-gold/10 text-gold border-gold/30' : 'bg-gold-light/10 text-gold-light border-gold-light/20'}`}>
+                            <Phone className="w-3.5 h-3.5" />
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{call.direction} Call</div>
-                            <div className="text-xs text-gray-500">{format(new Date(call.startedAt), 'MMM d, h:mm a')}</div>
+                            <div className="text-[10px] font-black text-pearl uppercase tracking-widest">{call.direction} CALL</div>
+                            <div className="text-[8px] text-gold-light/30 font-black flex items-center gap-2 mt-0.5 uppercase tracking-widest">{format(new Date(call.startedAt), 'MMM d, h:mm a')}</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -423,15 +424,14 @@ export default function ClientDrawer() {
                               href={call.recordingUrl} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
-                              title="Listen to recording"
+                              className="p-2 bg-gold/10 text-gold rounded-lg hover:bg-gold/20 transition-all border border-gold/20"
                             >
-                              <Play className="w-4 h-4 fill-current" />
+                              <Play className="w-3.5 h-3.5 fill-current" />
                             </a>
                           )}
                           <div className="text-right">
-                            <div className="text-sm font-medium text-gray-900">{call.duration ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s` : '-'}</div>
-                            <div className="text-xs text-gray-500">{call.status}</div>
+                            <div className="text-[10px] font-black text-pearl italic">{call.duration ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s` : '-'}</div>
+                            <div className="text-[8px] font-black text-gold uppercase tracking-[0.2em] shimmer-text">{call.status}</div>
                           </div>
                         </div>
                       </div>
@@ -443,35 +443,40 @@ export default function ClientDrawer() {
               {/* PREDICTIONS TAB */}
               {activeTab === 'predictions' && clientDetails.predictions?.[0] && (
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-xl shadow-sm p-6 text-white">
-                    <div className="flex items-center gap-3 mb-6">
-                      <Activity className="w-6 h-6 text-purple-300" />
-                      <h3 className="text-lg font-semibold">AI Lead Analysis</h3>
+                  <div className="luxury-card-gold p-6 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-gold/10 via-transparent to-transparent opacity-50" />
+                    <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-gold/40 to-transparent" />
+                    
+                    <div className="flex items-center gap-3 mb-6 relative z-10">
+                      <Activity className="w-5 h-5 text-gold animate-pulse" />
+                      <h3 className="text-xs font-black text-gold uppercase tracking-[0.3em] italic">AI Asset Analysis</h3>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-2 gap-6 mb-6 relative z-10">
                       <div>
-                        <span className="block text-purple-200 text-sm mb-1">Conversion Score</span>
-                        <div className="text-4xl font-bold">{clientDetails.predictions[0].score}/100</div>
+                        <span className="block text-gold-light/40 text-[9px] font-black uppercase tracking-widest mb-1.5">Conversion Matrix</span>
+                        <div className="text-4xl font-black text-pearl italic tracking-tighter shimmer-text">{clientDetails.predictions[0].score}/<span className="text-lg opacity-30 italic">100</span></div>
                       </div>
                       <div>
-                        <span className="block text-purple-200 text-sm mb-1">Urgency</span>
-                        <div className="text-xl font-semibold text-red-300">{clientDetails.predictions[0].urgency}</div>
+                        <span className="block text-gold-light/40 text-[9px] font-black uppercase tracking-widest mb-1.5">Urgency Pulse</span>
+                        <div className="text-lg font-black text-gold-light italic uppercase tracking-widest">{clientDetails.predictions[0].urgency}</div>
                       </div>
                     </div>
 
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                      <span className="block text-purple-200 text-sm mb-2">Recommended Action</span>
-                      <p className="font-medium text-lg">{clientDetails.predictions[0].recommendation}</p>
+                    <div className="bg-navy/40 border border-gold/20 rounded-xl p-4 relative z-10 backdrop-blur-md">
+                      <span className="block text-gold/60 text-[8px] font-black uppercase tracking-[0.3em] mb-2">Recommended Strategy</span>
+                      <p className="font-black text-pearl italic text-sm tracking-tight leading-relaxed">"{clientDetails.predictions[0].recommendation}"</p>
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Key Factors</h3>
-                    <ul className="space-y-3">
+                  <div className="luxury-card-gold p-4 relative overflow-hidden group">
+                    <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                       <CheckCircle className="w-3.5 h-3.5" /> Predictive Factors
+                    </h3>
+                    <ul className="space-y-3 relative z-10">
                       {JSON.parse(clientDetails.predictions[0].reasonJson).map((reason: string, i: number) => (
-                        <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                          <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+                        <li key={i} className="flex items-start gap-4 text-[10px] font-bold text-pearl/80 italic group/item">
+                          <div className="mt-1 w-1.5 h-1.5 rounded-full bg-gold/40 border border-gold shadow-[0_0_8px_rgba(212,175,55,0.6)] shrink-0 group-hover/item:scale-125 transition-transform" />
                           {reason}
                         </li>
                       ))}
@@ -487,50 +492,51 @@ export default function ClientDrawer() {
 
       {/* Schedule Meeting Modal */}
       {isMeetingModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-xl shadow-xl w-[400px] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-900">Schedule Meeting</h3>
-              <button onClick={() => setIsMeetingModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+        <div className="fixed inset-0 bg-navy/60 backdrop-blur-md flex items-center justify-center z-[60] transition-all duration-500">
+          <div className="luxury-card-gold w-[400px] overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-transparent pointer-events-none" />
+            <div className="px-6 py-4 border-b border-gold/10 flex justify-between items-center bg-navy/40 relative z-10">
+              <h3 className="text-xs font-black text-gold uppercase tracking-[0.3em] shimmer-text">Schedule Meeting</h3>
+              <button onClick={() => setIsMeetingModalOpen(false)} className="text-gold/40 hover:text-gold transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleScheduleMeeting} className="p-6 space-y-4">
+            <form onSubmit={handleScheduleMeeting} className="p-6 space-y-4 relative z-10">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Meeting Title *</label>
+                <label className="block text-[10px] font-black text-gold-light/40 uppercase tracking-widest mb-2">Meeting Title *</label>
                 <input 
                   required
                   type="text"
                   value={meetingTitle}
                   onChange={e => setMeetingTitle(e.target.value)}
-                  placeholder="e.g. Product Demo"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g. Asset Valuation"
+                  className="w-full bg-navy/40 border border-gold/20 rounded-xl p-2.5 text-xs text-pearl focus:border-gold/50 outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date & Time *</label>
+                <label className="block text-[10px] font-black text-gold-light/40 uppercase tracking-widest mb-2">Timestamp *</label>
                 <input 
                   required
                   type="datetime-local"
                   value={meetingDate}
                   onChange={e => setMeetingDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full bg-navy/40 border border-gold/20 rounded-xl p-2.5 text-xs text-pearl focus:border-gold/50 outline-none"
                 />
               </div>
               <div className="pt-4 flex justify-end gap-3">
                 <button 
                   type="button"
                   onClick={() => setIsMeetingModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium"
+                  className="px-4 py-2 text-[10px] font-black text-gold/40 hover:text-gold uppercase tracking-widest"
                 >
-                  Cancel
+                  Terminate
                 </button>
                 <button 
                   type="submit"
                   disabled={isSavingMeeting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+                  className="luxury-button px-6 py-2 text-[10px] font-black"
                 >
-                  {isSavingMeeting ? 'Scheduling...' : 'Schedule'}
+                  {isSavingMeeting ? 'Scheduling...' : 'Schedule Asset'}
                 </button>
               </div>
             </form>
@@ -539,59 +545,60 @@ export default function ClientDrawer() {
       )}
       {/* Send Email Modal */}
       {isEmailModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-xl shadow-xl w-[500px] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-900">Send Email to {clientDetails?.name}</h3>
-              <button onClick={() => setIsEmailModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+        <div className="fixed inset-0 bg-navy/60 backdrop-blur-md flex items-center justify-center z-[60] transition-all duration-500">
+          <div className="luxury-card-gold w-[550px] overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-transparent pointer-events-none" />
+            <div className="px-6 py-4 border-b border-gold/10 flex justify-between items-center bg-navy/40 relative z-10">
+              <h3 className="text-xs font-black text-gold uppercase tracking-[0.3em] shimmer-text">Encrypted Dispatch to {clientDetails?.name}</h3>
+              <button onClick={() => setIsEmailModalOpen(false)} className="text-gold/40 hover:text-gold transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleSendEmail} className="p-6 space-y-4">
+            <form onSubmit={handleSendEmail} className="p-6 space-y-4 relative z-10">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                <label className="block text-[10px] font-black text-gold-light/40 uppercase tracking-widest mb-2">Target Asset</label>
                 <input 
                   type="email"
                   value={clientDetails?.email || ''}
                   disabled
-                  className="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-gray-500"
+                  className="w-full bg-navy/20 border border-gold/10 rounded-xl p-2.5 text-xs text-gold-light/40 italic"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
+                <label className="block text-[10px] font-black text-gold-light/40 uppercase tracking-widest mb-2">Subject *</label>
                 <input 
                   required
                   type="text"
                   value={emailSubject}
                   onChange={e => setEmailSubject(e.target.value)}
-                  placeholder="e.g. Follow-up on your case"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Dispatch identifier..."
+                  className="w-full bg-navy/40 border border-gold/20 rounded-xl p-2.5 text-xs text-pearl focus:border-gold/50 outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                <label className="block text-[10px] font-black text-gold-light/40 uppercase tracking-widest mb-2">Transmission Message *</label>
                 <textarea 
                   required
                   value={emailBody}
                   onChange={e => setEmailBody(e.target.value)}
                   rows={6}
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  className="w-full bg-navy/40 border border-gold/20 rounded-xl p-2.5 text-xs text-pearl focus:border-gold/50 outline-none resize-none custom-scrollbar"
                 />
               </div>
               <div className="pt-4 flex justify-end gap-3">
                 <button 
                   type="button"
                   onClick={() => setIsEmailModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium"
+                  className="px-4 py-2 text-[10px] font-black text-gold/40 hover:text-gold uppercase tracking-widest"
                 >
-                  Cancel
+                  Abort
                 </button>
                 <button 
                   type="submit"
                   disabled={isSendingEmail || !clientDetails?.email}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                  className="luxury-button px-8 py-2 text-[10px] font-black flex items-center gap-2"
                 >
-                  <Send className="w-4 h-4" /> {isSendingEmail ? 'Sending...' : 'Send Email'}
+                  <Send className="w-4 h-4" /> {isSendingEmail ? 'Dispatching...' : 'Send Transmission'}
                 </button>
               </div>
             </form>

@@ -107,46 +107,46 @@ export default function AdminTelephony() {
 
   return (
     <div className="space-y-10 pb-12">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-black text-pearl tracking-tight font-serif italic text-white">Unified Telephony Matrix</h2>
-          <p className="text-gold-light/40 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Global Communication Infrastructure</p>
+          <h2 className="text-xl font-black text-pearl tracking-tight font-serif italic uppercase underline decoration-gold/30">Telephony Nexus</h2>
+          <p className="text-gold-light/40 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">Global Infrastructure Control</p>
         </div>
-        <div className="flex items-center gap-4 px-6 py-3 bg-gold/5 border border-gold/20 rounded-2xl">
-          <ShieldCheck className="w-5 h-5 text-gold" />
-          <span className="text-[10px] font-black text-gold-light uppercase tracking-widest">Quantum Encryption Active</span>
+        <div className="flex items-center gap-3 px-4 py-2 bg-gold/5 border border-gold/20 rounded-xl block">
+          <ShieldCheck className="w-4 h-4 text-gold" />
+          <span className="text-[9px] font-black text-gold-light uppercase tracking-widest">Protocol Encryption Active</span>
         </div>
       </div>
 
       {/* Global SIP Settings */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="luxury-card p-10 bg-navy/20 border-gold/10 relative overflow-hidden group"
+        className="luxury-card p-6 bg-navy/20 border-gold/10 relative overflow-hidden group"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full -mr-32 -mt-32" />
-        <h3 className="text-base font-black text-pearl mb-8 flex items-center gap-4 uppercase tracking-[0.2em]">
-          <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
-            <Cpu className="w-5 h-5 text-gold" />
+        <h3 className="text-[10px] font-black text-pearl mb-6 flex items-center gap-4 uppercase tracking-[0.3em]">
+          <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
+            <Cpu className="w-4 h-4 text-gold" />
           </div>
           Core SIP Protocol Configuration
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIP Master WSS URL</label>
+            <label className="block text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">SIP Master WSS URL</label>
             <input 
               type="text" 
-              className="w-full bg-navy/40 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" 
+              className="w-full bg-navy/40 border border-gold/10 rounded-xl p-2.5 text-xs text-pearl focus:ring-1 focus:ring-gold/30 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10 italic" 
               defaultValue={systemSettings.sip_wss_url}
               onBlur={(e) => updateSystemSetting('sip_wss_url', e.target.value)}
               placeholder="wss://sip.vault.com:443"
             />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIP Master Domain/Proxy</label>
+            <label className="block text-[8px] font-black text-gold/40 uppercase tracking-widest ml-1">SIP Master Domain/Proxy</label>
             <input 
               type="text" 
-              className="w-full bg-navy/40 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" 
+              className="w-full bg-navy/40 border border-gold/10 rounded-xl p-2.5 text-xs text-pearl focus:ring-1 focus:ring-gold/30 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10 italic" 
               defaultValue={systemSettings.sip_domain}
               onBlur={(e) => updateSystemSetting('sip_domain', e.target.value)}
               placeholder="sip.vault.com"
@@ -176,23 +176,23 @@ export default function AdminTelephony() {
           </div>
 
           <motion.div 
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="luxury-card overflow-hidden border-gold/10 flex flex-col h-[500px]"
+            className="luxury-card overflow-hidden border-gold/10 flex flex-col h-[350px]"
           >
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto flex-1 custom-scrollbar">
               <table className="min-w-full divide-y divide-gold/10">
                 <thead className="bg-navy/60">
                   <tr>
-                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Device Model</th>
-                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Signal Presence</th>
-                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Access Credentials</th>
-                    <th className="px-8 py-5 relative"></th>
+                    <th className="px-6 py-3 text-left text-[8px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Model</th>
+                    <th className="px-6 py-3 text-left text-[8px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Signal</th>
+                    <th className="px-6 py-3 text-left text-[8px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Key</th>
+                    <th className="px-6 py-3 relative"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gold/10 bg-navy/20">
+                <tbody className="divide-y divide-gold/5 bg-navy/10">
                   {gateways.length === 0 ? (
-                    <tr><td colSpan={4} className="px-8 py-20 text-center text-gold-light/10 italic text-sm">No gateway devices detected in the matrix.</td></tr>
+                    <tr><td colSpan={4} className="px-8 py-10 text-center text-gold-light/10 italic text-[10px]">No operational gateways.</td></tr>
                   ) : (
                     gateways.map((gw, i) => (
                       <motion.tr 
@@ -202,31 +202,24 @@ export default function AdminTelephony() {
                         key={gw.id} 
                         className="hover:bg-gold/5 transition-all group"
                       >
-                        <td className="px-8 py-6 text-[11px] font-black text-pearl uppercase tracking-widest">{gw.name}</td>
-                        <td className="px-8 py-6">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${gw.status === 'ONLINE' ? 'bg-gold/10 text-gold border-gold/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'}`}>
-                            <Signal className={`w-3 h-3 ${gw.status === 'ONLINE' ? 'animate-pulse' : ''}`} /> 
-                            <span className="text-[9px] font-black uppercase tracking-widest">{gw.status}</span>
+                        <td className="px-6 py-4 text-[10px] font-black text-pearl uppercase tracking-widest italic">{gw.name}</td>
+                        <td className="px-6 py-4">
+                          <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg border ${gw.status === 'ONLINE' ? 'bg-gold/10 text-gold border-gold/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'}`}>
+                            <Signal className={`w-2.5 h-2.5 ${gw.status === 'ONLINE' ? 'animate-pulse' : ''}`} /> 
+                            <span className="text-[8px] font-black uppercase tracking-widest">{gw.status}</span>
                           </div>
                         </td>
-                        <td className="px-8 py-6 font-mono text-[9px] text-gold-light/30">
-                          <div className="flex items-center gap-3">
-                            <Key className="w-3 h-3 text-gold/20" />
-                            {gw.apiKey.substring(0, 10)}...
-                            <button onClick={() => copyToClipboard(gw.apiKey)} className="p-1 hover:text-gold transition-colors">
-                              <Plus className="w-3 h-3 rotate-45" /> 
+                        <td className="px-6 py-4 font-mono text-[8px] text-gold-light/20 italic">
+                          <div className="flex items-center gap-2">
+                            {gw.apiKey.substring(0, 8)}...
+                            <button onClick={() => copyToClipboard(gw.apiKey)} className="hover:text-gold transition-colors">
+                              <Plus className="w-2.5 h-2.5 rotate-45" /> 
                             </button>
                           </div>
                         </td>
-                        <td className="px-8 py-6 text-right space-x-4">
-                          <button 
-                            onClick={() => verifyGateway(gw)}
-                            className="text-[9px] font-black text-gold hover:text-white uppercase tracking-widest transition-colors"
-                          >
-                            VERIFY
-                          </button>
-                          <button onClick={() => handleDeleteGateway(gw.id)} className="text-red-400/40 hover:text-red-400 transition-colors">
-                            <Trash2 className="w-4 h-4" />
+                        <td className="px-6 py-4 text-right space-x-3">
+                          <button onClick={() => handleDeleteGateway(gw.id)} className="text-red-400/20 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </td>
                       </motion.tr>
@@ -235,9 +228,9 @@ export default function AdminTelephony() {
                 </tbody>
               </table>
             </div>
-            <div className="mt-auto p-4 bg-gold/5 border-t border-gold/10 flex items-center justify-between">
-              <span className="text-[9px] font-black text-gold/40 uppercase tracking-widest">Gateway Network Health: Stable</span>
-              <Radio className="w-4 h-4 text-gold animate-pulse" />
+            <div className="p-3 bg-gold/5 border-t border-gold/10 flex items-center justify-between">
+              <span className="text-[8px] font-black text-gold/20 uppercase tracking-widest">Gateway Flux: Optimised</span>
+              <Radio className="w-3 h-3 text-gold/30 animate-pulse" />
             </div>
           </motion.div>
         </div>
@@ -262,23 +255,22 @@ export default function AdminTelephony() {
           </div>
 
           <motion.div 
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="luxury-card overflow-hidden border-gold/10 flex flex-col h-[500px]"
+            className="luxury-card overflow-hidden border-gold/10 flex flex-col h-[350px]"
           >
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto flex-1 custom-scrollbar">
               <table className="min-w-full divide-y divide-gold/10">
                 <thead className="bg-navy/60">
                   <tr>
-                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Transaction Number</th>
-                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Carrier Protocol</th>
-                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Nexus Link</th>
-                    <th className="px-8 py-5 relative"></th>
+                    <th className="px-6 py-3 text-left text-[8px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Transaction Number</th>
+                    <th className="px-6 py-3 text-left text-[8px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Link</th>
+                    <th className="px-6 py-3 relative"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gold/10 bg-navy/20">
+                <tbody className="divide-y divide-gold/5 bg-navy/10">
                    {lines.length === 0? (
-                     <tr><td colSpan={4} className="px-8 py-20 text-center text-gold-light/10 italic text-sm">No business lines registered in the matrix.</td></tr>
+                     <tr><td colSpan={3} className="px-8 py-10 text-center text-gold-light/10 italic text-[10px]">No registered channels.</td></tr>
                    ) : (
                      lines.map((line, i) => (
                       <motion.tr 
@@ -288,27 +280,18 @@ export default function AdminTelephony() {
                         key={line.id} 
                         className="hover:bg-gold/5 transition-all group"
                       >
-                        <td className="px-8 py-6 text-[12px] font-black text-pearl tracking-widest">{line.number}</td>
-                        <td className="px-8 py-6">
-                          <div className="flex items-center gap-3">
+                        <td className="px-6 py-4 text-[11px] font-black text-pearl tracking-[0.1em]">{line.number}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-gold" />
-                            <span className="text-[10px] font-black text-gold-light/60 uppercase tracking-widest">{line.providerType}</span>
+                            <span className="text-[9px] font-black text-gold/60 uppercase tracking-widest truncate max-w-[80px]">
+                              {line.gateway?.name || 'CLOUD'}
+                            </span>
                           </div>
                         </td>
-                        <td className="px-8 py-6 text-[10px] font-bold text-pearl/40 uppercase tracking-widest">
-                          {line.providerType === 'GATEWAY' ? (
-                            <span className="text-gold flex items-center gap-2">
-                              <Smartphone className="w-3 h-3" /> {line.gateway?.name || 'ORPHANED'}
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2">
-                              <Globe className="w-3 h-3" /> {line.providerRef || 'CLOUD INFRA'}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          <button onClick={() => handleDeleteLine(line.id)} className="text-red-400/40 hover:text-red-400 transition-colors">
-                            <Trash2 className="w-4 h-4" />
+                        <td className="px-6 py-4 text-right">
+                          <button onClick={() => handleDeleteLine(line.id)} className="text-red-400/20 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </td>
                       </motion.tr>
@@ -317,9 +300,9 @@ export default function AdminTelephony() {
                 </tbody>
               </table>
             </div>
-            <div className="mt-auto p-4 bg-gold/5 border-t border-gold/10 flex items-center justify-between">
-              <span className="text-[9px] font-black text-gold/40 uppercase tracking-widest">Active Channels: {lines.length}</span>
-              <Shield className="w-4 h-4 text-gold opacity-30" />
+            <div className="p-3 bg-gold/5 border-t border-gold/10 flex items-center justify-between">
+              <span className="text-[8px] font-black text-gold/20 uppercase tracking-widest">Channels Active: {lines.length}</span>
+              <Shield className="w-3 h-3 text-gold/30" />
             </div>
           </motion.div>
         </div>

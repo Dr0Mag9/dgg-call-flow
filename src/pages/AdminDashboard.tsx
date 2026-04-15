@@ -84,86 +84,36 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="luxury-card-gold p-6 relative overflow-hidden group"
+          className="luxury-card-gold p-6 relative overflow-hidden group min-h-[300px] flex flex-col justify-center"
         >
           <div className="absolute top-0 right-0 w-80 h-80 bg-gold/5 blur-[100px] rounded-full -mr-32 -mt-32 animate-heavenly-pulse" />
-          <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
-            <TrendingUp className="w-4 h-4 text-gold" />
-            Live Resonance Monitoring
-          </h3>
-          <div className="h-40 bg-[#0A1221]/40 rounded-3xl border border-gold/10 border-dashed flex flex-col items-center justify-center relative overflow-hidden">
-            <Sparkles className="w-10 h-10 text-gold mb-4 animate-[spin_10s_linear_infinite] opacity-20" />
-            <span className="text-gold-light/20 font-black uppercase tracking-[0.3em] text-[8px] italic">Awaiting Synthesis...</span>
-          </div>
-          <button className="luxury-button mt-6 text-[10px] py-3.5 uppercase tracking-[0.2em] shimmer-text">Optimize</button>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="luxury-card-gold overflow-hidden flex flex-col"
-        >
-          <div className="px-6 py-4 border-b border-gold/20 bg-gold/5 flex justify-between items-center relative overflow-hidden">
-            <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] flex items-center gap-3">
-              <Users className="w-4 h-4 text-gold" />
-              Workforce Ledger
+          <div className="relative z-10">
+            <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+              <TrendingUp className="w-4 h-4 text-gold" />
+              Strategic Resonance Monitoring
             </h3>
-            <button className="text-[9px] font-black text-gold/40 hover:text-gold transition-all tracking-[0.2em] uppercase bg-gold/5 px-3 py-1.5 rounded-lg border border-gold/10">Matrix</button>
-          </div>
-          <div className="overflow-x-auto flex-1 custom-scrollbar max-h-[250px]">
-            <table className="min-w-full divide-y divide-gold/10">
-              <thead className="bg-[#0A1221]/60">
-                <tr>
-                  <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Executor</th>
-                  <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Status</th>
-                  <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Ext</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gold/5 bg-navy/10">
-                {agents.slice(0, 5).map((agent, i) => (
-                  <motion.tr 
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 + i * 0.05 }}
-                    key={agent.id} 
-                    className="hover:bg-gold/10 transition-all group relative overflow-hidden"
-                  >
-                    <td className="px-6 py-3 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/40 flex items-center justify-center text-gold font-black shadow-lg group-hover:scale-105 transition-all duration-500 text-sm">
-                          {agent.user?.name?.charAt(0)}
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors italic tracking-tight uppercase">{agent.user?.name}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl border border-gold/10 bg-gold/5 group-hover:border-gold/30 transition-all">
-                        <motion.div 
-                          animate={{ scale: agent.status === 'ONLINE' ? [1, 1.3, 1] : 1 }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className={`w-1.5 h-1.5 rounded-full ${agent.status === 'ONLINE' ? 'bg-gold' : 'bg-slate-700'}`} 
-                        />
-                        <span className="text-[9px] font-black text-gold uppercase tracking-[0.2em]">{agent.status}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3 whitespace-nowrap font-mono text-[10px] font-black text-pearl/40 uppercase">
-                      EXT {agent.extension}
-                    </td>
-                  </motion.tr>
+            <div className="h-40 bg-[#0A1221]/40 rounded-3xl border border-gold/10 border-dashed flex flex-col items-center justify-center relative overflow-hidden">
+              <Sparkles className="w-10 h-10 text-gold mb-4 animate-[spin_10s_linear_infinite] opacity-20" />
+              <div className="flex gap-1 mb-2">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <motion.div 
+                    key={i}
+                    animate={{ height: [10, 20, 10] }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+                    className="w-1 bg-gold/20 rounded-full"
+                  />
                 ))}
-                {agents.length === 0 && (
-                  <tr><td colSpan={3} className="px-8 py-20 text-center text-gold-light/20 italic">No operational units detected.</td></tr>
-                )}
-              </tbody>
-            </table>
+              </div>
+              <span className="text-gold-light/20 font-black uppercase tracking-[0.3em] text-[8px] italic">Awaiting Quantitative Synthesis...</span>
+            </div>
+            <div className="mt-8 flex justify-center">
+              <button className="luxury-button text-[10px] py-3.5 px-12 uppercase tracking-[0.2em] shimmer-text">Optimize Yield</button>
+            </div>
           </div>
         </motion.div>
       </div>

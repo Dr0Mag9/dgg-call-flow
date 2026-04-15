@@ -160,10 +160,10 @@ export default function AdminAgents() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-black text-pearl tracking-tight font-serif italic">Operational Workforce</h2>
-          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.3em] mt-1">Resource Management & Deployment</p>
+          <h2 className="text-xl font-black text-pearl tracking-tight font-serif italic uppercase underline decoration-gold/30">Force Command</h2>
+          <p className="text-gold-light/40 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">Executor Registry & Deployment</p>
         </div>
         <motion.button 
           whileHover={{ scale: 1.05 }}
@@ -173,10 +173,10 @@ export default function AdminAgents() {
             setAddError('');
             setIsAddModalOpen(true);
           }}
-          className="luxury-button flex items-center gap-2"
+          className="luxury-button flex items-center gap-2 py-2.5 px-6 text-[10px]"
         >
-          <Plus className="w-5 h-5" />
-          <span>Deploy New Unit</span>
+          <Plus className="w-4 h-4" />
+          <span>Deploy Unit</span>
         </motion.button>
       </div>
 
@@ -186,65 +186,59 @@ export default function AdminAgents() {
           <span className="text-gold-light/30 font-black uppercase tracking-[0.3em] text-sm">Visualizing Unit Matrix...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {agents.map((agent, i) => (
             <motion.div 
               key={agent.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              whileHover={{ y: -5 }}
-              className={`luxury-card overflow-hidden group border-gold/10 ${!agent.user.isActive ? 'opacity-40 grayscale' : ''}`}
+              whileHover={{ y: -3 }}
+              className={`luxury-card overflow-hidden group border-gold/10 ${!agent.user.isActive ? 'opacity-30 grayscale' : ''}`}
             >
-              <div className="p-8 cursor-pointer relative" onClick={() => handleViewProfile(agent)}>
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold/20 to-navy border border-gold/30 flex items-center justify-center text-gold shadow-lg shadow-black/40 group-hover:scale-110 transition-transform">
-                      <User className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-pearl group-hover:text-gold transition-colors tracking-tight">
-                        {agent.user.name}
-                      </h3>
-                      <p className="text-[10px] text-gold-light/40 font-bold uppercase tracking-widest mt-1">{agent.user.email}</p>
-                    </div>
+              <div className="p-4 cursor-pointer relative" onClick={() => handleViewProfile(agent)}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/20 to-navy border border-gold/30 flex items-center justify-center text-gold shadow-lg group-hover:scale-110 transition-transform">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-black text-pearl group-hover:text-gold transition-colors tracking-tight truncate uppercase italic">
+                      {agent.user.name}
+                    </h3>
+                    <p className="text-[8px] text-gold-light/40 font-bold uppercase tracking-widest truncate">{agent.user.email}</p>
                   </div>
                 </div>
                 
-                <div className="space-y-5 bg-gold/5 p-5 rounded-2xl border border-gold/5 shadow-inner">
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                    <span className="text-gold-light/40">Status Registry</span>
-                    <span className="flex items-center gap-2 text-pearl">
+                <div className="space-y-2 bg-gold/5 p-3 rounded-xl border border-gold/5">
+                  <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
+                    <span className="text-gold-light/20">Protocol</span>
+                    <span className="flex items-center gap-1.5 text-gold">
                       <motion.div 
-                        animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                        animate={{ scale: agent.status === 'ONLINE' ? [1, 1.3, 1] : 1 }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className={`w-2 h-2 rounded-full ${agent.status === 'ONLINE' ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-700'}`} 
+                        className={`w-1.5 h-1.5 rounded-full ${agent.status === 'ONLINE' ? 'bg-gold' : 'bg-slate-700'}`} 
                       />
                       {agent.status}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                    <span className="text-gold-light/40">Internal Ext</span>
-                    <span className="text-pearl font-mono">{agent.extension || 'UNASSIGNED'}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                    <span className="text-gold-light/40">Assigned Asset</span>
-                    <span className="text-gold truncate max-w-[120px]">{agent.telephonyLine?.number || 'PENDING'}</span>
+                  <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
+                    <span className="text-gold-light/20">Extension</span>
+                    <span className="text-pearl font-mono">{agent.extension || '--'}</span>
                   </div>
                 </div>
               </div>
-              <div className="bg-navy-light/40 px-8 py-4 border-t border-gold/10 flex justify-end gap-6 pb-6">
+              <div className="bg-navy-light/20 px-4 py-2 border-t border-gold/10 flex justify-end gap-4 overflow-hidden">
                 <button 
                   onClick={(e) => { e.stopPropagation(); openEditModal(agent); }}
-                  className="text-[10px] font-black text-gold/40 hover:text-gold uppercase tracking-widest flex items-center gap-2 transition-colors"
+                  className="text-[8px] font-black text-gold/40 hover:text-gold uppercase tracking-[0.2em] flex items-center gap-1 transition-all"
                 >
-                  <Edit className="w-4 h-4" /> Modify
+                  <Edit className="w-3 h-3" /> Mod
                 </button>
                 <button 
                   onClick={(e) => { e.stopPropagation(); handleToggleStatus(agent.id); }}
-                  className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${agent.user.isActive ? 'text-red-400/60 hover:text-red-400' : 'text-gold-light/60 hover:text-gold'}`}
+                  className={`text-[8px] font-black uppercase tracking-[0.2em] flex items-center gap-1 transition-all ${agent.user.isActive ? 'text-red-400/40 hover:text-red-400' : 'text-gold-light/60 hover:text-gold'}`}
                 >
-                  <Power className="w-4 h-4" /> {agent.user.isActive ? 'Decommission' : 'Restore'}
+                  <Power className="w-3 h-3" /> {agent.user.isActive ? 'Kill' : 'Init'}
                 </button>
               </div>
             </motion.div>
