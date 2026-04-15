@@ -13,6 +13,9 @@ import org.json.JSONObject
 import java.net.URISyntaxException
 import java.util.*
 import android.os.BatteryManager
+import android.telephony.TelephonyManager
+import android.telephony.SignalStrength
+
 
 class GatewayService : Service() {
 
@@ -48,10 +51,25 @@ class GatewayService : Service() {
 
             socket?.on(Socket.EVENT_CONNECT) {
                 socket?.emit("gateway:auth", key)
+                sendStatusUpdate("Status: Authenticating...")
                 startHealthReporting()
             }
 
+            socket?.on("gateway:ready") {
+                sendStatusUpdate("Status: Connected")
+            }
+
+            socket?.on(Socket.EVENT_CONNECT_ERROR) {
+                sendStatusUpdate("Status: Connection Error")
+            }
+
+            socket?.on("gateway:error") { args ->
+                val data = args[0] as JSONObject
+                sendStatusUpdate("Status: ${data.optString("message", "Error")}")
+            }
+
             socket?.on("gateway:command") { args ->
+
                 val data = args[0] as JSONObject
                 handleCommand(data)
             }
@@ -66,11 +84,14 @@ class GatewayService : Service() {
         Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 val batteryLevel = getBatteryLevel()
+                val signalLevel = getSignalStrength()
                 val healthData = JSONObject().apply {
                     put("battery", batteryLevel)
+                    put("signal", signalLevel)
                     put("status", "ONLINE")
                 }
                 socket?.emit("gateway:health_update", healthData)
+
             }
         }, 0, 60000) // Every 1 minute
     }
@@ -79,6 +100,21 @@ class GatewayService : Service() {
         val bm = getSystemService(BATTERY_SERVICE) as BatteryManager
         return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
+
+    private fun getSignalStrength(): Int {
+        return try {
+            val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val signal = tm.signalStrength
+                signal?.level ?: 0 // Returns value from 0 to 4
+            } else {
+                0 // Fallback for older APIs if needed
+            }
+        } catch (e: Exception) {
+            0
+        }
+    }
+
 
     private fun handleCommand(data: JSONObject) {
         val command = data.getString("command")
@@ -119,10 +155,19 @@ class GatewayService : Service() {
         }
     }
 
+    private fun sendStatusUpdate(status: String) {
+        val intent = Intent("com.callflow.gateway.STATUS_UPDATE")
+        intent.putExtra("status", status)
+        sendBroadcast(intent)
+    }
+
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        sendStatusUpdate("Status: Disconnected")
         socket?.disconnect()
         super.onDestroy()
     }
+
 }

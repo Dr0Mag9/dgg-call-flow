@@ -190,8 +190,18 @@ export async function rejectCall(callId: string) {
 export async function hangupCall(callId: string) {
   cancelOutboundSimulation(callId);
 
-  const existingCall = await prisma.call.findUnique({ where: { id: callId } });
+  const existingCall = await prisma.call.findUnique({ 
+    where: { id: callId },
+    include: { agent: { include: { telephonyLine: true } } }
+  });
+  
   if (!existingCall) return { ok: false as const, error: 'Call not found' };
+
+  // Trigger physical hangup via provider
+  if (existingCall.agent?.telephonyLine) {
+    const provider = existingCall.agent.telephonyLine.providerType === 'GATEWAY' ? gatewayProvider : sipProvider;
+    provider.endCall(callId).catch(err => logger.error('Failed to trigger provider hangup', err));
+  }
 
   const duration = existingCall.startedAt
     ? Math.floor((Date.now() - existingCall.startedAt.getTime()) / 1000)
@@ -209,6 +219,7 @@ export async function hangupCall(callId: string) {
     },
     include: { client: true, agent: { include: { user: { select: { name: true } } } }, disposition: true },
   });
+
 
   broadcast('call_updated', call);
   emitToAdmins('call_updated', call);

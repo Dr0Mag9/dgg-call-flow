@@ -1,9 +1,12 @@
 package com.callflow.gateway
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -22,10 +25,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnStop: Button
     private lateinit var tvStatus: TextView
 
+    private val statusReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.getStringExtra("status")?.let {
+                tvStatus.text = it
+            }
+        }
+    }
+
+
     private val PERMISSIONS = arrayOf(
         Manifest.permission.CALL_PHONE,
-        Manifest.permission.READ_PHONE_STATE
+        Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +74,17 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, CallHistoryActivity::class.java))
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(statusReceiver, IntentFilter("com.callflow.gateway.STATUS_UPDATE"))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(statusReceiver)
+    }
+
 
     private fun saveAndStartService() {
         val url = etServerUrl.text.toString().trim()
