@@ -100,7 +100,7 @@ export default function ClientDrawer() {
         },
         body: JSON.stringify({
           title: meetingTitle,
-          dueAt: new Date(meetingDate).toISOString(),
+          dueAt: (meetingDate && !isNaN(new Date(meetingDate).getTime())) ? new Date(meetingDate).toISOString() : new Date().toISOString(),
           taskType: 'meeting'
         })
       });
@@ -335,7 +335,7 @@ export default function ClientDrawer() {
                               {note.agent?.user?.name?.charAt(0) || '?'}
                             </div>
                             <span className="text-[9px] font-black text-pearl/80 uppercase tracking-widest">{note.agent?.user?.name || 'NODE'}</span>
-                            <span className="text-[8px] text-gold-light/20 font-black">• {format(new Date(note.createdAt), 'MMM d, h:mm a')}</span>
+                            <span className="text-[8px] text-gold-light/20 font-black">• {note.createdAt && !isNaN(new Date(note.createdAt).getTime()) ? format(new Date(note.createdAt), 'MMM d, h:mm a') : 'Recent'}</span>
                           </div>
                           <span className="text-[7px] px-1.5 py-0.5 bg-gold/5 border border-gold/10 rounded text-gold-light/40 uppercase tracking-[0.2em] font-black italic">{note.noteType}</span>
                         </div>
@@ -391,7 +391,7 @@ export default function ClientDrawer() {
                             {task.title}
                           </h4>
                           <div className="flex items-center gap-3 mt-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-gold-light/30">
-                            <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {format(new Date(task.dueAt), 'MMM d, h:mm a')}</span>
+                            <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {task.dueAt && !isNaN(new Date(task.dueAt).getTime()) ? format(new Date(task.dueAt), 'MMM d, h:mm a') : 'TBD'}</span>
                             <span className="text-gold italic">{task.taskType}</span>
                           </div>
                         </div>
@@ -415,7 +415,7 @@ export default function ClientDrawer() {
                           </div>
                           <div>
                             <div className="text-[10px] font-black text-pearl uppercase tracking-widest">{call.direction} CALL</div>
-                            <div className="text-[8px] text-gold-light/30 font-black flex items-center gap-2 mt-0.5 uppercase tracking-widest">{format(new Date(call.startedAt), 'MMM d, h:mm a')}</div>
+                            <div className="text-[8px] text-gold-light/30 font-black flex items-center gap-2 mt-0.5 uppercase tracking-widest">{call.startedAt && !isNaN(new Date(call.startedAt).getTime()) ? format(new Date(call.startedAt), 'MMM d, h:mm a') : 'Static Log'}</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">

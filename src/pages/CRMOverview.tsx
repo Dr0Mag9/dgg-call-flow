@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Search, Filter, Star, Phone, Mail, Building, MoreVertical, X, MapPin, Scale, Plus, Sparkles, TrendingUp } from 'lucide-react';
+import { Search, Filter, Star, Phone, Mail, Building, MoreVertical, X, MapPin, Gavel, Plus, Sparkles, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -227,11 +227,11 @@ export default function CRMOverview() {
                     </td>
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="text-[10px] font-black text-pearl/40 uppercase tracking-widest">
-                        {client.lastContactedAt ? format(new Date(client.lastContactedAt), 'MMM dd') : '--'}
+                        {client.lastContactedAt && !isNaN(new Date(client.lastContactedAt).getTime()) ? format(new Date(client.lastContactedAt), 'MMM dd') : '--'}
                       </div>
                     </td>
                     <td className="px-6 py-3 whitespace-nowrap">
-                      {client.nextFollowUpAt ? (
+                      {client.nextFollowUpAt && !isNaN(new Date(client.nextFollowUpAt).getTime()) ? (
                         <div className="text-[10px] font-black text-gold flex items-center gap-2 uppercase tracking-widest italic shimmer-text">
                           <TrendingUp className="w-3.5 h-3.5" />
                           {format(new Date(client.nextFollowUpAt), 'MMM dd')}

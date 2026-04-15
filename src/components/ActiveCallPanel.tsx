@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { PhoneOff, MicOff, Mic, Pause, Play, User, ExternalLink } from 'lucide-react';
+import { PhoneOff, MicOff, Mic, Pause, Play, User, ExternalLink, Zap, Activity } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function ActiveCallPanel() {
   const { activeCall, token, setSelectedClient, setClientDrawerOpen } = useAppStore();
@@ -51,72 +52,101 @@ export default function ActiveCallPanel() {
   };
 
   return (
-    <div className="absolute bottom-6 right-6 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col z-50">
+    <motion.div 
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 100, opacity: 0 }}
+      className="fixed bottom-8 right-8 w-96 luxury-card overflow-hidden z-[100] border-gold/30 shadow-[0_0_50px_rgba(212,175,55,0.2)]"
+    >
+      <div className="absolute inset-0 bg-gold/5 opacity-50 pointer-events-none" />
+      
       <div className={cn(
-        "px-4 py-3 text-white flex justify-between items-center",
-        activeCall.status === 'CONNECTED' ? "bg-green-600" : "bg-blue-600"
+        "px-6 py-4 flex justify-between items-center relative overflow-hidden",
+        activeCall.status === 'CONNECTED' ? "bg-gold/10" : "bg-navy/60"
       )}>
-        <div className="font-medium">
-          {activeCall.status === 'DIALING' && 'Dialing...'}
-          {activeCall.status === 'RINGING' && 'Ringing...'}
-          {activeCall.status === 'CONNECTED' && 'Connected'}
-          {activeCall.status === 'ON_HOLD' && 'On Hold'}
+        <div className="absolute bottom-0 left-0 h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent w-full" />
+        <div className="flex items-center gap-3 z-10">
+          <Activity className={cn("w-4 h-4", activeCall.status === 'CONNECTED' ? "text-gold animate-pulse" : "text-gold/20")} />
+          <div className="text-[10px] font-black text-gold uppercase tracking-[0.3em] shimmer-text italic">
+            {activeCall.status === 'DIALING' && 'Initiating Core Link...'}
+            {activeCall.status === 'RINGING' && 'Signal Transmitting...'}
+            {activeCall.status === 'CONNECTED' && 'Active Logic Link'}
+            {activeCall.status === 'ON_HOLD' && 'Suspended Protocol'}
+          </div>
         </div>
-        <div className="font-mono text-sm">
+        <div className="font-mono text-xs font-black text-pearl tracking-widest z-10 bg-navy/40 px-3 py-1 rounded-full border border-gold/20">
           {activeCall.status === 'CONNECTED' ? formatTime(duration) : '00:00'}
         </div>
       </div>
       
-      <div className="p-6 flex flex-col items-center text-center relative">
+      <div className="p-8 flex flex-col items-center text-center relative bg-[#0A1221]/80 backdrop-blur-3xl">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-gold/5 blur-3xl rounded-full pointer-events-none" />
+        
         {activeCall.client && (
           <button 
             onClick={handleOpenProfile}
-            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-            title="Open Client Profile"
+            className="absolute top-4 right-4 p-2.5 bg-gold/5 border border-gold/20 rounded-xl text-gold/40 hover:text-gold hover:border-gold/40 transition-all group/prof"
+            title="Open Executive Profile"
           >
-            <ExternalLink className="w-5 h-5" />
+            <ExternalLink className="w-5 h-5 group-hover/prof:scale-110 transition-transform" />
           </button>
         )}
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-          <User className="w-8 h-8 text-gray-400" />
+        
+        <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-br from-gold/30 to-navy border border-gold/40 flex items-center justify-center mb-6 shadow-2xl relative group/avatar">
+          <div className="absolute inset-0 bg-gold/10 rounded-[inherit] animate-pulse" />
+          <User className="w-10 h-10 text-gold-light relative z-10 italic" />
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-gold border border-navy flex items-center justify-center">
+            <Zap className="w-3.5 h-3.5 text-navy fill-current" />
+          </div>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">
-          {activeCall.client?.name || 'Unknown Caller'}
+
+        <h3 className="text-xl font-black text-pearl italic gold-text-gradient tracking-tight uppercase mb-1">
+          {activeCall.client?.name || 'External Signal'}
         </h3>
-        <p className="text-gray-500">{activeCall.phoneNumber}</p>
-        <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider">
-          {activeCall.direction} CALL
-        </p>
+        <p className="text-[11px] font-black text-gold/60 tracking-[0.2em] mb-4 uppercase">{activeCall.phoneNumber}</p>
+        
+        <div className="px-4 py-1.5 rounded-full bg-gold/5 border border-gold/10 inline-flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-gold shadow-[0_0_8px_#D4AF37]" />
+          <span className="text-[8px] text-pearl/40 font-black uppercase tracking-[0.3em]">
+            {activeCall.direction} Link Established
+          </span>
+        </div>
       </div>
 
-      <div className="px-6 pb-6 flex justify-center gap-4">
-        <button 
+      <div className="px-8 pb-8 flex justify-center gap-6 bg-[#0A1221]/80 backdrop-blur-3xl relative z-10">
+        <motion.button 
+          whileHover={{ scale: 1.1, backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsMuted(!isMuted)}
           className={cn(
-            "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-            isMuted ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            "w-14 h-14 rounded-2xl flex items-center justify-center transition-all border",
+            isMuted ? "bg-navy-light text-white border-white/20" : "bg-gold/5 text-gold-light border-gold/20"
           )}
         >
-          {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-        </button>
+          {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+        </motion.button>
         
-        <button 
+        <motion.button 
+          whileHover={{ scale: 1.1, boxShadow: '0 0 30px rgba(239, 68, 68, 0.3)' }}
+          whileTap={{ scale: 0.9 }}
           onClick={handleHangup}
-          className="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30"
+          className="w-16 h-16 rounded-3xl bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all shadow-2xl shadow-red-500/20"
         >
-          <PhoneOff className="w-5 h-5" />
-        </button>
+          <PhoneOff className="w-7 h-7" />
+        </motion.button>
 
-        <button 
+        <motion.button 
+          whileHover={{ scale: 1.1, backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsOnHold(!isOnHold)}
           className={cn(
-            "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-            isOnHold ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            "w-14 h-14 rounded-2xl flex items-center justify-center transition-all border",
+            isOnHold ? "bg-gold text-navy border-gold" : "bg-gold/5 text-gold-light border-gold/20"
           )}
         >
-          {isOnHold ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-        </button>
+          {isOnHold ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }
