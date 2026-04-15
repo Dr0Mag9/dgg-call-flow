@@ -5,68 +5,111 @@ export default function LuxuryBackground() {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
       {/* Deep Base */}
-      <div className="absolute inset-0 bg-navy" />
+      <div className="absolute inset-0 bg-[#060B14]" />
       
-      {/* Heavenly Glows */}
-      <div 
-        className="heavenly-glow bg-gold w-[600px] h-[600px] -top-40 -left-40 opacity-10" 
-      />
-      <div 
-        className="heavenly-glow bg-gold-light w-[500px] h-[500px] top-1/2 -right-20 opacity-5" 
-      />
-      
-      {/* Waterfall of Gold Shimmer */}
-      <div className="absolute inset-0 opacity-10">
-        {[...Array(5)].map((_, i) => (
+      {/* Heavenly Light Beams */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 left-1/4 w-[1px] h-full bg-gradient-to-b from-gold via-transparent to-transparent -rotate-[15deg] blur-[80px] w-40" />
+        <div className="absolute top-0 right-1/3 w-[1px] h-full bg-gradient-to-b from-gold-light via-transparent to-transparent rotate-[20deg] blur-[100px] w-60" />
+      </div>
+
+      {/* Layered Floating Clouds */}
+      <div className="absolute inset-0">
+        {/* Cloud 1 */}
+        <motion.div
+          animate={{ 
+            x: [-100, 100, -100],
+            y: [-50, 50, -50],
+          }}
+          transition={{
+            duration: 35,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-[10%] -left-[10%] w-[800px] h-[600px] bg-gold/10 blur-[180px] rounded-full"
+        />
+        
+        {/* Cloud 2 */}
+        <motion.div
+          animate={{ 
+            x: [100, -100, 100],
+            y: [50, -50, 50],
+          }}
+          transition={{
+            duration: 40,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-[5%] -right-[15%] w-[900px] h-[700px] bg-gold-light/10 blur-[200px] rounded-full"
+        />
+
+        {/* Cloud 3 (Deep Gold) */}
+        <motion.div
+          animate={{ 
+            x: [0, 150, 0],
+            y: [0, 80, 0],
+          }}
+          transition={{
+            duration: 50,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] bg-gold-deep/5 blur-[220px] rounded-[100%]"
+        />
+      </div>
+
+      {/* Waterfall of Gold Shimmer & Sparkles */}
+      <div className="absolute inset-0">
+        {[...Array(8)].map((_, i) => (
           <motion.div
-            key={i}
+            key={`line-${i}`}
             initial={{ y: '-100%', opacity: 0 }}
             animate={{ 
               y: '100%', 
-              opacity: [0, 0.2, 0] 
+              opacity: [0, 0.3, 0] 
             }}
             transition={{
-              duration: 8 + Math.random() * 5,
+              duration: 10 + Math.random() * 8,
               repeat: Infinity,
-              delay: i * 2,
+              delay: i * 1.5,
               ease: "linear"
             }}
             style={{
-              left: `${i * 25}%`,
+              left: `${i * 15}%`,
               width: '1px',
-              height: '300px',
+              height: '400px',
               background: 'linear-gradient(to bottom, transparent, #D4AF37, transparent)'
             }}
             className="absolute"
           />
         ))}
-      </div>
 
-      {/* Soft Cloud Shapes */}
-      <motion.div
-        animate={{ 
-          x: [0, 50, 0],
-          y: [0, 30, 0],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/5 blur-[150px] rounded-full"
-      />
-      <motion.div
-        animate={{ 
-          x: [0, -40, 0],
-          y: [0, -20, 0],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gold-light/5 blur-[120px] rounded-full"
-      />
+        {/* Small Sparkling Dust */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={`sparkle-${i}`}
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ 
+              y: ['0vh', '100vh'],
+              opacity: [0, 0.8, 0],
+              scale: [1, 1.5, 1]
+            }}
+            transition={{
+              duration: 15 + Math.random() * 10,
+              repeat: Infinity,
+              delay: i * 0.8,
+              ease: "linear"
+            }}
+            style={{
+              left: `${Math.random() * 100}%`,
+              width: '2px',
+              height: '2px',
+              boxShadow: '0 0 10px #F5D77A'
+            }}
+            className="absolute bg-gold-light rounded-full"
+          />
+        ))}
+      </div>
     </div>
   );
 }

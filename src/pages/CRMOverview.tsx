@@ -121,21 +121,21 @@ export default function CRMOverview() {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="luxury-card p-4 flex gap-6 bg-navy/20"
+        className="luxury-card-gold p-6 flex gap-8 items-center"
       >
         <div className="relative flex-1 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/40 group-focus-within:text-gold w-5 h-5 transition-colors" />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gold/60 group-focus-within:text-gold w-6 h-6 transition-colors" />
           <input 
             type="text" 
             placeholder="Scan portfolio for names, coordinates, or markers..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-6 py-3 bg-navy-light/30 border border-gold/10 rounded-xl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 text-pearl transition-all outline-none placeholder:text-gold-light/20"
+            className="w-full pl-14 pr-8 py-4 bg-[#0A1221]/40 border border-gold/20 rounded-2xl focus:ring-4 focus:ring-gold/10 focus:border-gold/50 text-pearl transition-all outline-none placeholder:text-gold-light/20 font-medium"
           />
         </div>
-        <button className="flex items-center gap-3 px-6 py-2 border border-gold/10 rounded-xl hover:bg-gold/5 text-gold-light/60 font-bold uppercase text-[10px] tracking-widest transition-all">
-          <Filter className="w-4 h-4 text-gold" />
-          Filters
+        <button className="flex items-center gap-4 px-8 py-3.5 bg-gold/5 border border-gold/30 rounded-2xl hover:bg-gold/10 text-gold hover:text-gold-light font-black uppercase text-xs tracking-[0.2em] transition-all shadow-lg hover:shadow-gold/10 group">
+          <Filter className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+          Refine Search
         </button>
       </motion.div>
 
@@ -143,24 +143,24 @@ export default function CRMOverview() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="luxury-card flex-1 overflow-hidden flex flex-col border-gold/10"
+        className="luxury-card-gold flex-1 overflow-hidden flex flex-col"
       >
-        <div className="overflow-x-auto flex-1">
+        <div className="overflow-x-auto flex-1 custom-scrollbar">
           <table className="min-w-full divide-y divide-gold/10">
-            <thead className="bg-navy-light/60 backdrop-blur-3xl sticky top-0 z-10">
-              <tr>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Client Asset</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Coordinates</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Subject Matter</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Status Stage</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Value Rank</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Executor</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Last Sync</th>
-                <th className="px-8 py-5 text-left text-[10px] font-black text-gold/40 uppercase tracking-[0.2em]">Next Pulse</th>
-                <th className="px-8 py-5 relative"></th>
+            <thead className="bg-[#0A1221]/80 backdrop-blur-3xl sticky top-0 z-20">
+              <tr className="border-b border-gold/20">
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Client Asset</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Coordinates</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Subject Matter</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Status Stage</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Value Rank</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Executor</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Last Sync</th>
+                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Next Pulse</th>
+                <th className="px-8 py-6 relative"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gold/10">
+            <tbody className="divide-y divide-gold/5 bg-navy/10">
               {loading ? (
                 <tr><td colSpan={9} className="px-8 py-20 text-center"><Sparkles className="w-8 h-8 text-gold animate-spin mx-auto mb-4 opacity-20" /><span className="text-gold-light/30 italic">Decrypting portfolio...</span></td></tr>
               ) : filteredClients.length === 0 ? (
@@ -173,87 +173,83 @@ export default function CRMOverview() {
                     transition={{ delay: 0.1 + i * 0.03 }}
                     key={client.id} 
                     onClick={() => handleClientClick(client)}
-                    className="hover:bg-gold/5 cursor-pointer transition-all group"
+                    className="hover:bg-gold/10 cursor-pointer transition-all group relative overflow-hidden"
                   >
-                    <td className="px-8 py-5 whitespace-nowrap">
+                    <td className="px-8 py-7 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/30 flex items-center justify-center text-gold-light font-black shadow-lg shadow-black/20 group-hover:scale-110 transition-transform">
-                          {client.name.charAt(0)}
+                        <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/30 flex items-center justify-center text-gold-light font-black shadow-2xl group-hover:scale-110 group-hover:border-gold/60 transition-all duration-500 relative">
+                          {client.score > 85 && <div className="absolute inset-0 bg-gold/20 blur-lg animate-pulse rounded-[inherit]" />}
+                          <span className="relative z-10 text-lg uppercase italic">{client.name.charAt(0)}</span>
                         </div>
-                        <div className="ml-5">
-                          <div className="text-base font-bold text-pearl group-hover:text-gold transition-colors">{client.name}</div>
-                          <div className="text-[10px] text-gold-light/40 font-bold flex items-center gap-2 mt-1 uppercase tracking-widest">
-                            <Building className="w-3 h-3 text-gold/60" /> {client.company || 'Private Asset'}
+                        <div className="ml-6">
+                          <div className="text-lg font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic">{client.name}</div>
+                          <div className="text-[10px] text-gold-light/40 font-black flex items-center gap-2 mt-1.5 uppercase tracking-widest">
+                            <Building className="w-3.5 h-3.5 text-gold/40" /> {client.company || 'Private Asset'}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="text-sm text-pearl/80 flex items-center gap-2 group-hover:text-pearl transition-colors">
-                        <Phone className="w-3 h-3 text-gold/60" /> {client.phone}
+                    <td className="px-8 py-7 whitespace-nowrap">
+                      <div className="text-sm font-bold text-pearl/90 flex items-center gap-3 group-hover:text-gold transition-colors tracking-wide">
+                        <Phone className="w-4 h-4 text-gold/60" /> {client.phone}
                       </div>
                       {client.email && (
-                        <div className="text-[10px] text-gold-light/30 flex items-center gap-2 mt-1.5 font-medium truncate max-w-[150px]">
-                          <Mail className="w-3 h-3 text-gold/30" /> {client.email}
-                        </div>
-                      )}
-                      {client.city && (
-                        <div className="text-[10px] text-gold-light/30 flex items-center gap-2 mt-1.5 font-medium">
-                          <MapPin className="w-3 h-3 text-gold/30" /> {client.city}
+                        <div className="text-[11px] text-gold-light/30 flex items-center gap-2.5 mt-2 font-black uppercase tracking-widest truncate max-w-[180px]">
+                          <Mail className="w-3.5 h-3.5 text-gold/20" /> {client.email}
                         </div>
                       )}
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="px-3 py-1.5 rounded-lg bg-navy/60 border border-gold/10 inline-flex items-center gap-2">
+                    <td className="px-8 py-7 whitespace-nowrap">
+                      <div className="px-4 py-2 rounded-xl bg-gold/5 border border-gold/20 group-hover:border-gold/40 inline-flex items-center gap-3 transition-all">
                         {client.matterType ? (
-                          <><Scale className="w-3.5 h-3.5 text-gold/60" /> <span className="text-xs font-bold text-pearl/80">{client.matterType}</span></>
+                          <><Scale className="w-4 h-4 text-gold" /> <span className="text-xs font-black text-pearl/90 uppercase tracking-tighter">{client.matterType}</span></>
                         ) : (
-                          <span className="text-[10px] text-gold-light/20 font-bold uppercase tracking-widest">General</span>
+                          <span className="text-[10px] text-gold-light/20 font-black uppercase tracking-widest italic">General Portfolio</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
-                      <span className={`px-4 py-1 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full border ${getStageStyle(client.stage)}`}>
+                    <td className="px-8 py-7 whitespace-nowrap">
+                      <span className={`px-5 py-1.5 inline-flex text-[10px] font-black uppercase tracking-[0.2em] rounded-full border-2 ${getStageStyle(client.stage)}`}>
                         {client.stage}
                       </span>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <div className="relative">
-                          {client.score > 80 && <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-gold rounded-full blur-sm" />}
-                          <Star className={`w-4 h-4 relative z-10 ${client.score > 70 ? 'text-gold fill-gold' : 'text-gold-light/20'}`} />
+                    <td className="px-8 py-7 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="relative group/score">
+                          {client.score > 80 && <motion.div animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0, 0.4] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-gold rounded-full blur-md" />}
+                          <Star className={`w-5 h-5 relative z-10 transition-transform group-hover/score:scale-125 ${client.score > 70 ? 'text-gold fill-gold drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]' : 'text-gold-light/20'}`} />
                         </div>
-                        <span className="text-sm font-black text-pearl">{client.score}%</span>
+                        <span className="text-base font-black text-pearl italic">{client.score}%</span>
                       </div>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-[10px] font-black text-gold">
+                    <td className="px-8 py-7 whitespace-nowrap">
+                      <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-[11px] font-black text-gold shadow-lg">
                           {(client.assignedAgent?.user?.name || 'U').charAt(0)}
                         </div>
-                        <span className="text-xs font-bold text-gold-light/60 uppercase tracking-widest whitespace-nowrap">
-                          {client.assignedAgent?.user?.name || 'Available'}
+                        <span className="text-[10px] font-black text-gold-light/60 uppercase tracking-[0.2em] whitespace-nowrap">
+                          {client.assignedAgent?.user?.name || 'ALLOCATED'}
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="text-[10px] font-black text-pearl/60 uppercase tracking-widest">
-                        {client.lastContactedAt ? format(new Date(client.lastContactedAt), 'MMM d, yyyy') : '--'}
+                    <td className="px-8 py-7 whitespace-nowrap">
+                      <div className="text-[11px] font-black text-pearl/40 uppercase tracking-[0.2em]">
+                        {client.lastContactedAt ? format(new Date(client.lastContactedAt), 'MMM dd') : '--'}
                       </div>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap">
+                    <td className="px-8 py-7 whitespace-nowrap">
                       {client.nextFollowUpAt ? (
-                        <div className="text-[10px] font-black text-gold flex items-center gap-2 uppercase tracking-[0.1em]">
-                          <TrendingUp className="w-3 h-3 animate-pulse" />
-                          {format(new Date(client.nextFollowUpAt), 'MMM d, h:mm a')}
+                        <div className="text-[11px] font-black text-gold flex items-center gap-3 uppercase tracking-[0.2em] italic shimmer-text">
+                          <TrendingUp className="w-4 h-4" />
+                          {format(new Date(client.nextFollowUpAt), 'MMM dd')}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-gold-light/20 font-bold uppercase tracking-widest italic">Stable</span>
+                        <span className="text-[11px] text-gold-light/10 font-black uppercase tracking-[0.2em] italic">Stationary</span>
                       )}
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap text-right">
-                      <button className="p-2 rounded-lg hover:bg-gold/10 text-gold-light/40 hover:text-gold transition-all">
-                        <MoreVertical className="w-5 h-5" />
+                    <td className="px-8 py-7 whitespace-nowrap text-right">
+                      <button className="p-3 rounded-xl hover:bg-gold/20 text-gold-light/40 hover:text-gold transition-all group-hover:scale-110">
+                        <MoreVertical className="w-6 h-6" />
                       </button>
                     </td>
                   </motion.tr>

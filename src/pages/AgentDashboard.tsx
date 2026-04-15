@@ -45,37 +45,38 @@ export default function AgentDashboard() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="luxury-card p-8 relative overflow-hidden group"
+        className="luxury-card-gold p-10 relative overflow-hidden group border-gold/40 shadow-[0_0_60px_rgba(212,175,55,0.15)]"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[80px] rounded-full -mr-20 -mt-20 group-hover:bg-gold/10 transition-colors duration-1000" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gold/5 blur-[100px] rounded-full -mr-32 -mt-32 group-hover:bg-gold/15 transition-all duration-1000 animate-pulse" />
         
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/30 flex items-center justify-center shadow-xl">
-              <Award className="w-10 h-10 text-gold" />
+        <div className="flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
+          <div className="flex items-center gap-8">
+            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-gold/30 to-navy-light/50 border-2 border-gold/40 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500">
+              <Award className="w-12 h-12 text-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" />
             </div>
             <div>
-              <h2 className="text-3xl font-black text-pearl tracking-tight">
-                Welcome back, <span className="gold-text-gradient">{user?.name}</span>
+              <h2 className="text-4xl font-black text-pearl tracking-tighter italic">
+                Salutations, <span className="gold-text-gradient shimmer-text uppercase">{user?.name}</span>
               </h2>
-              <p className="text-gold-light/60 font-medium mt-1 tracking-wide">
-                Your wealth command center is fully operational.
+              <p className="text-gold-light/40 font-black mt-2 tracking-[0.3em] uppercase text-xs">
+                Asset Optimization Node: <span className="text-gold">Operational</span>
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-6 px-6 py-4 rounded-2xl bg-gold/5 border border-gold/10 backdrop-blur-md">
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] text-gold-deep font-bold tracking-widest uppercase">Connectivity</span>
-              <span className="text-lg font-bold text-gold-light tracking-tight">VIRTUAL GOLD LINE</span>
+          <div className="flex items-center gap-8 px-8 py-5 rounded-3xl bg-gold/10 border border-gold/30 backdrop-blur-3xl shadow-inner relative group/status">
+            <div className="absolute inset-0 bg-gold/5 opacity-0 group-hover/status:opacity-100 transition-opacity duration-700 blur-2xl" />
+            <div className="flex flex-col items-end relative z-10">
+              <span className="text-[11px] text-gold font-black tracking-[0.3em] uppercase shimmer-text">Connectivity</span>
+              <span className="text-xl font-black text-gold-light tracking-widest uppercase italic mt-1">Primus Gold Link</span>
             </div>
-            <div className="relative flex h-5 w-5">
+            <div className="relative flex h-6 w-6 z-10">
               <motion.span 
-                animate={{ scale: [1, 2, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inline-flex h-full w-full rounded-full bg-gold-light"
+                animate={{ scale: [1, 2.5, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute inline-flex h-full w-full rounded-full bg-gold"
               ></motion.span>
-              <span className="relative inline-flex rounded-full h-5 w-5 bg-gold border border-navy shadow-[0_0_15px_rgba(212,175,55,0.5)]"></span>
+              <span className="relative inline-flex rounded-full h-6 w-6 bg-gold border-2 border-navy shadow-[0_0_20px_rgba(212,175,55,1)]"></span>
             </div>
           </div>
         </div>
@@ -97,22 +98,25 @@ export default function AgentDashboard() {
 
         <div className="xl:col-span-2 space-y-8">
           {/* Quick Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { label: "Today's Volume", value: todayCalls.length, icon: TrendingUp, color: "text-gold" },
               { label: "Success Rate", value: "84%", icon: Zap, color: "text-gold-light" },
-              { label: "Active Revenue", value: "$12.4k", icon: Award, color: "text-gold" },
+              { label: "Active Revenue", value: "$32.8k", icon: Award, color: "text-gold" },
             ].map((stat, i) => (
               <motion.div 
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.1 }}
-                className="luxury-card p-6 flex flex-col items-center text-center group hover:bg-gold/5"
+                className="luxury-card p-8 flex flex-col items-center text-center group bg-[#0A1221]/40 border-gold/10 hover:border-gold/40 hover:shadow-gold/10 transition-all duration-500"
               >
-                <stat.icon className={`w-8 h-8 ${stat.color} mb-3 group-hover:scale-110 transition-transform`} />
-                <div className="text-sm font-bold text-gold-light/40 uppercase tracking-widest">{stat.label}</div>
-                <div className="text-2xl font-black text-pearl mt-1">{stat.value}</div>
+                <div className="w-14 h-14 rounded-2xl bg-gold/5 border border-gold/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-gold/10 transition-all duration-500">
+                  <stat.icon className={`w-8 h-8 ${stat.color} drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]`} />
+                </div>
+                <div className="text-[11px] font-black text-gold/40 uppercase tracking-[0.2em]">{stat.label}</div>
+                <div className="text-3xl font-black text-pearl mt-2 tracking-tight italic">{stat.value}</div>
+                {i === 2 && <div className="mt-2 text-[9px] font-black text-gold bg-gold/10 px-2 py-0.5 rounded tracking-widest">+12% EST.</div>}
               </motion.div>
             ))}
           </div>
@@ -121,40 +125,39 @@ export default function AgentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="luxury-card overflow-hidden"
+            className="luxury-card-gold overflow-hidden"
           >
-            <div className="px-8 py-6 border-b border-gold/10 flex justify-between items-center bg-gold/5">
-              <h3 className="text-xl font-bold text-pearl tracking-tight">Recent Opportunities</h3>
-              <button className="text-xs font-bold text-gold-light hover:text-gold transition-colors uppercase tracking-widest">View Ledger</button>
+            <div className="px-10 py-7 border-b border-gold/20 flex justify-between items-center bg-gold/5">
+              <h3 className="text-xl font-black text-pearl tracking-tight uppercase italic tracking-widest">Opportunity Ledger</h3>
+              <button className="text-[10px] font-black text-gold hover:text-gold-light transition-all uppercase tracking-[0.3em] bg-gold/10 px-4 py-2 rounded-xl border border-gold/20 shimmer-text">Expand Archive</button>
             </div>
-            <ul className="divide-y divide-gold/10">
+            <ul className="divide-y divide-gold/10 bg-navy/20">
               {calls.map((call, i) => (
                 <motion.li 
                   key={call.id}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.6 + i * 0.05 }}
-                  className="px-8 py-5 hover:bg-gold/5 cursor-pointer transition-colors group"
+                  className="px-10 py-6 hover:bg-gold/10 cursor-pointer transition-all group flex items-center justify-between relative overflow-hidden"
                   onClick={() => handleClientClick(call.client)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-5">
-                      <div className={`p-3 rounded-xl ${
-                        call.direction === 'INBOUND' ? 'bg-gold/10 text-gold' : 'bg-gold-light/10 text-gold-light'
-                      } group-hover:scale-110 transition-transform shadow-lg shadow-black/20`}>
-                        {call.direction === 'INBOUND' ? <PhoneIncoming className="w-5 h-5" /> : <Phone className="w-5 h-5" />}
-                      </div>
-                      <div>
-                        <p className="text-base font-bold text-pearl group-hover:text-gold transition-colors">{call.client?.name || call.phoneNumber}</p>
-                        <p className="text-xs text-gold-light/40 font-medium mt-0.5">{format(new Date(call.startedAt), 'MMM d, h:mm a')}</p>
-                      </div>
+                  <div className="absolute inset-y-0 left-0 w-1 bg-gold opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center gap-6 relative z-10">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      call.direction === 'INBOUND' ? 'bg-gold/20 text-gold border border-gold/30' : 'bg-gold-light/20 text-gold-light border border-gold-light/30'
+                    } group-hover:scale-110 transition-all duration-500 shadow-xl`}>
+                      {call.direction === 'INBOUND' ? <PhoneIncoming className="w-6 h-6" /> : <Phone className="w-6 h-6" />}
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-pearl tracking-tight">{call.duration ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s` : '--'}</p>
-                      <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${
-                        call.status === 'MISSED' ? 'text-red-400' : 'text-gold-light/60'
-                      }`}>{call.status}</p>
+                    <div>
+                      <p className="text-lg font-black text-pearl group-hover:text-gold transition-colors italic tracking-tight">{call.client?.name || call.phoneNumber}</p>
+                      <p className="text-[10px] text-gold-light/40 font-black mt-1 uppercase tracking-widest">{format(new Date(call.startedAt), 'h:mm a')} • {format(new Date(call.startedAt), 'MMMM d')}</p>
                     </div>
+                  </div>
+                  <div className="text-right relative z-10">
+                    <p className="text-sm font-black text-pearl tracking-widest">{call.duration ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s` : '--'}</p>
+                    <p className={`text-[9px] font-black uppercase tracking-[0.3em] mt-2 px-3 py-1 rounded-full border ${
+                      call.status === 'MISSED' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-gold/10 text-gold border-gold/20'
+                    }`}>{call.status}</p>
                   </div>
                 </motion.li>
               ))}

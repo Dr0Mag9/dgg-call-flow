@@ -51,12 +51,13 @@ export default function DashboardLayout() {
       <LuxuryBackground />
       
       {/* Sidebar */}
-      <aside className="w-64 bg-navy-light/40 backdrop-blur-2xl border-r border-gold/10 flex flex-col z-20">
-        <div className="p-6 flex items-center gap-3 border-b border-gold/10">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-light via-gold to-gold-deep flex items-center justify-center shadow-lg shadow-gold/20">
-            <PhoneCall className="w-6 h-6 text-navy" />
+      <aside className="w-68 bg-[#0A1221]/60 backdrop-blur-3xl border-r border-gold/20 flex flex-col z-20 relative before:absolute before:inset-y-0 before:right-0 before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-gold/50 before:to-transparent">
+        <div className="p-8 flex items-center gap-4 border-b border-gold/10 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-xl" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-light via-gold to-gold-deep flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.4)] relative z-10">
+            <PhoneCall className="w-7 h-7 text-navy" />
           </div>
-          <span className="text-xl font-bold gold-text-gradient tracking-tight">CallFlow</span>
+          <span className="text-2xl font-black gold-text-gradient tracking-tighter relative z-10 italic">CallFlow</span>
         </div>
         
         <div className="flex-1 py-6 overflow-y-auto">
@@ -69,25 +70,33 @@ export default function DashboardLayout() {
                   key={link.name}
                   to={link.href}
                   className={cn(
-                    "group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 relative overflow-hidden",
+                    "group flex items-center gap-3 px-5 py-3 rounded-2xl transition-all duration-500 relative overflow-hidden",
                     isActive 
-                      ? "bg-gold/10 text-gold-light shadow-[inset_0_0_20px_rgba(212,175,55,0.1)]" 
+                      ? "bg-gold/10 text-gold-light shadow-[inset_0_0_30px_rgba(212,175,55,0.15)] border border-gold/20" 
                       : "text-slate-400 hover:text-gold-light hover:bg-gold/5"
                   )}
                 >
                   {isActive && (
                     <motion.div 
                       layoutId="activeNav"
-                      className="absolute left-0 w-1 h-6 bg-gold rounded-r-full"
+                      className="absolute left-0 w-1.5 h-8 bg-gold rounded-r-full shadow-[0_0_15px_#D4AF37]"
                     />
                   )}
                   <Icon className={cn(
-                    "w-5 h-5 transition-colors duration-300",
-                    isActive ? "text-gold" : "group-hover:text-gold-light"
+                    "w-5 h-5 transition-all duration-500",
+                    isActive ? "text-gold scale-110" : "group-hover:text-gold-light group-hover:scale-110"
                   )} />
-                  <span className="font-medium text-sm">{link.name}</span>
+                  <span className={cn(
+                    "font-bold text-sm tracking-wide lowercase",
+                    isActive ? "shimmer-text" : ""
+                  )}>{link.name}</span>
                   {isActive && (
-                    <div className="absolute inset-0 bg-gold/5 animate-pulse pointer-events-none" />
+                    <motion.div 
+                      initial={{ x: '-100%' }}
+                      animate={{ x: '200%' }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/10 to-transparent skew-x-12 pointer-events-none" 
+                    />
                   )}
                 </Link>
               );
@@ -95,14 +104,14 @@ export default function DashboardLayout() {
           </nav>
         </div>
 
-        <div className="p-4 border-t border-gold/10 bg-navy/20">
-          <div className="flex items-center gap-3 mb-4 p-2 rounded-xl bg-gold/5 border border-gold/10">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/30 flex items-center justify-center font-bold text-gold-light shadow-inner">
+        <div className="p-6 border-t border-gold/10 bg-navy/40 relative overflow-hidden">
+          <div className="flex items-center gap-4 mb-5 p-3 rounded-2xl bg-gold/5 border border-gold/20 hover:border-gold/40 transition-all duration-500 group/profile">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold/30 to-gold/5 border border-gold/40 flex items-center justify-center font-black text-xl text-gold-light shadow-[0_0_15px_rgba(212,175,55,0.2)] group-hover/profile:scale-110 transition-transform">
               {user.name.charAt(0)}
             </div>
             <div className="overflow-hidden">
-              <div className="font-semibold text-sm truncate text-pearl">{user.name}</div>
-              <div className="text-[10px] uppercase tracking-wider text-gold-deep font-bold">{user.role}</div>
+              <div className="font-black text-sm truncate text-pearl tracking-tight uppercase">{user.name}</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-gold-deep font-black mt-0.5">{user.role}</div>
             </div>
           </div>
           <button
@@ -110,10 +119,10 @@ export default function DashboardLayout() {
               logout();
               navigate('/login');
             }}
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition-all duration-300 w-full px-3 py-2 rounded-lg hover:bg-red-500/10 hover:text-red-400"
+            className="flex items-center gap-3 text-slate-400 hover:text-white transition-all duration-500 w-full px-4 py-2.5 rounded-xl hover:bg-red-500/10 hover:text-red-400 group/logout"
           >
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm font-medium">Logout</span>
+            <LogOut className="w-5 h-5 group-hover/logout:rotate-12 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-widest">Terminate Session</span>
           </button>
         </div>
       </aside>
@@ -121,29 +130,33 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         {/* Topbar */}
-        <header className="h-16 bg-navy/20 backdrop-blur-md border-b border-gold/10 flex items-center justify-between px-8 shadow-sm">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-pearl tracking-tight">
+        <header className="h-20 bg-navy/40 backdrop-blur-3xl border-b border-gold/20 flex items-center justify-between px-10 shadow-2xl relative">
+          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+          <div className="flex items-center gap-6">
+            <h1 className="text-2xl font-black text-pearl tracking-tighter uppercase italic">
               {links.find(l => l.href === location.pathname)?.name || 'Dashboard'}
             </h1>
-            <div className="h-4 w-[1px] bg-gold/20 mx-2" />
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gold/5 border border-gold/10">
+            <div className="h-6 w-[1px] bg-gold/30 mx-2" />
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
               <motion.div 
-                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className={cn(
-                  "w-2 h-2 rounded-full",
-                  user.status === 'ONLINE' ? "bg-gold-light shadow-[0_0_8px_#F5D77A]" : "bg-slate-500"
+                  "w-2.5 h-2.5 rounded-full",
+                  user.status === 'ONLINE' ? "bg-gold shadow-[0_0_12px_#D4AF37]" : "bg-slate-500"
                 )} 
               />
-              <span className="text-xs font-bold text-gold-light/80 tracking-widest uppercase">{user.status}</span>
+              <span className="text-[10px] font-black text-gold tracking-[0.2em] uppercase">{user.status}</span>
             </div>
           </div>
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
             <div className="flex flex-col items-end">
-              <span className="text-[10px] text-gold-deep font-bold tracking-widest uppercase">System Ready</span>
-              <span className="text-xs text-pearl/60 font-medium">Secured Connection</span>
+              <span className="text-[11px] text-gold font-black tracking-[0.3em] uppercase shimmer-text">Quantum Ready</span>
+              <span className="text-[10px] text-pearl/40 font-bold uppercase tracking-widest mt-1">Secured Node</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center text-gold shadow-lg">
+              <Settings className="w-5 h-5 animate-[spin_8s_linear_infinite]" />
             </div>
           </div>
         </header>
