@@ -11,6 +11,8 @@ import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
 import java.net.URISyntaxException
+import java.util.*
+import android.os.BatteryManager
 
 class GatewayService : Service() {
 
@@ -46,6 +48,7 @@ class GatewayService : Service() {
 
             socket?.on(Socket.EVENT_CONNECT) {
                 socket?.emit("gateway:auth", key)
+                startHealthReporting()
             }
 
             socket?.on("gateway:command") { args ->
@@ -57,6 +60,24 @@ class GatewayService : Service() {
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         }
+    }
+
+    private fun startHealthReporting() {
+        Timer().scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                val batteryLevel = getBatteryLevel()
+                val healthData = JSONObject().apply {
+                    put("battery", batteryLevel)
+                    put("status", "ONLINE")
+                }
+                socket?.emit("gateway:health_update", healthData)
+            }
+        }, 0, 60000) // Every 1 minute
+    }
+
+    private fun getBatteryLevel(): Int {
+        val bm = getSystemService(BATTERY_SERVICE) as BatteryManager
+        return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
     private fun handleCommand(data: JSONObject) {

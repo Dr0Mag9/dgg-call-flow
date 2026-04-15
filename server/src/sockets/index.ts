@@ -75,6 +75,25 @@ export function registerSocketHandlers() {
       }
     });
 
+    socket.on('gateway:health_update', async (data: any) => {
+      const gatewayId = socket.data.gatewayId;
+      if (!gatewayId) return;
+
+      try {
+        await prisma.gatewayDevice.update({
+          where: { id: gatewayId },
+          data: { 
+            status: 'ONLINE',
+            lastSeen: new Date()
+            // In a future update, we could add battery/signal columns to the schema
+          },
+        });
+        logger.debug(`[Socket] Gateway health update: ${gatewayId}`, data);
+      } catch (err) {
+        logger.error('Failed to update gateway health', err);
+      }
+    });
+
     socket.on('disconnect', async () => {
       const userId = socket.data.userId as string | undefined;
       const role = socket.data.role as string | undefined;
