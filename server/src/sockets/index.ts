@@ -50,12 +50,37 @@ export function registerSocketHandlers() {
       }
     });
 
-    socket.on('gateway:auth', async (apiKey: string) => {
+    socket.on('gateway:auth', async (data: any) => {
       try {
+        const apiKey = typeof data === 'string' ? data : data?.apiKey;
+        const phoneNumber = typeof data === 'object' ? data?.phoneNumber : null;
+
+        if (!apiKey) {
+          socket.emit('gateway:error', { message: 'API Key missing' });
+          return;
+        }
+
         const gateway = await prisma.gatewayDevice.findUnique({ where: { apiKey } });
         if (!gateway) {
           socket.emit('gateway:error', { message: 'Invalid API Key' });
           return;
+        }
+
+        // Auto-detect and link phone number if provided by the app
+        if (phoneNumber) {
+          await prisma.telephonyLine.upsert({
+            where: { number: phoneNumber },
+            update: { 
+              gatewayId: gateway.id,
+              providerType: 'GATEWAY'
+            },
+            create: {
+              number: phoneNumber,
+              providerType: 'GATEWAY',
+              gatewayId: gateway.id
+            }
+          });
+          logger.info(`[Socket] Gateway ${gateway.name} auto-linked to number: ${phoneNumber}`);
         }
 
         socket.data.gatewayId = gateway.id;

@@ -14,7 +14,10 @@ import java.net.URISyntaxException
 import java.util.*
 import android.os.BatteryManager
 import android.telephony.TelephonyManager
+import android.telephony.SubscriptionManager
 import android.telephony.SignalStrength
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
 
 
 class GatewayService : Service() {
@@ -50,7 +53,12 @@ class GatewayService : Service() {
             socket = IO.socket(url, opts)
 
             socket?.on(Socket.EVENT_CONNECT) {
-                socket?.emit("gateway:auth", key)
+                val phoneNumber = getSimPhoneNumber()
+                val authData = JSONObject().apply {
+                    put("apiKey", key)
+                    put("phoneNumber", phoneNumber)
+                }
+                socket?.emit("gateway:auth", authData)
                 sendStatusUpdate("Status: Authenticating...")
                 startHealthReporting()
             }
@@ -101,17 +109,28 @@ class GatewayService : Service() {
         return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
-    private fun getSignalStrength(): Int {
+    private fun getSimPhoneNumber(): String? {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            return null
+        }
+
         return try {
             val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val signal = tm.signalStrength
-                signal?.level ?: 0 // Returns value from 0 to 4
-            } else {
-                0 // Fallback for older APIs if needed
+            var number = tm.line1Number
+            
+            if (number.isNullOrEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+                if (!activeSubscriptionInfoList.isNullOrEmpty()) {
+                    // Try to get number from first active SIM
+                    number = activeSubscriptionInfoList[0].number
+                }
             }
+            
+            if (number.isNullOrEmpty()) null else number
         } catch (e: Exception) {
-            0
+            null
         }
     }
 
