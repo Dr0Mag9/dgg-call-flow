@@ -215,11 +215,11 @@ model TelephonyLine {
 }
 
 model GatewayDevice {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   name      String
   apiKey    String   @unique
   status    String   @default("OFFLINE")
-  lastSeen  DateTime @default(now())
+  lastSeen  DateTime?
   lines     TelephonyLine[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

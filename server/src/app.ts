@@ -14,6 +14,7 @@ import tasksRoutes from './routes/tasks.routes.js';
 import materialsRoutes from './routes/materials.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import webhooksRoutes from './routes/webhooks.routes.js';
+import gatewayRoutes from './modules/gateway/gateway.routes.js';
 
 export function createApp() {
   const app = express();
@@ -32,6 +33,7 @@ export function createApp() {
   app.use('/api/materials', materialsRoutes);
   app.use('/api/settings', settingsRoutes);
   app.use('/api/settings', webhooksRoutes);
+  app.use('/api/gateway', gatewayRoutes);
   app.use('/api', webhooksRoutes);
 
   app.use('/api', (_req, res) => {
