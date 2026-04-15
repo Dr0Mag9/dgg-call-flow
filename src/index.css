@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+@theme {
+  --color-gold: #D4AF37;
+  --color-gold-deep: #B8891B;
+  --color-gold-light: #F5D77A;
+  --color-navy: #08111F;
+  --color-navy-light: #111C33;
+  --color-ivory: #F8F3E7;
+  --color-pearl: #FFFDF8;
+  --color-champagne: #FDF5E6;
+  --color-amber-glow: #FFBF0022;
+
+  --animate-gold-shimmer: gold-shimmer 3s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-waterfall: waterfall 10s linear infinite;
+
+  @keyframes gold-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  @keyframes waterfall {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-navy text-white antialiased selection:bg-gold/30 selection:text-gold-light;
+  }
+}
+
+@layer components {
+  .luxury-card {
+    @apply bg-navy-light/40 backdrop-blur-xl border border-gold/20 rounded-2xl shadow-2xl transition-all duration-300 hover:border-gold/40 hover:shadow-gold/10;
+  }
+
+  .luxury-button {
+    @apply relative overflow-hidden bg-gradient-to-br from-gold-light via-gold to-gold-deep text-navy font-bold py-2.5 px-6 rounded-xl shadow-lg transition-transform duration-200 active:scale-95 hover:shadow-gold/30;
+  }
+
+  .luxury-button::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 translate-x-[-200%] transition-transform duration-1000;
+  }
+
+  .luxury-button:hover::after {
+    @apply translate-x-[200%];
+  }
+
+  .gold-text-gradient {
+    @apply bg-gradient-to-br from-gold-light via-gold to-gold-deep bg-clip-text text-transparent;
+  }
+
+  .heavenly-glow {
+    @apply absolute blur-[120px] rounded-full opacity-20 pointer-events-none;
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Globe, Plus, Trash2, Edit, Save, X } from 'lucide-react';
+import { Globe, Plus, Trash2, Edit, Save, X, Cpu, PhoneCall, ShieldCheck, Zap, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function Settings() {
   const { token, user } = useAppStore();
@@ -105,197 +106,216 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">System Settings</h2>
+        <div>
+          <h2 className="text-3xl font-black text-pearl tracking-tight">System Core</h2>
+          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.2em] mt-1">Global Configuration & Protocols</p>
+        </div>
       </div>
 
-      <div className="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
-        <div className="p-6 space-y-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="luxury-card overflow-hidden border-gold/10"
+      >
+        <div className="p-10 space-y-12 bg-navy/20">
           
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Telephony Configuration</h3>
-              {!isAdmin && <span className="px-2 py-1 bg-red-50 text-red-700 text-xs font-bold rounded border border-red-100">VIEW ONLY</span>}
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
+                  <PhoneCall className="w-5 h-5 text-gold" />
+                </div>
+                <h3 className="text-xl font-bold text-pearl tracking-tight uppercase tracking-widest text-sm">Telephony Infrastructure</h3>
+              </div>
+              {!isAdmin && <span className="px-3 py-1 bg-red-500/10 text-red-400 text-[10px] font-black rounded-lg border border-red-500/20 tracking-widest">RESTRICTED ACCESS</span>}
             </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">SIP Provider WSS URL</label>
-                <input 
-                  disabled={!isAdmin} 
-                  type="text" 
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
-                  defaultValue={systemSettings.sip_wss_url || ''} 
-                  onBlur={(e) => updateSystemSetting('sip_wss_url', e.target.value)}
-                  placeholder="wss://sip.example.com" 
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">SIP Domain / Proxy</label>
-                <input 
-                  disabled={!isAdmin} 
-                  type="text" 
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
-                  defaultValue={systemSettings.sip_domain || ''} 
-                  onBlur={(e) => updateSystemSetting('sip_domain', e.target.value)}
-                  placeholder="sip.example.com" 
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Main Business Number</label>
-                <input 
-                  disabled={!isAdmin} 
-                  type="text" 
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
-                  defaultValue={systemSettings.main_business_number || ''} 
-                  onBlur={(e) => updateSystemSetting('main_business_number', e.target.value)}
-                  placeholder="+15550000000" 
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">SIP Default Password</label>
-                <input 
-                  disabled={!isAdmin} 
-                  type="password" 
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500" 
-                  defaultValue={systemSettings.sip_default_password || ''} 
-                  onBlur={(e) => updateSystemSetting('sip_default_password', e.target.value)}
-                  placeholder="Password for SIP extensions" 
-                />
-              </div>
+            
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              {[
+                { label: "SIP Provider WSS URL", key: "sip_wss_url", placeholder: "wss://sip.vault.com", type: "text" },
+                { label: "SIP Domain / Proxy", key: "sip_domain", placeholder: "sip.vault.com", type: "text" },
+                { label: "Main Business Number", key: "main_business_number", placeholder: "+1-800-GOLD-LINE", type: "text" },
+                { label: "SIP Default Secure Key", key: "sip_default_password", placeholder: "Enter Encryption Key", type: "password" },
+              ].map((field) => (
+                <div key={field.key} className="space-y-2">
+                  <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">{field.label}</label>
+                  <input 
+                    disabled={!isAdmin} 
+                    type={field.type} 
+                    className="w-full bg-navy/40 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10 disabled:opacity-30 disabled:cursor-not-allowed" 
+                    defaultValue={systemSettings[field.key] || ''} 
+                    onBlur={(e) => updateSystemSetting(field.key, e.target.value)}
+                    placeholder={field.placeholder} 
+                  />
+                </div>
+              ))}
             </div>
-          </div>
+          </section>section
 
-          <div className="border-t border-gray-200 pt-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Call Routing</h3>
-              {!isAdmin && <span className="px-2 py-1 bg-red-50 text-red-700 text-xs font-bold rounded border border-red-100">VIEW ONLY</span>}
+          <section className="border-t border-gold/10 pt-12">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
+                  <Cpu className="w-5 h-5 text-gold" />
+                </div>
+                <h3 className="text-xl font-bold text-pearl tracking-tight uppercase tracking-widest text-sm">Autonomous Intelligence</h3>
+              </div>
+              {!isAdmin && <span className="px-3 py-1 bg-red-500/10 text-red-400 text-[10px] font-black rounded-lg border border-red-500/20 tracking-widest">RESTRICTED ACCESS</span>}
             </div>
-            <div className="space-y-4">
+            
+            <div className="luxury-card p-6 bg-gold/5 border-gold/20">
               <div className="flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex items-center h-6">
                   <input 
                     id="route_available" 
                     type="checkbox" 
                     disabled={!isAdmin}
                     checked={systemSettings.route_available === 'true'}
                     onChange={e => updateSystemSetting('route_available', e.target.checked)}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded disabled:opacity-50" 
+                    className="w-5 h-5 rounded-lg border-2 border-gold/20 bg-navy text-gold focus:ring-gold/20 transition-all cursor-pointer disabled:opacity-20" 
                   />
                 </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="route_available" className="font-medium text-gray-700">Route to longest idle agent</label>
-                  <p className="text-gray-500">Incoming calls will be routed to the agent who has been waiting the longest.</p>
+                <div className="ml-4">
+                  <label htmlFor="route_available" className="text-sm font-bold text-pearl uppercase tracking-widest">Proprietary Load Balancing</label>
+                  <p className="text-gold-light/40 text-xs mt-1 leading-relaxed">Incoming signals will be autonomously routed to the executor with the highest idle state efficiency.</p>
                 </div>
               </div>
             </div>
-          </div>
+          </section>section
 
-          <div className="border-t border-gray-200 pt-8">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Web Integrations (Webhooks)</h3>
-                <p className="text-sm text-gray-500">Send real-time data to external systems when events occur.</p>
+          <section className="border-t border-gold/10 pt-12">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
+                  <Globe className="w-5 h-5 text-gold" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-pearl tracking-tight uppercase tracking-widest text-sm">External API Bridges</h3>
+                  <p className="text-gold-light/40 text-[10px] font-bold uppercase tracking-widest mt-1">Real-time Wealth Data Sync</p>
+                </div>
               </div>
               {isAdmin && !isAdding && (
-                <button 
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setIsAdding(true)}
-                  className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-100 font-medium text-sm"
+                  className="luxury-button text-[10px] py-2 px-4 flex items-center gap-2"
                 >
-                  <Plus className="w-4 h-4" /> Add Webhook
-                </button>
+                  <Plus className="w-4 h-4" /> Link New Terminal
+                </motion.button>
               )}
             </div>
 
-            {isAdding && (
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-medium text-gray-900">{editingId ? 'Edit Webhook' : 'New Webhook'}</h4>
-                  <button onClick={() => { setIsAdding(false); setEditingId(null); setFormData({ name: '', url: '', secret: '', events: '[]' }); }} className="text-gray-400 hover:text-gray-600">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <form onSubmit={handleSaveWebhook} className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                      <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g., Zapier Integration" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Payload URL</label>
-                      <input required type="url" value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} placeholder="https://" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Secret (Optional)</label>
-                      <input type="text" value={formData.secret} onChange={e => setFormData({...formData, secret: e.target.value})} placeholder="Secret token for signature" className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Events</label>
-                      <select 
-                        value={formData.events} 
-                        onChange={e => setFormData({...formData, events: e.target.value})}
-                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="[]">All Events</option>
-                        <option value='["client_created"]'>Client Created</option>
-                        <option value='["call_ended"]'>Call Ended</option>
-                        <option value='["task_completed"]'>Task Completed</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button type="submit" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-medium">
-                      <Save className="w-4 h-4" /> Save Webhook
+            <AnimatePresence>
+              {isAdding && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-gold/5 p-8 rounded-2xl border border-gold/20 mb-10 overflow-hidden"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <h4 className="text-xs font-black text-gold uppercase tracking-[0.3em]">{editingId ? 'Modify Connection' : 'Initialize New Terminal'}</h4>
+                    <button onClick={() => { setIsAdding(false); setEditingId(null); setFormData({ name: '', url: '', secret: '', events: '[]' }); }} className="text-gold-light/40 hover:text-gold transition-colors">
+                      <X className="w-6 h-6" />
                     </button>
                   </div>
-                </form>
-              </div>
-            )}
+                  <form onSubmit={handleSaveWebhook} className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-gold/60 uppercase tracking-widest ml-1">Terminal Alias</label>
+                        <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g., Global Ledger Sync" className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-gold/60 uppercase tracking-widest ml-1">Secure Endpoint URL</label>
+                        <input required type="url" value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} placeholder="https://api.vault.com/v1/sync" className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-gold/60 uppercase tracking-widest ml-1">Authentication Secret</label>
+                        <input type="text" value={formData.secret} onChange={e => setFormData({...formData, secret: e.target.value})} placeholder="Signature HMAC Key" className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-gold/60 uppercase tracking-widest ml-1">Trigger Protocols</label>
+                        <select 
+                          value={formData.events} 
+                          onChange={e => setFormData({...formData, events: e.target.value})}
+                          className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="[]">Absolute Oversight (All Pulse)</option>
+                          <option value='["client_created"]'>Asset Registry Pulse</option>
+                          <option value='["call_ended"]'>Transaction Conclusion Pulse</option>
+                          <option value='["task_completed"]'>Objective Neutralized Pulse</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end pt-4">
+                      <button type="submit" className="luxury-button flex items-center gap-3 text-xs py-4 px-10">
+                        <Save className="w-4 h-4" /> Finalize Connection
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {webhooks.length === 0 && !isAdding ? (
-                <p className="text-sm text-gray-500 text-center py-4 border border-dashed border-gray-300 rounded-lg">No webhooks configured.</p>
+                <div className="py-16 text-center border border-dashed border-gold/10 rounded-2xl bg-gold/5">
+                  <Sparkles className="w-8 h-8 text-gold/20 mx-auto mb-4" />
+                  <p className="text-gold-light/20 font-bold uppercase tracking-widest text-xs">No active API bridges found.</p>
+                </div>
               ) : (
                 webhooks.map(webhook => (
-                  <div key={webhook.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Globe className="w-5 h-5 text-blue-600" />
+                  <motion.div 
+                    layout
+                    key={webhook.id} 
+                    className="flex items-center justify-between p-6 bg-navy-light/10 border border-gold/10 rounded-2xl hover:bg-gold/5 transition-all group"
+                  >
+                    <div className="flex items-center gap-6">
+                      <div className="p-3 bg-gold/10 rounded-xl border border-gold/20 group-hover:scale-110 transition-transform">
+                        <Globe className="w-6 h-6 text-gold" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900">{webhook.name}</h4>
-                        <p className="text-xs text-gray-500">{webhook.url}</p>
+                        <h4 className="text-sm font-black text-pearl uppercase tracking-widest group-hover:text-gold transition-colors">{webhook.name}</h4>
+                        <p className="text-[10px] text-gold-light/40 font-bold mt-1 tracking-wider">{webhook.url}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${webhook.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {webhook.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-gold/10 bg-gold/5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${webhook.isActive ? 'bg-gold animate-pulse' : 'bg-slate-500'}`} />
+                        <span className="text-[9px] font-black text-gold uppercase tracking-widest">{webhook.isActive ? 'OPERATIONAL' : 'OFFLINE'}</span>
+                      </div>
                       {isAdmin && (
-                        <>
-                          <button onClick={() => startEdit(webhook)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50">
-                            <Edit className="w-4 h-4" />
+                        <div className="flex items-center gap-3">
+                          <button onClick={() => startEdit(webhook)} className="p-2 text-gold-light/30 hover:text-gold transition-colors rounded-lg hover:bg-gold/10">
+                            <Edit className="w-5 h-5" />
                           </button>
-                          <button onClick={() => handleDeleteWebhook(webhook.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50">
-                            <Trash2 className="w-4 h-4" />
+                          <button onClick={() => handleDeleteWebhook(webhook.id)} className="p-2 text-gold-light/30 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10">
+                            <Trash2 className="w-5 h-5" />
                           </button>
-                        </>
+                        </div>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               )}
             </div>
-          </div>
+          </section>section
 
           {isAdmin && (
-            <div className="border-t border-gray-200 pt-8 flex justify-end">
-              <span className="text-sm text-gray-500 pt-2 mr-4">All settings auto-save as you type.</span>
+            <div className="pt-12 flex justify-end items-center gap-4">
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] text-gold-deep font-black tracking-widest uppercase mb-1">Status Report</span>
+                <span className="text-xs text-gold-light/40 font-bold italic">Protocols are autonomously synchronized in real-time.</span>
+              </div>
+              <ShieldCheck className="w-10 h-10 text-gold/40" />
             </div>
           )}
 
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

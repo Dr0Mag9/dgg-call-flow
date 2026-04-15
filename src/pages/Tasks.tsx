@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { CheckSquare, Calendar, Clock, AlertCircle } from 'lucide-react';
+import { CheckSquare, Calendar, Clock, AlertCircle, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { format, isPast, isToday } from 'date-fns';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function Tasks() {
   const { token, setSelectedClient, setClientDrawerOpen } = useAppStore();
@@ -48,82 +49,133 @@ export default function Tasks() {
   const completedTasks = tasks.filter(t => t.status === 'COMPLETED');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">My Tasks</h2>
+        <div>
+          <h2 className="text-3xl font-black text-pearl tracking-tight">Success Roadmap</h2>
+          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.2em] mt-1">Strategic Objectives & Actions</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Pending Tasks */}
-        <div className="bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">Pending</h3>
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{pendingTasks.length}</span>
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="luxury-card overflow-hidden flex flex-col border-gold/10"
+        >
+          <div className="px-8 py-6 border-b border-gold/10 bg-gold/5 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-5 h-5 text-gold" />
+              <h3 className="text-lg font-bold text-pearl uppercase tracking-widest text-sm">Active Objectives</h3>
+            </div>
+            <span className="bg-gold text-navy text-[10px] font-black px-2.5 py-0.5 rounded-md shadow-lg">{pendingTasks.length} PENDING</span>
           </div>
-          <ul className="divide-y divide-gray-200">
-            {loading ? (
-              <li className="px-6 py-8 text-center text-gray-500">Loading tasks...</li>
-            ) : pendingTasks.length === 0 ? (
-              <li className="px-6 py-8 text-center text-gray-500">No pending tasks. Great job!</li>
-            ) : (
-              pendingTasks.map(task => {
-                const dueDate = new Date(task.dueAt);
-                const isOverdue = isPast(dueDate) && !isToday(dueDate);
-                return (
-                  <li 
-                    key={task.id} 
-                    className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => handleTaskClick(task.client)}
-                  >
-                    <div className="flex items-start gap-4">
-                      <button 
-                        onClick={(e) => handleComplete(e, task.id)}
-                        className="mt-1 text-gray-400 hover:text-green-500 transition-colors"
-                      >
-                        <CheckSquare className="w-5 h-5" />
-                      </button>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <p className="text-sm font-medium text-gray-900">{task.title}</p>
-                          <span className={`text-xs font-medium flex items-center gap-1 ${
-                            isOverdue ? 'text-red-600' : isToday(dueDate) ? 'text-amber-600' : 'text-gray-500'
-                          }`}>
-                            {isOverdue && <AlertCircle className="w-3 h-3" />}
-                            {format(dueDate, 'MMM d, h:mm a')}
-                          </span>
-                        </div>
-                        {task.description && <p className="text-sm text-gray-500 mt-1">{task.description}</p>}
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded uppercase tracking-wider">{task.taskType}</span>
-                          <span className="text-sm text-blue-600 font-medium">{task.client?.name}</span>
+          
+          <ul className="divide-y divide-gold/10 overflow-y-auto max-h-[600px] bg-navy/20">
+            <AnimatePresence mode="popLayout">
+              {loading ? (
+                <li className="px-8 py-20 text-center"><Sparkles className="w-8 h-8 text-gold animate-spin mx-auto mb-4 opacity-20" /><span className="text-gold-light/30 italic">Calculating priorities...</span></li>
+              ) : pendingTasks.length === 0 ? (
+                <motion.li 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="px-8 py-24 text-center group"
+                >
+                  <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-gold/20 group-hover:scale-110 transition-transform duration-500">
+                    <CheckCircle2 className="w-8 h-8 text-gold" />
+                  </div>
+                  <p className="text-pearl font-bold text-lg mb-2">Absolute Excellence</p>
+                  <p className="text-gold-light/40 text-sm italic">All strategic objectives have been neutralized.</p>
+                </motion.li>
+              ) : (
+                pendingTasks.map((task, i) => {
+                  const dueDate = new Date(task.dueAt);
+                  const isOverdue = isPast(dueDate) && !isToday(dueDate);
+                  return (
+                    <motion.li 
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: 50 }}
+                      transition={{ delay: i * 0.05 }}
+                      key={task.id} 
+                      className="px-8 py-6 hover:bg-gold/5 cursor-pointer transition-all group"
+                      onClick={() => handleTaskClick(task.client)}
+                    >
+                      <div className="flex items-start gap-6">
+                        <motion.button 
+                          whileHover={{ scale: 1.2, color: '#D4AF37' }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={(e) => handleComplete(e, task.id)}
+                          className="mt-1 text-gold-light/20 transition-colors"
+                        >
+                          <div className="w-6 h-6 rounded-lg border-2 border-current flex items-center justify-center">
+                            <CheckSquare className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        </motion.button>
+                        
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start gap-4">
+                            <p className="text-base font-bold text-pearl group-hover:text-gold transition-colors">{task.title}</p>
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${
+                              isOverdue ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
+                              isToday(dueDate) ? 'bg-gold/10 text-gold border-gold/20' : 
+                              'bg-navy/40 text-gold-light/40 border-gold/10'
+                            }`}>
+                              {isOverdue && <AlertCircle className="w-3 h-3 animate-pulse" />}
+                              {format(dueDate, 'MMM d, h:mm a')}
+                            </div>
+                          </div>
+                          
+                          {task.description && <p className="text-sm text-gold-light/40 mt-1.5 font-medium line-clamp-2">{task.description}</p>}
+                          
+                          <div className="mt-4 flex items-center gap-4">
+                            <span className="px-2.5 py-1 bg-gold/10 text-gold text-[10px] font-black rounded border border-gold/10 uppercase tracking-[0.2em]">{task.taskType}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+                              <span className="text-xs text-pearl/60 font-bold group-hover:text-pearl transition-colors">{task.client?.name}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })
-            )}
+                    </motion.li>
+                  );
+                })
+              )}
+            </AnimatePresence>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Completed Tasks */}
-        <div className="bg-white shadow rounded-lg border border-gray-200 overflow-hidden opacity-75">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">Completed</h3>
-            <span className="bg-gray-200 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{completedTasks.length}</span>
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="luxury-card overflow-hidden flex flex-col border-gold/5 bg-navy/10 grayscale-[0.5] opacity-60"
+        >
+          <div className="px-8 py-6 border-b border-gold/5 bg-navy/40 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="w-5 h-5 text-gold-light/20" />
+              <h3 className="text-lg font-bold text-pearl/40 uppercase tracking-widest text-sm text-pearl/60">Archived Success</h3>
+            </div>
+            <span className="bg-gold-light/10 text-gold-light/40 text-[10px] font-black px-2.5 py-0.5 rounded-md border border-gold/5">{completedTasks.length} COMPLETED</span>
           </div>
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-gold/5 overflow-y-auto max-h-[600px]">
             {completedTasks.length === 0 ? (
-              <li className="px-6 py-8 text-center text-gray-500">No completed tasks yet.</li>
+              <li className="px-8 py-20 text-center text-gold-light/20 italic">The archive is empty.</li>
             ) : (
               completedTasks.map(task => (
-                <li key={task.id} className="px-6 py-4 bg-gray-50">
-                  <div className="flex items-start gap-4">
-                    <CheckSquare className="w-5 h-5 text-green-500 mt-1" />
+                <li key={task.id} className="px-8 py-6 bg-navy/20">
+                  <div className="flex items-start gap-6">
+                    <div className="mt-1 p-1 rounded-lg bg-gold/10">
+                      <CheckSquare className="w-4 h-4 text-gold/40" />
+                    </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-500 line-through">{task.title}</p>
-                      <div className="mt-1 flex items-center gap-2">
-                        <span className="text-sm text-gray-400">{task.client?.name}</span>
+                      <p className="text-sm font-bold text-pearl/30 line-through tracking-wide">{task.title}</p>
+                      <div className="mt-2 flex items-center gap-3">
+                        <span className="text-[10px] text-gold-light/20 font-black uppercase tracking-widest">{task.client?.name}</span>
+                        <div className="w-1 h-1 rounded-full bg-gold/10" />
+                        <span className="text-[10px] text-gold-light/10 font-bold">VERIFIED SUCCESS</span>
                       </div>
                     </div>
                   </div>
@@ -131,7 +183,7 @@ export default function Tasks() {
               ))
             )}
           </ul>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

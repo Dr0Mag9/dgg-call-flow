@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { User, Phone, Circle, X, Edit, Power, Activity, PhoneIncoming, PhoneOutgoing, CheckSquare, Clock } from 'lucide-react';
+import { User, Phone, Circle, X, Edit, Power, Activity, PhoneIncoming, PhoneOutgoing, CheckSquare, Clock, Plus, ShieldCheck, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function AdminAgents() {
   const { token } = useAppStore();
@@ -52,7 +53,6 @@ export default function AdminAgents() {
     e.preventDefault();
     setAddError('');
 
-    // Client-side validation
     if (formData.password.length < 8) {
       setAddError('Password must be at least 8 characters.');
       return;
@@ -75,12 +75,11 @@ export default function AdminAgents() {
         setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
         fetchAgents();
       } else {
-        // Show the error returned by the API (e.g. duplicate email)
-        setAddError(data?.error || 'Failed to create agent. Please try again.');
+        setAddError(data?.error || 'Failed to create agent.');
       }
     } catch (err) {
       console.error(err);
-      setAddError('Network error. Please check your connection.');
+      setAddError('Network error.');
     } finally {
       setIsSubmitting(false);
     }
@@ -160,273 +159,287 @@ export default function AdminAgents() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Agents</h2>
-        <button 
+        <div>
+          <h2 className="text-3xl font-black text-pearl tracking-tight font-serif italic">Operational Workforce</h2>
+          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.3em] mt-1">Resource Management & Deployment</p>
+        </div>
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => {
             setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
             setAddError('');
             setIsAddModalOpen(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium"
+          className="luxury-button flex items-center gap-2"
         >
-          Add Agent
-        </button>
+          <Plus className="w-5 h-5" />
+          <span>Deploy New Unit</span>
+        </motion.button>
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-gray-500">Loading agents...</div>
+        <div className="py-24 text-center">
+          <Sparkles className="w-12 h-12 text-gold animate-spin mx-auto mb-6 opacity-20" />
+          <span className="text-gold-light/30 font-black uppercase tracking-[0.3em] text-sm">Visualizing Unit Matrix...</span>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {agents.map((agent) => (
-            <div key={agent.id} className={`bg-white shadow rounded-lg border border-gray-100 overflow-hidden ${!agent.user.isActive ? 'opacity-60' : ''}`}>
-              <div className="p-6 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => handleViewProfile(agent)}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-                      <User className="w-6 h-6 text-slate-500" />
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {agents.map((agent, i) => (
+            <motion.div 
+              key={agent.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -5 }}
+              className={`luxury-card overflow-hidden group border-gold/10 ${!agent.user.isActive ? 'opacity-40 grayscale' : ''}`}
+            >
+              <div className="p-8 cursor-pointer relative" onClick={() => handleViewProfile(agent)}>
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold/20 to-navy border border-gold/30 flex items-center justify-center text-gold shadow-lg shadow-black/40 group-hover:scale-110 transition-transform">
+                      <User className="w-8 h-8" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                      <h3 className="text-xl font-black text-pearl group-hover:text-gold transition-colors tracking-tight">
                         {agent.user.name}
-                        {!agent.user.isActive && <span className="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">Disabled</span>}
                       </h3>
-                      <p className="text-sm text-gray-500">{agent.user.email}</p>
+                      <p className="text-[10px] text-gold-light/40 font-bold uppercase tracking-widest mt-1">{agent.user.email}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Status</span>
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <Circle className={`w-3 h-3 fill-current ${agent.status === 'ONLINE' ? 'text-green-500' : 'text-gray-400'}`} />
+                <div className="space-y-5 bg-gold/5 p-5 rounded-2xl border border-gold/5 shadow-inner">
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-gold-light/40">Status Registry</span>
+                    <span className="flex items-center gap-2 text-pearl">
+                      <motion.div 
+                        animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className={`w-2 h-2 rounded-full ${agent.status === 'ONLINE' ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-700'}`} 
+                      />
                       {agent.status}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Extension</span>
-                    <span className="font-medium text-gray-900">{agent.extension || 'None'}</span>
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-gold-light/40">Internal Ext</span>
+                    <span className="text-pearl font-mono">{agent.extension || 'UNASSIGNED'}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Business Line</span>
-                    <span className="font-medium text-blue-600">{agent.telephonyLine?.number || 'Not Assigned'}</span>
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-gold-light/40">Assigned Asset</span>
+                    <span className="text-gold truncate max-w-[120px]">{agent.telephonyLine?.number || 'PENDING'}</span>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-end gap-3">
+              <div className="bg-navy-light/40 px-8 py-4 border-t border-gold/10 flex justify-end gap-6 pb-6">
                 <button 
                   onClick={(e) => { e.stopPropagation(); openEditModal(agent); }}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-500 flex items-center gap-1"
+                  className="text-[10px] font-black text-gold/40 hover:text-gold uppercase tracking-widest flex items-center gap-2 transition-colors"
                 >
-                  <Edit className="w-4 h-4" /> Edit
+                  <Edit className="w-4 h-4" /> Modify
                 </button>
                 <button 
                   onClick={(e) => { e.stopPropagation(); handleToggleStatus(agent.id); }}
-                  className={`text-sm font-medium flex items-center gap-1 ${agent.user.isActive ? 'text-red-600 hover:text-red-500' : 'text-green-600 hover:text-green-500'}`}
+                  className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${agent.user.isActive ? 'text-red-400/60 hover:text-red-400' : 'text-gold-light/60 hover:text-gold'}`}
                 >
-                  <Power className="w-4 h-4" /> {agent.user.isActive ? 'Disable' : 'Enable'}
+                  <Power className="w-4 h-4" /> {agent.user.isActive ? 'Decommission' : 'Restore'}
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
 
       {/* Add Agent Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-[500px] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-900">Add New Agent</h3>
-              <button onClick={() => { setIsAddModalOpen(false); setAddError(''); }} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleAddAgent} className="p-6 space-y-4">
-              {addError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                  {addError}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center z-[100] p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute inset-0 bg-navy/80 backdrop-blur-md" 
+            />
+            
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="luxury-card w-full max-w-xl overflow-hidden relative z-10 border-gold/30 shadow-[0_0_50px_rgba(212,175,55,0.1)]"
+            >
+              <div className="px-8 py-6 border-b border-gold/10 bg-gold/5 flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
+                    <User className="w-5 h-5 text-gold" />
+                  </div>
+                  <h3 className="text-lg font-black text-pearl uppercase tracking-[0.2em]">Deploy Unit</h3>
                 </div>
-              )}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password * <span className="text-gray-400 font-normal">(min 8 characters)</span></label>
-                <input required type="password" minLength={8} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Min. 8 characters" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Extension</label>
-                  <input type="text" value={formData.extension} onChange={e => setFormData({...formData, extension: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Direct Number</label>
-                  <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Business Line</label>
-                <select 
-                  value={formData.telephonyLineId} 
-                  onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">No Line Assigned</option>
-                  {telephonyLines.map(line => (
-                    <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
-                  ))}
-                </select>
-              </div>
-              <div className="pt-4 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium">Cancel</button>
-                <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
-                  {isSubmitting ? 'Adding...' : 'Add Agent'}
+                <button onClick={() => { setIsAddModalOpen(false); setAddError(''); }} className="p-2 rounded-full hover:bg-gold/10 text-gold-light/40 hover:text-gold transition-colors">
+                  <X className="w-6 h-6" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Agent Modal */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-[500px] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-900">Edit Agent</h3>
-              <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleEditAgent} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Extension</label>
-                  <input type="text" value={formData.extension} onChange={e => setFormData({...formData, extension: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              <form onSubmit={handleAddAgent} className="p-8 space-y-6 bg-navy/20">
+                {addError && (
+                  <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                    Protocol Error: {addError}
+                  </motion.div>
+                )}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Full Legal Alias</label>
+                    <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" placeholder="e.g. Alexander Vance" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Digital Identity (Email)</label>
+                    <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" placeholder="executor@vault.com" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Master Secure Key</label>
+                    <input required type="password" minLength={8} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" placeholder="Min. 8 Entropy Points" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Internal Line</label>
+                      <input type="text" value={formData.extension} onChange={e => setFormData({...formData, extension: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="101" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Direct Signal</label>
+                      <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="+1-555..." />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Global Asset Assignment</label>
+                    <select 
+                      value={formData.telephonyLineId} 
+                      onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
+                      className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none"
+                    >
+                      <option value="">Awaiting Allocation</option>
+                      {telephonyLines.map(line => (
+                        <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Direct Number</label>
-                  <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <div className="pt-6 flex justify-end gap-6 items-center">
+                  <button type="button" onClick={() => setIsAddModalOpen(false)} className="text-[10px] font-black text-gold-light/30 hover:text-gold-light uppercase tracking-widest transition-colors">Abort</button>
+                  <button type="submit" disabled={isSubmitting} className="luxury-button min-w-[160px] text-xs py-4 px-8">
+                    {isSubmitting ? 'Initializing...' : 'Deploy Unit'}
+                  </button>
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Business Line</label>
-                <select 
-                  value={formData.telephonyLineId} 
-                  onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">No Line Assigned</option>
-                  {telephonyLines.map(line => (
-                    <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
-                  ))}
-                </select>
-              </div>
-              <div className="pt-4 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium">Cancel</button>
-                <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
-                  {isSubmitting ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Profile & Activity Drawer */}
-      {isProfileDrawerOpen && selectedAgent && (
-        <div className="fixed inset-y-0 right-0 w-[500px] bg-white shadow-2xl z-50 flex flex-col border-l border-gray-200 transform transition-transform duration-300">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-slate-50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
-                {selectedAgent.user.name.charAt(0)}
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">{selectedAgent.user.name}</h3>
-                <p className="text-sm text-gray-500">{selectedAgent.user.email}</p>
-              </div>
-            </div>
-            <button onClick={() => setIsProfileDrawerOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-6 space-y-8">
-            {/* Recent Calls */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-gray-400" /> Recent Calls
-              </h4>
-              <div className="space-y-3">
-                {agentActivity.calls.length === 0 ? (
-                  <p className="text-sm text-gray-500">No recent calls.</p>
-                ) : (
-                  agentActivity.calls.map(call => (
-                    <div key={call.id} className="bg-gray-50 p-3 rounded-lg border border-gray-100 flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <div className={`p-1.5 rounded-full mt-0.5 ${call.direction === 'INBOUND' ? 'bg-indigo-100 text-indigo-600' : 'bg-purple-100 text-purple-600'}`}>
-                          {call.direction === 'INBOUND' ? <PhoneIncoming className="w-3 h-3" /> : <PhoneOutgoing className="w-3 h-3" />}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{call.client?.name || call.phoneNumber}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{format(new Date(call.startedAt), 'MMM d, h:mm a')}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${call.status === 'ENDED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {call.status}
-                        </span>
-                        {call.duration && <p className="text-xs text-gray-500 mt-1">{Math.floor(call.duration / 60)}m {call.duration % 60}s</p>}
-                      </div>
+      <AnimatePresence>
+        {isProfileDrawerOpen && selectedAgent && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsProfileDrawerOpen(false)}
+              className="fixed inset-0 bg-navy/60 backdrop-blur-md z-[110]" 
+            />
+            <motion.div 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 right-0 w-full max-w-xl bg-navy border-l border-gold/20 shadow-2xl z-[120] flex flex-col"
+            >
+              <div className="px-10 py-8 border-b border-gold/10 flex justify-between items-center bg-gold/5">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold/30 to-navy border border-gold/30 flex items-center justify-center text-gold shadow-xl">
+                    <User className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-pearl tracking-tight">{selectedAgent.user.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+                      <span className="text-[10px] text-gold font-black uppercase tracking-[0.2em]">{selectedAgent.user.email}</span>
                     </div>
-                  ))
-                )}
+                  </div>
+                </div>
+                <button onClick={() => setIsProfileDrawerOpen(false)} className="p-3 hover:bg-gold/10 rounded-full transition-all text-gold-light/40 hover:text-gold">
+                  <X className="w-8 h-8" />
+                </button>
               </div>
-            </div>
+              
+              <div className="flex-1 overflow-y-auto p-10 space-y-12 bg-navy/40 custom-scrollbar">
+                {/* Recent Calls */}
+                <section>
+                  <h4 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                    <Phone className="w-4 h-4" /> Strategic Transactions
+                  </h4>
+                  <div className="space-y-4">
+                    {agentActivity.calls.length === 0 ? (
+                      <div className="p-8 border border-dashed border-gold/10 rounded-2xl text-center text-gold-light/20 italic text-sm">No transaction history detected.</div>
+                    ) : (
+                      agentActivity.calls.map(call => (
+                        <div key={call.id} className="luxury-card p-5 bg-navy/60 border-gold/5 group flex items-start justify-between">
+                          <div className="flex items-start gap-4">
+                            <div className={`p-2.5 rounded-xl mt-0.5 shadow-lg ${call.direction === 'INBOUND' ? 'bg-gold/10 text-gold' : 'bg-gold-light/10 text-gold-light'}`}>
+                              {call.direction === 'INBOUND' ? <PhoneIncoming className="w-4 h-4" /> : <PhoneOutgoing className="w-4 h-4" />}
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-pearl group-hover:text-gold transition-colors">{call.client?.name || call.phoneNumber}</p>
+                              <p className="text-[10px] text-gold-light/40 font-bold mt-1 uppercase tracking-widest">{format(new Date(call.startedAt), 'MMM d, h:mm a')}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className={`text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full border ${call.status === 'ENDED' ? 'bg-gold/10 text-gold border-gold/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                              {call.status}
+                            </span>
+                            {call.duration && <p className="text-[10px] font-mono text-gold-light/40 mt-2">{Math.floor(call.duration / 60)}m {call.duration % 60}s</p>}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </section>
 
-            {/* Recent Tasks */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <CheckSquare className="w-4 h-4 text-gray-400" /> Upcoming Tasks
-              </h4>
-              <div className="space-y-3">
-                {agentActivity.tasks.length === 0 ? (
-                  <p className="text-sm text-gray-500">No upcoming tasks.</p>
-                ) : (
-                  agentActivity.tasks.map(task => (
-                    <div key={task.id} className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                      <div className="flex justify-between items-start">
-                        <p className={`text-sm font-medium ${task.status === 'COMPLETED' ? 'text-gray-500 line-through' : 'text-gray-900'}`}>{task.title}</p>
-                        <span className="text-xs text-blue-600 font-medium">{task.client?.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
-                        <Clock className="w-3 h-3" /> {format(new Date(task.dueAt), 'MMM d, h:mm a')}
-                        <span className="px-1.5 py-0.5 bg-gray-200 rounded uppercase text-[10px] tracking-wider">{task.taskType}</span>
-                      </div>
-                    </div>
-                  ))
-                )}
+                {/* Recent Tasks */}
+                <section>
+                  <h4 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                    <CheckSquare className="w-4 h-4" /> Objective Roadmap
+                  </h4>
+                  <div className="space-y-4">
+                    {agentActivity.tasks.length === 0 ? (
+                      <div className="p-8 border border-dashed border-gold/10 rounded-2xl text-center text-gold-light/20 italic text-sm">No active objectives detected.</div>
+                    ) : (
+                      agentActivity.tasks.map(task => (
+                        <div key={task.id} className="luxury-card p-5 bg-navy/60 border-gold/5">
+                          <div className="flex justify-between items-start">
+                            <p className={`text-sm font-bold ${task.status === 'COMPLETED' ? 'text-gold-light/20 line-through' : 'text-pearl'}`}>{task.title}</p>
+                            <span className="text-[9px] font-black text-gold uppercase tracking-widest">{task.client?.name}</span>
+                          </div>
+                          <div className="flex items-center gap-4 mt-3">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-gold-light/40 uppercase tracking-widest">
+                              <Clock className="w-3.5 h-3.5 text-gold/60" /> {format(new Date(task.dueAt), 'MMM d, h:mm a')}
+                            </div>
+                            <span className="px-2 py-0.5 bg-gold/10 text-gold text-[8px] font-black rounded border border-gold/10 uppercase tracking-widest">{task.taskType}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </section>
+                
+                <div className="pt-8 flex justify-center">
+                  <ShieldCheck className="w-12 h-12 text-gold/10" />
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

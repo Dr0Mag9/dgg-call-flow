@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Phone, Smartphone, Plus, Trash2, Signal, Shield, Key, ExternalLink, Activity, Save } from 'lucide-react';
+import { Phone, Smartphone, Plus, Trash2, Signal, Shield, Key, ExternalLink, Activity, Save, X, Sparkles, Zap, Cpu, Radio, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function AdminTelephony() {
   const { token } = useAppStore();
@@ -83,15 +84,9 @@ export default function AdminTelephony() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('Copied to clipboard!');
   };
 
   const verifyGateway = (gw: any) => {
-    if (gw.status === 'ONLINE') {
-      alert(`Success! ${gw.name} is connected and ready.`);
-    } else {
-      alert(`${gw.name} is currently offline. Please check the Android app.`);
-    }
     fetchData();
   };
 
@@ -103,250 +98,340 @@ export default function AdminTelephony() {
     fetchData();
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Loading Telephony Suite...</div>;
+  if (loading) return (
+    <div className="p-24 text-center">
+      <Sparkles className="w-12 h-12 text-gold animate-spin mx-auto mb-6 opacity-20" />
+      <span className="text-gold-light/30 font-black uppercase tracking-[0.3em] text-sm">Synchronizing Telephony Suite...</span>
+    </div>
+  );
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Unified Telephony Management</h2>
-        <p className="text-gray-500 mt-1">Manage SIP Trunks, Global Connectors, and Android SIM Gateways.</p>
+    <div className="space-y-10 pb-12">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-black text-pearl tracking-tight font-serif italic text-white">Unified Telephony Matrix</h2>
+          <p className="text-gold-light/40 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Global Communication Infrastructure</p>
+        </div>
+        <div className="flex items-center gap-4 px-6 py-3 bg-gold/5 border border-gold/20 rounded-2xl">
+          <ShieldCheck className="w-5 h-5 text-gold" />
+          <span className="text-[10px] font-black text-gold-light uppercase tracking-widest">Quantum Encryption Active</span>
+        </div>
       </div>
 
       {/* Global SIP Settings */}
-      <div className="bg-white shadow rounded-lg border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-blue-600" /> Global SIP Configuration
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="luxury-card p-10 bg-navy/20 border-gold/10 relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full -mr-32 -mt-32" />
+        <h3 className="text-base font-black text-pearl mb-8 flex items-center gap-4 uppercase tracking-[0.2em]">
+          <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
+            <Cpu className="w-5 h-5 text-gold" />
+          </div>
+          Core SIP Protocol Configuration
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">SIP WSS URL</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIP Master WSS URL</label>
             <input 
               type="text" 
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm" 
+              className="w-full bg-navy/40 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" 
               defaultValue={systemSettings.sip_wss_url}
               onBlur={(e) => updateSystemSetting('sip_wss_url', e.target.value)}
-              placeholder="wss://sip.example.com:443"
+              placeholder="wss://sip.vault.com:443"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">SIP Domain/Proxy</label>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIP Master Domain/Proxy</label>
             <input 
               type="text" 
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm" 
+              className="w-full bg-navy/40 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" 
               defaultValue={systemSettings.sip_domain}
               onBlur={(e) => updateSystemSetting('sip_domain', e.target.value)}
-              placeholder="sip.example.com"
+              placeholder="sip.vault.com"
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
         {/* Gateway Devices Section */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-orange-600" /> Android SIM Gateways
+        <div className="space-y-6">
+          <div className="flex justify-between items-center px-4">
+            <h3 className="text-sm font-black text-pearl flex items-center gap-4 uppercase tracking-[0.2em]">
+              <div className="p-2 bg-gold/10 rounded-lg">
+                <Smartphone className="w-4 h-4 text-gold" />
+              </div>
+              Android SIM Pro-Gateways
             </h3>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsAddingGateway(true)}
-              className="text-sm bg-orange-50 text-orange-700 px-3 py-1.5 rounded-md hover:bg-orange-100 font-medium flex items-center gap-1"
+              className="luxury-button text-[9px] py-2 px-4 flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" /> Add Device
-            </button>
+              <Plus className="w-3.5 h-3.5" /> Initialize Device
+            </motion.button>
           </div>
 
-          <div className="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Device</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">API Key</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {gateways.length === 0 ? (
-                  <tr><td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">No devices registered</td></tr>
-                ) : (
-                  gateways.map(gw => (
-                    <tr key={gw.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{gw.name}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${gw.status === 'ONLINE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
-                          <Signal className="w-3 h-3" /> {gw.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm font-mono text-gray-400 flex items-center gap-2">
-                        {gw.apiKey.substring(0, 8)}...
-                        <button onClick={() => copyToClipboard(gw.apiKey)} className="text-gray-400 hover:text-blue-600">
-                          <Plus className="w-3 h-3 rotate-45" /> 
-                        </button>
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-3">
-                        <button 
-                          onClick={() => verifyGateway(gw)}
-                          className="text-blue-500 hover:text-blue-700 text-xs font-medium"
-                        >
-                          Verify
-                        </button>
-                        <button onClick={() => handleDeleteGateway(gw.id)} className="text-red-400 hover:text-red-600">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="luxury-card overflow-hidden border-gold/10 flex flex-col h-[500px]"
+          >
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gold/10">
+                <thead className="bg-navy/60">
+                  <tr>
+                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Device Model</th>
+                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Signal Presence</th>
+                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Access Credentials</th>
+                    <th className="px-8 py-5 relative"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gold/10 bg-navy/20">
+                  {gateways.length === 0 ? (
+                    <tr><td colSpan={4} className="px-8 py-20 text-center text-gold-light/10 italic text-sm">No gateway devices detected in the matrix.</td></tr>
+                  ) : (
+                    gateways.map((gw, i) => (
+                      <motion.tr 
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        key={gw.id} 
+                        className="hover:bg-gold/5 transition-all group"
+                      >
+                        <td className="px-8 py-6 text-[11px] font-black text-pearl uppercase tracking-widest">{gw.name}</td>
+                        <td className="px-8 py-6">
+                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${gw.status === 'ONLINE' ? 'bg-gold/10 text-gold border-gold/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'}`}>
+                            <Signal className={`w-3 h-3 ${gw.status === 'ONLINE' ? 'animate-pulse' : ''}`} /> 
+                            <span className="text-[9px] font-black uppercase tracking-widest">{gw.status}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 font-mono text-[9px] text-gold-light/30">
+                          <div className="flex items-center gap-3">
+                            <Key className="w-3 h-3 text-gold/20" />
+                            {gw.apiKey.substring(0, 10)}...
+                            <button onClick={() => copyToClipboard(gw.apiKey)} className="p-1 hover:text-gold transition-colors">
+                              <Plus className="w-3 h-3 rotate-45" /> 
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right space-x-4">
+                          <button 
+                            onClick={() => verifyGateway(gw)}
+                            className="text-[9px] font-black text-gold hover:text-white uppercase tracking-widest transition-colors"
+                          >
+                            VERIFY
+                          </button>
+                          <button onClick={() => handleDeleteGateway(gw.id)} className="text-red-400/40 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-auto p-4 bg-gold/5 border-t border-gold/10 flex items-center justify-between">
+              <span className="text-[9px] font-black text-gold/40 uppercase tracking-widest">Gateway Network Health: Stable</span>
+              <Radio className="w-4 h-4 text-gold animate-pulse" />
+            </div>
+          </motion.div>
         </div>
 
         {/* Telephony Lines Section */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Phone className="w-5 h-5 text-purple-600" /> Business Lines
+        <div className="space-y-6">
+          <div className="flex justify-between items-center px-4">
+            <h3 className="text-sm font-black text-pearl flex items-center gap-4 uppercase tracking-[0.2em]">
+              <div className="p-2 bg-gold/10 rounded-lg">
+                <Phone className="w-4 h-4 text-gold" />
+              </div>
+              Strategic Business Channels
             </h3>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsAddingLine(true)}
-              className="text-sm bg-purple-50 text-purple-700 px-3 py-1.5 rounded-md hover:bg-purple-100 font-medium flex items-center gap-1"
+              className="luxury-button text-[9px] py-2 px-4 flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" /> Add Line
-            </button>
+              <Plus className="w-3.5 h-3.5" /> Allocate Line
+            </motion.button>
           </div>
 
-          <div className="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Number</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provider</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gateway/Ref</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                 {lines.length === 0? (
-                   <tr><td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">No lines added</td></tr>
-                 ) : (
-                   lines.map(line => (
-                    <tr key={line.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-bold text-gray-900">{line.number}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-600">{line.providerType}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {line.providerType === 'GATEWAY' ? (line.gateway?.name || 'Unlinked') : (line.providerRef || 'PBX Default')}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => handleDeleteLine(line.id)} className="text-red-400 hover:text-red-600">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                   ))
-                 )}
-              </tbody>
-            </table>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="luxury-card overflow-hidden border-gold/10 flex flex-col h-[500px]"
+          >
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gold/10">
+                <thead className="bg-navy/60">
+                  <tr>
+                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Transaction Number</th>
+                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Carrier Protocol</th>
+                    <th className="px-8 py-5 text-left text-[9px] font-black text-gold-light/20 uppercase tracking-[0.2em]">Nexus Link</th>
+                    <th className="px-8 py-5 relative"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gold/10 bg-navy/20">
+                   {lines.length === 0? (
+                     <tr><td colSpan={4} className="px-8 py-20 text-center text-gold-light/10 italic text-sm">No business lines registered in the matrix.</td></tr>
+                   ) : (
+                     lines.map((line, i) => (
+                      <motion.tr 
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        key={line.id} 
+                        className="hover:bg-gold/5 transition-all group"
+                      >
+                        <td className="px-8 py-6 text-[12px] font-black text-pearl tracking-widest">{line.number}</td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gold" />
+                            <span className="text-[10px] font-black text-gold-light/60 uppercase tracking-widest">{line.providerType}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-[10px] font-bold text-pearl/40 uppercase tracking-widest">
+                          {line.providerType === 'GATEWAY' ? (
+                            <span className="text-gold flex items-center gap-2">
+                              <Smartphone className="w-3 h-3" /> {line.gateway?.name || 'ORPHANED'}
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <Globe className="w-3 h-3" /> {line.providerRef || 'CLOUD INFRA'}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <button onClick={() => handleDeleteLine(line.id)} className="text-red-400/40 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </motion.tr>
+                     ))
+                   )}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-auto p-4 bg-gold/5 border-t border-gold/10 flex items-center justify-between">
+              <span className="text-[9px] font-black text-gold/40 uppercase tracking-widest">Active Channels: {lines.length}</span>
+              <Shield className="w-4 h-4 text-gold opacity-30" />
+            </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Modals */}
-      {isAddingGateway && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl">
-            {!lastCreatedKey ? (
-              <>
-                <h3 className="text-lg font-bold mb-4">Register Android Gateway</h3>
-                <form onSubmit={handleCreateGateway} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Device Name</label>
-                    <input required type="text" className="w-full border p-2 rounded" value={gwName} onChange={e => setGwName(e.target.value)} placeholder="e.g. Office Phone 1" />
+      <AnimatePresence>
+        {isAddingGateway && (
+          <div className="fixed inset-0 flex items-center justify-center p-6 z-[200]">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsAddingGateway(false); setLastCreatedKey(null); }} className="absolute inset-0 bg-navy/90 backdrop-blur-xl" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-navy border border-gold/30 rounded-3xl p-10 w-full max-w-lg shadow-[0_0_50px_rgba(212,175,55,0.15)] relative z-10">
+              {!lastCreatedKey ? (
+                <>
+                  <h3 className="text-xl font-black text-pearl mb-8 uppercase tracking-[0.2em] flex items-center gap-4">
+                    <Smartphone className="w-6 h-6 text-gold" />
+                    Initialize Gateway
+                  </h3>
+                  <form onSubmit={handleCreateGateway} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Device Alias</label>
+                      <input required type="text" className="w-full bg-navy/50 border border-gold/10 rounded-xl p-4 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" value={gwName} onChange={e => setGwName(e.target.value)} placeholder="e.g. Nexus-01-Global" />
+                    </div>
+                    <div className="flex justify-end gap-6 pt-4 items-center">
+                      <button type="button" onClick={() => setIsAddingGateway(false)} className="text-[10px] font-black text-gold-light/20 hover:text-gold-light uppercase tracking-widest transition-colors">Terminate</button>
+                      <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit" className="luxury-button py-4 px-10 text-xs">Authorize Protocol</motion.button>
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <div className="text-center py-6">
+                  <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 360] }} transition={{ duration: 10, repeat: Infinity, ease: 'linear' }} className="w-20 h-20 bg-gold/10 text-gold rounded-full flex items-center justify-center mx-auto mb-8 border border-gold/40 shadow-xl shadow-gold/10">
+                    <Activity className="w-10 h-10" />
+                  </motion.div>
+                  <h3 className="text-2xl font-black text-pearl mb-4 tracking-tight uppercase tracking-widest">Access Granted</h3>
+                  <p className="text-gold-light/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-10">Deploy this cryptographic key to the target unit.</p>
+                  
+                  <div className="bg-gold/5 p-6 rounded-2xl font-mono text-xs break-all border border-gold/20 mb-10 flex items-center justify-between gap-4 shadow-inner">
+                    <span className="text-gold-light/80 select-all">{lastCreatedKey}</span>
+                    <button 
+                      onClick={() => copyToClipboard(lastCreatedKey)}
+                      className="p-2 hover:bg-gold/10 rounded-xl text-gold shrink-0 transition-all"
+                      title="Copy Terminal Key"
+                    >
+                      <Save className="w-5 h-5" />
+                    </button>
                   </div>
-                  <div className="flex justify-end gap-3 pt-2">
-                    <button type="button" onClick={() => setIsAddingGateway(false)} className="px-4 py-2 text-gray-600">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded font-medium">Create API Key</button>
-                  </div>
-                </form>
-              </>
-            ) : (
-              <div className="text-center py-4">
-                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Activity className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Gateway Registered!</h3>
-                <p className="text-gray-500 text-sm mb-6">Copy this key into your Android app to connect.</p>
-                
-                <div className="bg-gray-50 p-4 rounded-lg font-mono text-sm break-all border border-gray-200 mb-6 flex items-center justify-between gap-2">
-                  <span className="text-gray-700">{lastCreatedKey}</span>
+
                   <button 
-                    onClick={() => copyToClipboard(lastCreatedKey)}
-                    className="p-1.5 hover:bg-gray-200 rounded-md text-blue-600 shrink-0"
-                    title="Copy Key"
+                    onClick={() => {
+                      setIsAddingGateway(false);
+                      setLastCreatedKey(null);
+                      setGwName('');
+                    }}
+                    className="luxury-button w-full py-5 text-sm"
                   >
-                    <Save className="w-4 h-4" />
+                    DEPLOYMENT COMPLETE
                   </button>
                 </div>
-
-                <button 
-                  onClick={() => {
-                    setIsAddingGateway(false);
-                    setLastCreatedKey(null);
-                    setGwName('');
-                  }}
-                  className="w-full py-2 bg-gray-900 text-white rounded font-medium hover:bg-gray-800"
-                >
-                  Done
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isAddingLine && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg">
-            <h3 className="text-lg font-bold mb-4">Add Business Line</h3>
-            <form onSubmit={handleCreateLine} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Phone Number</label>
-                  <input required type="text" className="w-full border p-2 rounded" value={lineFormData.number} onChange={e => setLineFormData({...lineFormData, number: e.target.value})} placeholder="+91..." />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Provider Type</label>
-                  <select className="w-full border p-2 rounded" value={lineFormData.providerType} onChange={e => setLineFormData({...lineFormData, providerType: e.target.value})}>
-                    <option value="GATEWAY">Android Gateway</option>
-                    <option value="SIP">Cloud SIP Trunk</option>
-                  </select>
-                </div>
-              </div>
-              
-              {lineFormData.providerType === 'GATEWAY' ? (
-                <div>
-                  <label className="block text-sm font-medium mb-1">Link to Device</label>
-                  <select required className="w-full border p-2 rounded" value={lineFormData.gatewayId} onChange={e => setLineFormData({...lineFormData, gatewayId: e.target.value})}>
-                    <option value="">Select a device...</option>
-                    {gateways.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-                  </select>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium mb-1">SIP Extension / Username</label>
-                  <input required type="text" className="w-full border p-2 rounded" value={lineFormData.providerRef} onChange={e => setLineFormData({...lineFormData, providerRef: e.target.value})} placeholder="e.g. 101" />
-                </div>
               )}
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsAddingLine(false)} className="px-4 py-2 text-gray-600">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded font-medium">Add Line</button>
-              </div>
-            </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAddingLine && (
+          <div className="fixed inset-0 flex items-center justify-center p-6 z-[200]">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAddingLine(false)} className="absolute inset-0 bg-navy/90 backdrop-blur-xl" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-navy border border-gold/30 rounded-3xl p-10 w-full max-w-xl shadow-[0_0_50px_rgba(212,175,55,0.15)] relative z-10">
+              <h3 className="text-xl font-black text-pearl mb-8 uppercase tracking-[0.2em] flex items-center gap-4">
+                <Zap className="w-6 h-6 text-gold" />
+                Strategic Allocation
+              </h3>
+              <form onSubmit={handleCreateLine} className="space-y-6">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Terminal Number</label>
+                    <input required type="text" className="w-full bg-navy/50 border border-gold/10 rounded-xl p-4 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" value={lineFormData.number} onChange={e => setLineFormData({...lineFormData, number: e.target.value})} placeholder="+1 (555) 000-0000" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Protocol Type</label>
+                    <select className="w-full bg-navy/50 border border-gold/10 rounded-xl p-4 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none" value={lineFormData.providerType} onChange={e => setLineFormData({...lineFormData, providerType: e.target.value})}>
+                      <option value="GATEWAY">SIM Transceiver (Android)</option>
+                      <option value="SIP">Virtual Trunk (Cloud)</option>
+                    </select>
+                  </div>
+                </div>
+                
+                {lineFormData.providerType === 'GATEWAY' ? (
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Link to Operational Nexus</label>
+                    <select required className="w-full bg-navy/50 border border-gold/10 rounded-xl p-4 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none" value={lineFormData.gatewayId} onChange={e => setLineFormData({...lineFormData, gatewayId: e.target.value})}>
+                      <option value="">Awaiting Nexus Verification...</option>
+                      {gateways.map(g => <option key={g.id} value={g.id}>{g.name} ({g.status})</option>)}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Cloud SIP Identifier</label>
+                    <input required type="text" className="w-full bg-navy/50 border border-gold/10 rounded-xl p-4 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" value={lineFormData.providerRef} onChange={e => setLineFormData({...lineFormData, providerRef: e.target.value})} placeholder="e.g. 1001-A" />
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-6 pt-6 items-center">
+                  <button type="button" onClick={() => setIsAddingLine(false)} className="text-[10px] font-black text-gold-light/20 hover:text-gold-light uppercase tracking-widest transition-colors">Decline Allocation</button>
+                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit" className="luxury-button py-4 px-10 text-xs text-white">Authorize Asset</motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
