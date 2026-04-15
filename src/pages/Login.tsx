@@ -77,19 +77,22 @@ export default function Login() {
         transition={{ duration: 0.8 }}
         className="w-full max-w-md"
       >
-        <div className="text-center mb-10">
+        <div className="text-center mb-8 relative">
+          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-gold/10 blur-3xl rounded-full" />
           <motion.div 
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-gold-light via-gold to-gold-deep shadow-2xl shadow-gold/20 mb-6"
+            initial={{ scale: 0.8, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            className="inline-flex items-center justify-center w-24 h-24 rounded-[2.5rem] bg-gradient-to-br from-gold-light via-gold to-gold-deep shadow-2xl shadow-gold/30 mb-6 relative group overflow-hidden"
           >
-            <PhoneCall className="w-10 h-10 text-navy" />
+            <img src="/assets/@digitalgrowthgurus (1).jpg" className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000" alt="DGG" />
+            <div className="absolute inset-0 bg-navy/20" />
+            <PhoneCall className="w-10 h-10 text-white relative z-10 drop-shadow-lg" />
           </motion.div>
-          <h2 className="text-4xl font-black text-pearl tracking-tight mb-2">
-            Welcome to <span className="gold-text-gradient">CallFlow</span>
+          <h2 className="text-3xl font-black text-pearl tracking-tight mb-2 uppercase italic">
+            <span className="gold-text-gradient">CallFlow</span> PRO
           </h2>
-          <p className="text-gold-light/60 font-medium tracking-wide uppercase text-xs">
-            Unlock Your Prosperity Today
+          <p className="text-gold-light/40 font-black tracking-[0.4em] uppercase text-[10px] shimmer-text">
+            Digital Asset Command
           </p>
         </div>
 
@@ -169,9 +172,15 @@ export default function Login() {
           </form>
         </div>
         
-        <p className="mt-8 text-center text-sm text-gold-light/30">
-          Powered by <span className="text-gold-light/60 font-bold">CallFlow Wealth System</span>
-        </p>
+        <div className="mt-8 text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold-light/20">
+            System Protocol 2.0
+          </p>
+          <p className="mt-2 text-[11px] font-black text-gold-light/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+            Powered by <span className="text-gold shimmer-text">DIGITAL GROWTH GURUS</span>
+          </p>
+          <img src="/assets/@digitalgrowthgurus (1).jpg" className="w-8 h-8 rounded-full mx-auto mt-4 opacity-10 grayscale brightness-200" alt="" />
+        </div>
       </motion.div>
     </div>
   );

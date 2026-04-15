@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { PhoneCall, Activity, Signal, Smartphone } from 'lucide-react';
+import { PhoneCall, Activity, Signal, Smartphone, Zap } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export default function TelephonyStatusPanel() {
   const { user, token } = useAppStore();
   const [lineInfo, setLineInfo] = useState<any>(null);
 
   useEffect(() => {
-    // Determine assigned line. This would ideally be fetched from /api/agents/me/line.
-    // For this implementation, we will assume we have an endpoint that returns line details.
-    
-    // Simulate fetching assigned line data
     fetch('/api/auth/me', {
        headers: { 'Authorization': `Bearer ${token}` }
     })
@@ -20,40 +17,54 @@ export default function TelephonyStatusPanel() {
          setLineInfo(data.agent.telephonyLine);
       }
     });
-
   }, [token]);
 
   return (
-    <div className="bg-white shadow rounded-lg border border-gray-100 p-6 flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-          <PhoneCall className="w-6 h-6" />
+    <motion.div 
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="luxury-card-gold px-6 py-3 flex items-center justify-between bg-gold/5 border-gold/20 shadow-lg relative overflow-hidden group"
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+      
+      <div className="flex items-center gap-4 relative z-10">
+        <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+          <PhoneCall className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-sm font-medium text-gray-500">Assigned Inbound/Outbound Line</h3>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-xl font-bold text-gray-900">
-               {lineInfo ? lineInfo.number : 'Unassigned'}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black text-pearl italic tracking-tight">
+               {lineInfo ? lineInfo.number : 'Stationary Node'}
             </span>
             {lineInfo && (
-              <span className={`text-xs px-2 py-0.5 rounded-full border ${lineInfo.providerType === 'SIP' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-orange-50 text-orange-700 border-orange-200'} font-medium flex items-center gap-1`}>
-                {lineInfo.providerType === 'SIP' ? <Activity className="w-3 h-3"/> : <Smartphone className="w-3 h-3"/>}
+              <span className="text-[8px] px-2 py-0.5 rounded-md border border-gold/30 bg-gold/10 text-gold font-black flex items-center gap-1 uppercase tracking-widest">
+                {lineInfo.providerType === 'SIP' ? <Zap className="w-2.5 h-2.5"/> : <Smartphone className="w-2.5 h-2.5"/>}
                 {lineInfo.providerType}
               </span>
             )}
           </div>
+          <p className="text-[9px] font-black text-gold/40 uppercase tracking-[0.2em] mt-0.5">Assigned Wealth Channel</p>
         </div>
       </div>
       
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6 relative z-10">
         <div className="text-right">
-          <p className="text-sm font-medium text-gray-900">Telephony Link</p>
-          <p className={`text-sm ${lineInfo ? 'text-green-600' : 'text-gray-500'}`}>
-            {lineInfo ? 'Registered' : 'Disconnected'}
-          </p>
+          <p className="text-[9px] font-black text-gold/40 uppercase tracking-[0.2em]">Telephony Link</p>
+          <div className="flex items-center gap-2 justify-end mt-0.5">
+            <motion.div 
+              animate={{ opacity: lineInfo ? [0.4, 1, 0.4] : 0.2 }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className={`w-1.5 h-1.5 rounded-full ${lineInfo ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-600'}`} 
+            />
+            <p className={`text-[10px] font-black uppercase tracking-widest ${lineInfo ? 'text-gold' : 'text-slate-500'}`}>
+              {lineInfo ? 'Operational' : 'Offline'}
+            </p>
+          </div>
         </div>
-        <Signal className={`w-6 h-6 ${lineInfo ? 'text-green-500' : 'text-gray-300'}`} />
+        <div className="p-2.5 rounded-xl bg-gold/5 border border-gold/10">
+          <Signal className={`w-4 h-4 ${lineInfo ? 'text-gold' : 'text-slate-700'}`} />
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

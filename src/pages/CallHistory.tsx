@@ -30,32 +30,32 @@ export default function CallHistory() {
   );
 
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 pb-4">
+      <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-black text-pearl tracking-tight">Call Ledger</h2>
-          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.2em] mt-1">Transaction History & Records</p>
+          <h2 className="text-xl font-black text-pearl tracking-tight uppercase italic underline decoration-gold/30">Call Ledger</h2>
+          <p className="text-gold-light/40 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">Transaction History</p>
         </div>
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="luxury-card-gold p-6 flex gap-8 items-center"
+        className="luxury-card-gold p-3 flex gap-4 items-center"
       >
         <div className="relative flex-1 group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gold/60 group-focus-within:text-gold w-6 h-6 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/60 group-focus-within:text-gold w-5 h-5 transition-colors" />
           <input 
             type="text" 
-            placeholder="Search ledger by client, agent, or outcome markers..." 
+            placeholder="Search ledger..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-14 pr-8 py-4 bg-[#0A1221]/40 border border-gold/20 rounded-2xl focus:ring-4 focus:ring-gold/10 focus:border-gold/50 text-pearl transition-all outline-none placeholder:text-gold-light/20 font-medium"
+            className="w-full pl-11 pr-6 py-2 bg-[#0A1221]/40 border border-gold/20 rounded-xl focus:ring-2 focus:ring-gold/10 focus:border-gold/30 text-pearl transition-all outline-none placeholder:text-gold-light/20 text-xs font-medium"
           />
         </div>
-        <button className="flex items-center gap-4 px-8 py-3.5 bg-gold/5 border border-gold/30 rounded-2xl hover:bg-gold/10 text-gold hover:text-gold-light font-black uppercase text-xs tracking-[0.2em] transition-all shadow-lg hover:shadow-gold/10 group">
-          <Filter className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-          Refine Ledger
+        <button className="flex items-center gap-3 px-4 py-2 bg-gold/5 border border-gold/20 rounded-xl hover:bg-gold/10 text-gold hover:text-gold-light font-black uppercase text-[9px] tracking-[0.2em] transition-all group">
+          <Filter className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+          Refine
         </button>
       </motion.div>
 
@@ -69,15 +69,15 @@ export default function CallHistory() {
           <table className="min-w-full divide-y divide-gold/10">
             <thead className="bg-[#0A1221]/80 backdrop-blur-3xl sticky top-0 z-20">
               <tr className="border-b border-gold/20">
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Flow</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Asset / Target</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Executor</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Assigned Channel</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Timestamp</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Session Time</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Audio Vault</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Resolution</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Outcome</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Flow</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Target</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Executor</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Channel</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Timestamp</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Time</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Vault</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Status</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Outcome</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gold/5 bg-navy/10">
@@ -94,73 +94,71 @@ export default function CallHistory() {
                     key={call.id} 
                     className="hover:bg-gold/10 transition-all group relative overflow-hidden"
                   >
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className={`inline-flex p-3 rounded-2xl ${
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className={`inline-flex p-2 rounded-lg ${
                         call.direction === 'INBOUND' ? 'bg-gold/10 text-gold border border-gold/30' : 'bg-gold-light/10 text-gold-light border border-gold-light/30'
-                      } shadow-xl group-hover:scale-110 transition-all duration-500`}>
-                        {call.direction === 'INBOUND' ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
+                      }`}>
+                        {call.direction === 'INBOUND' ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="text-base font-black text-pearl group-hover:text-gold transition-colors italic tracking-tight">{call.client?.name || 'External Signal'}</div>
-                      <div className="text-[11px] text-gold-light/40 font-black mt-1.5 uppercase tracking-widest">{call.phoneNumber}</div>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors italic tracking-tight uppercase truncate max-w-[150px]">{call.client?.name || 'External'}</div>
+                      <div className="text-[8px] text-gold-light/40 font-black mt-0.5 uppercase tracking-widest">{call.phoneNumber}</div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-[10px] font-black text-gold uppercase shadow-lg">
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-[10px] font-black text-gold">
                           {(call.agent?.user?.name || 'U').charAt(0)}
                         </div>
-                        <span className="text-[11px] font-black text-pearl/80 uppercase tracking-widest">{call.agent?.user?.name || 'AUTO NODE'}</span>
+                        <span className="text-[9px] font-black text-pearl/80 uppercase tracking-widest truncate max-w-[100px]">{call.agent?.user?.name || 'AUTO'}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="text-[11px] text-pearl font-mono font-black tracking-[0.2em]">{call.assignedLine || '--'}</div>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="text-[10px] text-pearl font-mono font-black tracking-tight">{call.assignedLine || '--'}</div>
                       {call.providerType && (
-                        <div className="text-[9px] font-black text-gold-light/40 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-pulse" />
+                        <div className="text-[8px] font-black text-gold-light/40 uppercase tracking-widest mt-1">
                           {call.providerType}
                         </div>
                       )}
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="text-xs font-black text-pearl/80 uppercase tracking-widest">{format(new Date(call.startedAt), 'MMM dd, yyyy')}</div>
-                      <div className="text-[10px] text-gold-light/40 font-black mt-1.5 uppercase tracking-widest italic">{format(new Date(call.startedAt), 'h:mm:ss a')}</div>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="text-[10px] font-black text-pearl/80 uppercase tracking-widest">{format(new Date(call.startedAt), 'MMM dd')}</div>
+                      <div className="text-[8px] text-gold-light/40 font-black mt-0.5 uppercase tracking-widest italic">{format(new Date(call.startedAt), 'h:mm a')}</div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <Clock className="w-4 h-4 text-gold/60" />
-                        <span className="text-xs font-black text-pearl/80 tracking-widest">
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3.5 h-3.5 text-gold/60" />
+                        <span className="text-[10px] font-black text-pearl/80 tracking-widest">
                           {call.duration ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s` : '--'}
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
+                    <td className="px-6 py-3 whitespace-nowrap">
                       {call.recordingUrl ? (
                         <a 
                           href={call.recordingUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="p-3 bg-gold/10 text-gold rounded-xl hover:bg-gold/20 transition-all shadow-xl group/play inline-block border border-gold/20"
-                          title="Decrypt Recording"
+                          className="p-2 bg-gold/10 text-gold rounded-lg hover:bg-gold/20 transition-all inline-block border border-gold/20"
                         >
-                          <Play className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" />
+                          <Play className="w-3.5 h-3.5 fill-current" />
                         </a>
                       ) : (
-                        <div className="text-[9px] font-black text-gold-light/10 uppercase tracking-widest italic">Encrypted (No Audio)</div>
+                        <div className="text-[8px] font-black text-gold-light/10 uppercase italic">N/A</div>
                       )}
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <span className={`px-5 py-1.5 inline-flex text-[10px] font-black uppercase tracking-[0.2em] rounded-full border-2 ${
-                        call.status === 'ENDED' ? 'bg-gold/10 text-gold border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.1)]' :
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <span className={`px-3 py-1 inline-flex text-[9px] font-black uppercase tracking-widest rounded-full border ${
+                        call.status === 'ENDED' ? 'bg-gold/10 text-gold border-gold/30' :
                         call.status === 'MISSED' ? 'bg-red-500/10 text-red-500 border-red-500/30' :
-                        'bg-gold-light/10 text-gold-light border-gold-light/30'
+                        'bg-navy-light text-pearl/40 border-gold/10'
                       }`}>
                         {call.status}
                       </span>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="text-[11px] font-black text-gold uppercase tracking-[0.2em] italic shimmer-text">
-                        {call.disposition?.outcome || 'STATIONARY'}
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="text-[9px] font-black text-gold uppercase tracking-widest italic truncate max-w-[100px]">
+                        {call.disposition?.outcome || 'NONE'}
                       </div>
                     </td>
                   </motion.tr>

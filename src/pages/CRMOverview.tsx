@@ -101,41 +101,41 @@ export default function CRMOverview() {
   };
 
   return (
-    <div className="space-y-8 h-full flex flex-col pb-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 h-full flex flex-col pb-4">
+      <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-black text-pearl tracking-tight">Business Intelligence</h2>
-          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.2em] mt-1">Portfolio & Client Assets</p>
+          <h2 className="text-xl font-black text-pearl tracking-tight uppercase italic underline decoration-gold/30">Business Intelligence</h2>
+          <p className="text-gold-light/40 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">Asset Portfolio</p>
         </div>
         <motion.button 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAddModalOpen(true)}
-          className="luxury-button flex items-center gap-2"
+          className="luxury-button flex items-center gap-2 py-2 text-[10px]"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4" />
           <span>New Prospect</span>
         </motion.button>
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="luxury-card-gold p-6 flex gap-8 items-center"
+        className="luxury-card-gold p-3 flex gap-4 items-center"
       >
         <div className="relative flex-1 group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gold/60 group-focus-within:text-gold w-6 h-6 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/60 group-focus-within:text-gold w-5 h-5 transition-colors" />
           <input 
             type="text" 
-            placeholder="Scan portfolio for names, coordinates, or markers..." 
+            placeholder="Scan portfolio..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-14 pr-8 py-4 bg-[#0A1221]/40 border border-gold/20 rounded-2xl focus:ring-4 focus:ring-gold/10 focus:border-gold/50 text-pearl transition-all outline-none placeholder:text-gold-light/20 font-medium"
+            className="w-full pl-11 pr-6 py-2 bg-[#0A1221]/40 border border-gold/20 rounded-xl focus:ring-2 focus:ring-gold/10 focus:border-gold/30 text-pearl transition-all outline-none placeholder:text-gold-light/20 text-xs font-medium"
           />
         </div>
-        <button className="flex items-center gap-4 px-8 py-3.5 bg-gold/5 border border-gold/30 rounded-2xl hover:bg-gold/10 text-gold hover:text-gold-light font-black uppercase text-xs tracking-[0.2em] transition-all shadow-lg hover:shadow-gold/10 group">
-          <Filter className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-          Refine Search
+        <button className="flex items-center gap-3 px-4 py-2 bg-gold/5 border border-gold/20 rounded-xl hover:bg-gold/10 text-gold hover:text-gold-light font-black uppercase text-[9px] tracking-[0.2em] transition-all group">
+          <Filter className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+          Refine
         </button>
       </motion.div>
 
@@ -149,15 +149,15 @@ export default function CRMOverview() {
           <table className="min-w-full divide-y divide-gold/10">
             <thead className="bg-[#0A1221]/80 backdrop-blur-3xl sticky top-0 z-20">
               <tr className="border-b border-gold/20">
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Client Asset</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Coordinates</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Subject Matter</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Status Stage</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Value Rank</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Executor</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Last Sync</th>
-                <th className="px-8 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Next Pulse</th>
-                <th className="px-8 py-6 relative"></th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Client Asset</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Coordinates</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Domain</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Stage</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Rank</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Executor</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Last Sync</th>
+                <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Next</th>
+                <th className="px-6 py-3 relative"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gold/5 bg-navy/10">
@@ -175,81 +175,74 @@ export default function CRMOverview() {
                     onClick={() => handleClientClick(client)}
                     className="hover:bg-gold/10 cursor-pointer transition-all group relative overflow-hidden"
                   >
-                    <td className="px-8 py-7 whitespace-nowrap">
+                    <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/30 flex items-center justify-center text-gold-light font-black shadow-2xl group-hover:scale-110 group-hover:border-gold/60 transition-all duration-500 relative">
-                          {client.score > 85 && <div className="absolute inset-0 bg-gold/20 blur-lg animate-pulse rounded-[inherit]" />}
-                          <span className="relative z-10 text-lg uppercase italic">{client.name.charAt(0)}</span>
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/30 flex items-center justify-center text-gold-light font-black shadow-lg group-hover:scale-105 transition-all duration-500 relative shrink-0">
+                          {client.score > 85 && <div className="absolute inset-0 bg-gold/20 blur-md rounded-[inherit]" />}
+                          <span className="relative z-10 text-sm italic uppercase">{client.name.charAt(0)}</span>
                         </div>
-                        <div className="ml-6">
-                          <div className="text-lg font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic">{client.name}</div>
-                          <div className="text-[10px] text-gold-light/40 font-black flex items-center gap-2 mt-1.5 uppercase tracking-widest">
-                            <Building className="w-3.5 h-3.5 text-gold/40" /> {client.company || 'Private Asset'}
+                        <div className="ml-4 truncate">
+                          <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic uppercase">{client.name}</div>
+                          <div className="text-[8px] text-gold-light/40 font-black flex items-center gap-1.5 mt-0.5 uppercase tracking-widest truncate max-w-[120px]">
+                            {client.company || 'Private Asset'}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="text-sm font-bold text-pearl/90 flex items-center gap-3 group-hover:text-gold transition-colors tracking-wide">
-                        <Phone className="w-4 h-4 text-gold/60" /> {client.phone}
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="text-xs font-bold text-pearl/90 flex items-center gap-2 group-hover:text-gold transition-colors">
+                        <Phone className="w-3.5 h-3.5 text-gold/60 shrink-0" /> {client.phone}
                       </div>
                       {client.email && (
-                        <div className="text-[11px] text-gold-light/30 flex items-center gap-2.5 mt-2 font-black uppercase tracking-widest truncate max-w-[180px]">
-                          <Mail className="w-3.5 h-3.5 text-gold/20" /> {client.email}
+                        <div className="text-[9px] text-gold-light/30 flex items-center gap-2 mt-1 font-black uppercase tracking-widest truncate max-w-[150px]">
+                          <Mail className="w-3 h-3 text-gold/20 shrink-0" /> {client.email}
                         </div>
                       )}
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="px-4 py-2 rounded-xl bg-gold/5 border border-gold/20 group-hover:border-gold/40 inline-flex items-center gap-3 transition-all">
-                        {client.matterType ? (
-                          <><Scale className="w-4 h-4 text-gold" /> <span className="text-xs font-black text-pearl/90 uppercase tracking-tighter">{client.matterType}</span></>
-                        ) : (
-                          <span className="text-[10px] text-gold-light/20 font-black uppercase tracking-widest italic">General Portfolio</span>
-                        )}
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="px-3 py-1 rounded-lg bg-gold/5 border border-gold/20 text-[9px] font-black text-pearl/80 uppercase tracking-tighter shimmer-text">
+                        {client.matterType || 'General'}
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <span className={`px-5 py-1.5 inline-flex text-[10px] font-black uppercase tracking-[0.2em] rounded-full border-2 ${getStageStyle(client.stage)}`}>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <span className={`px-3 py-1 inline-flex text-[9px] font-black uppercase tracking-widest rounded-full border ${getStageStyle(client.stage)}`}>
                         {client.stage}
                       </span>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="relative group/score">
-                          {client.score > 80 && <motion.div animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0, 0.4] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-gold rounded-full blur-md" />}
-                          <Star className={`w-5 h-5 relative z-10 transition-transform group-hover/score:scale-125 ${client.score > 70 ? 'text-gold fill-gold drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]' : 'text-gold-light/20'}`} />
-                        </div>
-                        <span className="text-base font-black text-pearl italic">{client.score}%</span>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Star className={`w-3.5 h-3.5 ${client.score > 70 ? 'text-gold fill-gold' : 'text-gold-light/20'}`} />
+                        <span className="text-xs font-black text-pearl italic">{client.score}%</span>
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-[11px] font-black text-gold shadow-lg">
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-[10px] font-black text-gold">
                           {(client.assignedAgent?.user?.name || 'U').charAt(0)}
                         </div>
-                        <span className="text-[10px] font-black text-gold-light/60 uppercase tracking-[0.2em] whitespace-nowrap">
+                        <span className="text-[9px] font-black text-gold-light/60 uppercase tracking-widest">
                           {client.assignedAgent?.user?.name || 'ALLOCATED'}
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
-                      <div className="text-[11px] font-black text-pearl/40 uppercase tracking-[0.2em]">
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="text-[10px] font-black text-pearl/40 uppercase tracking-widest">
                         {client.lastContactedAt ? format(new Date(client.lastContactedAt), 'MMM dd') : '--'}
                       </div>
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap">
+                    <td className="px-6 py-3 whitespace-nowrap">
                       {client.nextFollowUpAt ? (
-                        <div className="text-[11px] font-black text-gold flex items-center gap-3 uppercase tracking-[0.2em] italic shimmer-text">
-                          <TrendingUp className="w-4 h-4" />
+                        <div className="text-[10px] font-black text-gold flex items-center gap-2 uppercase tracking-widest italic shimmer-text">
+                          <TrendingUp className="w-3.5 h-3.5" />
                           {format(new Date(client.nextFollowUpAt), 'MMM dd')}
                         </div>
                       ) : (
-                        <span className="text-[11px] text-gold-light/10 font-black uppercase tracking-[0.2em] italic">Stationary</span>
+                        <span className="text-[9px] text-gold-light/10 font-black uppercase tracking-widest italic">Idle</span>
                       )}
                     </td>
-                    <td className="px-8 py-7 whitespace-nowrap text-right">
-                      <button className="p-3 rounded-xl hover:bg-gold/20 text-gold-light/40 hover:text-gold transition-all group-hover:scale-110">
-                        <MoreVertical className="w-6 h-6" />
+                    <td className="px-6 py-3 whitespace-nowrap text-right">
+                      <button className="p-2 rounded-lg hover:bg-gold/20 text-gold-light/40 hover:text-gold transition-all">
+                        <MoreVertical className="w-5 h-5" />
                       </button>
                     </td>
                   </motion.tr>

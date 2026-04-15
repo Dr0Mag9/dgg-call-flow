@@ -41,15 +41,15 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 pb-4">
+      <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-black text-pearl tracking-tight font-serif italic">The Wealth Command</h2>
-          <p className="text-gold-light/40 text-xs font-bold uppercase tracking-[0.3em] mt-1">Global Operations & Metrics</p>
+          <h2 className="text-xl font-black text-pearl tracking-tight font-serif italic uppercase underline decoration-gold/30">The Wealth Command</h2>
+          <p className="text-gold-light/40 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">Control Center</p>
         </div>
-        <div className="flex items-center gap-4 px-6 py-3 bg-gold/5 border border-gold/20 rounded-2xl">
-          <Shield className="w-5 h-5 text-gold" />
-          <span className="text-xs font-black text-gold-light uppercase tracking-widest">Administrator Oversight Active</span>
+        <div className="flex items-center gap-3 px-4 py-2 bg-gold/5 border border-gold/20 rounded-xl">
+          <Shield className="w-4 h-4 text-gold" />
+          <span className="text-[9px] font-black text-gold-light uppercase tracking-widest">Oversight Active</span>
         </div>
       </div>
 
@@ -59,25 +59,23 @@ export default function AdminDashboard() {
           return (
             <motion.div 
               key={card.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              whileHover={{ y: -8, boxShadow: '0 0 50px rgba(212,175,55,0.15)' }}
-              className="luxury-card-gold group transition-all duration-500 flex items-center p-10 relative overflow-hidden"
+              className="luxury-card-gold group transition-all duration-500 flex items-center p-5 relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gold/2 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="flex-shrink-0 relative z-10">
-                <div className="rounded-[2rem] p-6 bg-gold/5 border-2 border-gold/10 group-hover:border-gold/50 group-hover:bg-gold/15 transition-all duration-500 shadow-2xl relative">
-                  <div className="absolute inset-0 bg-gold opacity-0 group-hover:opacity-20 blur-xl transition-opacity" />
-                  <Icon className={`h-8 w-8 ${card.color} group-hover:scale-125 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]`} />
+                <div className="rounded-2xl p-3 bg-gold/5 border border-gold/10 group-hover:border-gold/50 transition-all duration-500 shadow-xl relative">
+                  <Icon className={`h-5 w-5 ${card.color} group-hover:scale-110 transition-transform duration-500`} />
                 </div>
               </div>
-              <div className="ml-8 flex-1 relative z-10">
+              <div className="ml-5 flex-1 relative z-10">
                 <dl>
-                  <dt className="text-[11px] font-black text-gold/40 uppercase tracking-[0.3em] truncate mb-2">{card.name}</dt>
+                  <dt className="text-[9px] font-black text-gold/40 uppercase tracking-[0.2em] truncate mb-1">{card.name}</dt>
                   <dd className="flex items-baseline">
-                    <div className="text-4xl font-black text-pearl group-hover:text-gold transition-colors italic tracking-tighter">{card.value}</div>
-                    <div className="ml-3 text-[10px] font-black text-gold/60 uppercase tracking-[0.2em] simmer-text">SYNCED</div>
+                    <div className="text-2xl font-black text-pearl group-hover:text-gold transition-colors italic tracking-tighter">{card.value}</div>
+                    <div className="ml-2 text-[8px] font-black text-gold/60 tracking-[0.1em]">SYNC</div>
                   </dd>
                 </dl>
               </div>
@@ -86,26 +84,23 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="luxury-card-gold p-12 flex flex-col justify-center relative overflow-hidden group shadow-[0_0_80px_rgba(212,175,55,0.1)]"
+          className="luxury-card-gold p-6 relative overflow-hidden group"
         >
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/5 blur-[120px] rounded-full -mr-40 -mt-40 animate-heavenly-pulse" />
-          <h3 className="text-[11px] font-black text-gold uppercase tracking-[0.4em] mb-10 flex items-center gap-5">
-            <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
-              <TrendingUp className="w-5 h-5 text-gold" />
-            </div>
+          <div className="absolute top-0 right-0 w-80 h-80 bg-gold/5 blur-[100px] rounded-full -mr-32 -mt-32 animate-heavenly-pulse" />
+          <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+            <TrendingUp className="w-4 h-4 text-gold" />
             Live Resonance Monitoring
           </h3>
-          <div className="h-72 bg-[#0A1221]/40 rounded-[3rem] border-2 border-gold/10 border-dashed flex flex-col items-center justify-center group-hover:border-gold/30 transition-all duration-700 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gold/2 animate-pulse" />
-            <Sparkles className="w-16 h-16 text-gold mb-6 animate-[spin_10s_linear_infinite] opacity-40 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
-            <span className="text-gold-light/20 font-black uppercase tracking-[0.5em] text-[10px] italic">Awaiting Global Synthesis...</span>
+          <div className="h-40 bg-[#0A1221]/40 rounded-3xl border border-gold/10 border-dashed flex flex-col items-center justify-center relative overflow-hidden">
+            <Sparkles className="w-10 h-10 text-gold mb-4 animate-[spin_10s_linear_infinite] opacity-20" />
+            <span className="text-gold-light/20 font-black uppercase tracking-[0.3em] text-[8px] italic">Awaiting Synthesis...</span>
           </div>
-          <button className="luxury-button mt-10 text-[11px] py-5 uppercase tracking-[0.3em] shimmer-text">Maximize Operations</button>
+          <button className="luxury-button mt-6 text-[10px] py-3.5 uppercase tracking-[0.2em] shimmer-text">Optimize</button>
         </motion.div>
 
         <motion.div 
@@ -114,56 +109,53 @@ export default function AdminDashboard() {
           transition={{ delay: 0.5 }}
           className="luxury-card-gold overflow-hidden flex flex-col"
         >
-          <div className="px-10 py-8 border-b border-gold/20 bg-gold/5 flex justify-between items-center relative overflow-hidden">
-            <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-30" />
-            <h3 className="text-[11px] font-black text-gold uppercase tracking-[0.4em] flex items-center gap-5">
-              <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
-                <Users className="w-5 h-5 text-gold" />
-              </div>
+          <div className="px-6 py-4 border-b border-gold/20 bg-gold/5 flex justify-between items-center relative overflow-hidden">
+            <h3 className="text-[10px] font-black text-gold uppercase tracking-[0.3em] flex items-center gap-3">
+              <Users className="w-4 h-4 text-gold" />
               Workforce Ledger
             </h3>
-            <button className="text-[10px] font-black text-gold/40 hover:text-gold transition-all tracking-[0.3em] uppercase bg-gold/5 px-4 py-2 rounded-xl border border-gold/10">View Matrix</button>
+            <button className="text-[9px] font-black text-gold/40 hover:text-gold transition-all tracking-[0.2em] uppercase bg-gold/5 px-3 py-1.5 rounded-lg border border-gold/10">Matrix</button>
           </div>
-          <div className="overflow-x-auto flex-1 custom-scrollbar">
+          <div className="overflow-x-auto flex-1 custom-scrollbar max-h-[250px]">
             <table className="min-w-full divide-y divide-gold/10">
               <thead className="bg-[#0A1221]/60">
                 <tr>
-                  <th className="px-10 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Executor Unit</th>
-                  <th className="px-10 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Status Rank</th>
-                  <th className="px-10 py-6 text-left text-[11px] font-black text-gold uppercase tracking-[0.3em]">Sync Ext</th>
+                  <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Executor</th>
+                  <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Status</th>
+                  <th className="px-6 py-3 text-left text-[9px] font-black text-gold uppercase tracking-[0.2em]">Ext</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold/5 bg-navy/10">
                 {agents.slice(0, 5).map((agent, i) => (
                   <motion.tr 
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + i * 0.05 }}
                     key={agent.id} 
                     className="hover:bg-gold/10 transition-all group relative overflow-hidden"
                   >
-                    <td className="px-10 py-6 whitespace-nowrap">
+                    <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-12 w-12 rounded-[1rem] bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/40 flex items-center justify-center text-gold font-black shadow-xl group-hover:scale-110 transition-all duration-500 shadow-gold/5">
+                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/40 flex items-center justify-center text-gold font-black shadow-lg group-hover:scale-105 transition-all duration-500 text-sm">
                           {agent.user?.name?.charAt(0)}
                         </div>
-                        <div className="ml-6">
-                          <div className="text-base font-black text-pearl group-hover:text-gold transition-colors italic tracking-tight uppercase">{agent.user?.name}</div>
+                        <div className="ml-4">
+                          <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors italic tracking-tight uppercase">{agent.user?.name}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-6 whitespace-nowrap">
-                      <div className="flex items-center gap-4 px-4 py-2 rounded-2xl border border-gold/20 bg-gold/5 group-hover:border-gold/40 transition-all">
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl border border-gold/10 bg-gold/5 group-hover:border-gold/30 transition-all">
                         <motion.div 
-                          animate={{ scale: agent.status === 'ONLINE' ? [1, 1.5, 1] : 1 }}
+                          animate={{ scale: agent.status === 'ONLINE' ? [1, 1.3, 1] : 1 }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className={`w-2 h-2 rounded-full ${agent.status === 'ONLINE' ? 'bg-gold shadow-[0_0_12px_#D4AF37]' : 'bg-slate-700'}`} 
+                          className={`w-1.5 h-1.5 rounded-full ${agent.status === 'ONLINE' ? 'bg-gold' : 'bg-slate-700'}`} 
                         />
-                        <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em]">{agent.status}</span>
+                        <span className="text-[9px] font-black text-gold uppercase tracking-[0.2em]">{agent.status}</span>
                       </div>
                     </td>
-                    <td className="px-10 py-6 whitespace-nowrap font-mono text-[11px] font-black text-pearl/40 uppercase tracking-[0.2em]">
-                      SIGNAL: EXT {agent.extension}
+                    <td className="px-6 py-3 whitespace-nowrap font-mono text-[10px] font-black text-pearl/40 uppercase">
+                      EXT {agent.extension}
                     </td>
                   </motion.tr>
                 ))}
