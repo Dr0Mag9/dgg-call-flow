@@ -90,7 +90,9 @@ export function registerSocketHandlers() {
         });
         logger.debug(`[Socket] Gateway health update: ${gatewayId}`, data);
       } catch (err) {
-        logger.error('Failed to update gateway health', err);
+        logger.error('Failed to update gateway health', {
+          message: err instanceof Error ? err.message : String(err)
+        });
       }
     });
 
