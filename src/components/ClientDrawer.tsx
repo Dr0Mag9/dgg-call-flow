@@ -179,7 +179,7 @@ export default function ClientDrawer() {
           <img src="/assets/@digitalgrowthgurus (1).jpg" className="absolute -right-4 -top-4 w-32 h-32 opacity-5 rotate-12 pointer-events-none group-hover:opacity-10 transition-opacity duration-1000" alt="" />
           <div className="flex gap-5 relative z-10">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-light via-gold to-gold-deep border border-gold/40 flex items-center justify-center text-navy text-2xl font-black shadow-[0_0_20px_rgba(212,175,55,0.4)]">
-              {selectedClient.name.charAt(0)}
+              {selectedClient.name?.charAt(0) || '?'}
             </div>
             <div>
               <h2 className="text-xl font-black text-pearl tracking-tighter italic gold-text-gradient uppercase">{selectedClient.name}</h2>
@@ -474,12 +474,18 @@ export default function ClientDrawer() {
                        <CheckCircle className="w-3.5 h-3.5" /> Predictive Factors
                     </h3>
                     <ul className="space-y-3 relative z-10">
-                      {JSON.parse(clientDetails.predictions[0].reasonJson).map((reason: string, i: number) => (
-                        <li key={i} className="flex items-start gap-4 text-[10px] font-bold text-pearl/80 italic group/item">
-                          <div className="mt-1 w-1.5 h-1.5 rounded-full bg-gold/40 border border-gold shadow-[0_0_8px_rgba(212,175,55,0.6)] shrink-0 group-hover/item:scale-125 transition-transform" />
-                          {reason}
-                        </li>
-                      ))}
+                      {(() => {
+                        try {
+                          return JSON.parse(clientDetails.predictions[0].reasonJson || '[]').map((reason: string, i: number) => (
+                            <li key={i} className="flex items-start gap-4 text-[10px] font-bold text-pearl/80 italic group/item">
+                              <div className="mt-1 w-1.5 h-1.5 rounded-full bg-gold/40 border border-gold shadow-[0_0_8px_rgba(212,175,55,0.6)] shrink-0 group-hover/item:scale-125 transition-transform" />
+                              {reason}
+                            </li>
+                          ));
+                        } catch (e) {
+                          return <li className="text-[10px] text-gold-light/20 italic uppercase tracking-widest">Protocol factors encrypted or unavailable</li>;
+                        }
+                      })()}
                     </ul>
                   </div>
                 </div>

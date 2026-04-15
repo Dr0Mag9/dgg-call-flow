@@ -52,7 +52,9 @@ export default function CallDispositionScreen() {
       <div className="bg-white rounded-2xl shadow-2xl w-[500px] overflow-hidden">
         <div className="bg-slate-900 p-6 text-white">
           <h2 className="text-xl font-bold">Call Disposition</h2>
-          <p className="text-slate-300 text-sm mt-1">Log the outcome for {activeCall.client?.name || activeCall.phoneNumber}</p>
+          <p className="text-slate-300 text-sm mt-1 uppercase tracking-widest font-black">
+            Log outcome for: <span className="text-gold-light italic">{activeCall?.client?.name || activeCall?.phoneNumber || 'Unknown Signal'}</span>
+          </p>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">

@@ -12,11 +12,15 @@ export default function ActiveCallPanel() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (activeCall && activeCall.status === 'CONNECTED') {
-      const start = new Date(activeCall.startedAt).getTime();
-      interval = setInterval(() => {
-        setDuration(Math.floor((Date.now() - start) / 1000));
-      }, 1000);
+    if (activeCall && activeCall.status === 'CONNECTED' && activeCall.startedAt) {
+      const startTime = new Date(activeCall.startedAt).getTime();
+      if (!isNaN(startTime)) {
+        interval = setInterval(() => {
+          setDuration(Math.max(0, Math.floor((Date.now() - startTime) / 1000)));
+        }, 1000);
+      } else {
+        setDuration(0);
+      }
     } else {
       setDuration(0);
     }

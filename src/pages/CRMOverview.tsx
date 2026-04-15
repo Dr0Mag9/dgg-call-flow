@@ -84,11 +84,11 @@ export default function CRMOverview() {
   };
 
   const filteredClients = clients.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase()) || 
+    (c.name?.toLowerCase().includes(search.toLowerCase()) || 
     c.company?.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone.includes(search) ||
+    c.phone?.includes(search) ||
     c.city?.toLowerCase().includes(search.toLowerCase()) ||
-    c.matterType?.toLowerCase().includes(search.toLowerCase())
+    c.matterType?.toLowerCase().includes(search.toLowerCase())) ?? false
   );
 
   const getStageStyle = (stage: string) => {
@@ -179,7 +179,7 @@ export default function CRMOverview() {
                       <div className="flex items-center">
                         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gold/30 to-navy-light/50 border border-gold/30 flex items-center justify-center text-gold-light font-black shadow-lg group-hover:scale-105 transition-all duration-500 relative shrink-0">
                           {client.score > 85 && <div className="absolute inset-0 bg-gold/20 blur-md rounded-[inherit]" />}
-                          <span className="relative z-10 text-sm italic uppercase">{client.name.charAt(0)}</span>
+                          <span className="relative z-10 text-sm italic uppercase">{client.name?.charAt(0) || '?'}</span>
                         </div>
                         <div className="ml-4 truncate">
                           <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic uppercase">{client.name}</div>
@@ -212,7 +212,7 @@ export default function CRMOverview() {
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <Star className={`w-3.5 h-3.5 ${client.score > 70 ? 'text-gold fill-gold' : 'text-gold-light/20'}`} />
-                        <span className="text-xs font-black text-pearl italic">{client.score}%</span>
+                        <span className="text-xs font-black text-pearl italic">{client.score || 0}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-3 whitespace-nowrap">
