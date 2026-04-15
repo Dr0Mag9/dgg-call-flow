@@ -1,5 +1,6 @@
 package com.callflow.gateway
 
+import android.Manifest
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -107,6 +108,20 @@ class GatewayService : Service() {
     private fun getBatteryLevel(): Int {
         val bm = getSystemService(BATTERY_SERVICE) as BatteryManager
         return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+    }
+
+    private fun getSignalStrength(): Int {
+        return try {
+            val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val signal = tm.signalStrength
+                signal?.level ?: 0 // Returns value from 0 to 4
+            } else {
+                0
+            }
+        } catch (e: Exception) {
+            0
+        }
     }
 
     private fun getSimPhoneNumber(): String? {
