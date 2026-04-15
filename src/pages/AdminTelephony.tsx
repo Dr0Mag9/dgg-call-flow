@@ -12,6 +12,7 @@ export default function AdminTelephony() {
   // Modals / Forms
   const [isAddingLine, setIsAddingLine] = useState(false);
   const [isAddingGateway, setIsAddingGateway] = useState(false);
+  const [lastCreatedKey, setLastCreatedKey] = useState<string | null>(null);
   const [lineFormData, setLineFormData] = useState({ number: '', providerType: 'GATEWAY', gatewayId: '', providerRef: '' });
   const [gwName, setGwName] = useState('');
 
@@ -74,10 +75,24 @@ export default function AdminTelephony() {
       body: JSON.stringify({ name: gwName })
     });
     if (res.ok) {
-      setIsAddingGateway(false);
-      setGwName('');
+      const data = await res.json();
+      setLastCreatedKey(data.apiKey);
       fetchData();
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert('Copied to clipboard!');
+  };
+
+  const verifyGateway = (gw: any) => {
+    if (gw.status === 'ONLINE') {
+      alert(`Success! ${gw.name} is connected and ready.`);
+    } else {
+      alert(`${gw.name} is currently offline. Please check the Android app.`);
+    }
+    fetchData();
   };
 
   const handleDeleteGateway = async (id: string) => {
@@ -163,10 +178,19 @@ export default function AdminTelephony() {
                           <Signal className="w-3 h-3" /> {gw.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-gray-400">
+                      <td className="px-6 py-4 text-sm font-mono text-gray-400 flex items-center gap-2">
                         {gw.apiKey.substring(0, 8)}...
+                        <button onClick={() => copyToClipboard(gw.apiKey)} className="text-gray-400 hover:text-blue-600">
+                          <Plus className="w-3 h-3 rotate-45" /> 
+                        </button>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right space-x-3">
+                        <button 
+                          onClick={() => verifyGateway(gw)}
+                          className="text-blue-500 hover:text-blue-700 text-xs font-medium"
+                        >
+                          Verify
+                        </button>
                         <button onClick={() => handleDeleteGateway(gw.id)} className="text-red-400 hover:text-red-600">
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -231,18 +255,52 @@ export default function AdminTelephony() {
       {/* Modals */}
       {isAddingGateway && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold mb-4">Register Android Gateway</h3>
-            <form onSubmit={handleCreateGateway} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Device Name</label>
-                <input required type="text" className="w-full border p-2 rounded" value={gwName} onChange={e => setGwName(e.target.value)} placeholder="e.g. Office Phone 1" />
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl">
+            {!lastCreatedKey ? (
+              <>
+                <h3 className="text-lg font-bold mb-4">Register Android Gateway</h3>
+                <form onSubmit={handleCreateGateway} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Device Name</label>
+                    <input required type="text" className="w-full border p-2 rounded" value={gwName} onChange={e => setGwName(e.target.value)} placeholder="e.g. Office Phone 1" />
+                  </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button type="button" onClick={() => setIsAddingGateway(false)} className="px-4 py-2 text-gray-600">Cancel</button>
+                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded font-medium">Create API Key</button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Activity className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Gateway Registered!</h3>
+                <p className="text-gray-500 text-sm mb-6">Copy this key into your Android app to connect.</p>
+                
+                <div className="bg-gray-50 p-4 rounded-lg font-mono text-sm break-all border border-gray-200 mb-6 flex items-center justify-between gap-2">
+                  <span className="text-gray-700">{lastCreatedKey}</span>
+                  <button 
+                    onClick={() => copyToClipboard(lastCreatedKey)}
+                    className="p-1.5 hover:bg-gray-200 rounded-md text-blue-600 shrink-0"
+                    title="Copy Key"
+                  >
+                    <Save className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    setIsAddingGateway(false);
+                    setLastCreatedKey(null);
+                    setGwName('');
+                  }}
+                  className="w-full py-2 bg-gray-900 text-white rounded font-medium hover:bg-gray-800"
+                >
+                  Done
+                </button>
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsAddingGateway(false)} className="px-4 py-2 text-gray-600">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded font-medium">Create API Key</button>
-              </div>
-            </form>
+            )}
           </div>
         </div>
       )}
