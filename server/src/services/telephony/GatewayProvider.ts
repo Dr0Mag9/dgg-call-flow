@@ -22,23 +22,8 @@ export class GatewayProvider implements TelephonyService {
 
     const io = getIo();
     const gatewayRoom = `gateway_${line.gatewayId}`;
-    
-    const socketsInRoom = await io.in(gatewayRoom).fetchSockets();
-    if (socketsInRoom.length === 0) {
-      return { success: false, error: 'No active socket connection for gateway' };
-    }
 
-    logger.info(`[Gateway Provider] Emitting dial command to gateway ${line.gatewayId}`);
-    
-    // 1. Emit via socket (Real-time)
-    io.to(gatewayRoom).emit('gateway:command', {
-      command: 'DIAL',
-      phoneNumber: req.phoneNumber,
-      callId: req.callId,
-      timestamp: new Date().toISOString()
-    });
-
-    // 2. Persist to DB for Polling (Robust fallback required by Step 3 & 4)
+    // 1. Always persist command for HTTP polling (robust delivery)
     await prisma.gatewayCommand.create({
       data: {
         gatewayId: line.gatewayId,
@@ -51,6 +36,24 @@ export class GatewayProvider implements TelephonyService {
       }
     });
 
+    // 2. Also try socket emit (real-time, best-effort)
+    try {
+      const socketsInRoom = await io.in(gatewayRoom).fetchSockets();
+      if (socketsInRoom.length > 0) {
+        logger.info(`[Gateway Provider] Emitting dial command to gateway ${line.gatewayId} via socket`);
+        io.to(gatewayRoom).emit('gateway:command', {
+          command: 'DIAL',
+          phoneNumber: req.phoneNumber,
+          callId: req.callId,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        logger.info(`[Gateway Provider] No active sockets for gateway ${line.gatewayId}, relying on HTTP polling`);
+      }
+    } catch (err) {
+      logger.warn('[Gateway Provider] Socket emit failed, command queued for polling', err);
+    }
+
     return { 
       success: true, 
       externalId: `gw_sig_${Date.now()}` 
@@ -62,14 +65,46 @@ export class GatewayProvider implements TelephonyService {
   }
 
   async answerCall(callId: string) {
-    getIo().emit('gateway:command', { command: 'ANSWER', callId });
+    await this.sendCommandToGateway(callId, 'ANSWER');
   }
 
   async endCall(callId: string) {
-    // 1. Socket Hangup
-    getIo().emit('gateway:command', { command: 'HANGUP', callId });
+    logger.info(`[Gateway Provider] Ending call ${callId}`);
 
-    // 2. Clear any pending dial commands for this gateway? Optional.
+    // Find the call to get the gateway ID
+    const call = await prisma.call.findUnique({
+      where: { id: callId },
+      include: { agent: { include: { telephonyLine: { include: { gateway: true } } } } }
+    });
+
+    const gatewayId = call?.agent?.telephonyLine?.gatewayId;
+
+    if (gatewayId) {
+      // 1. Queue HANGUP for HTTP polling
+      await prisma.gatewayCommand.create({
+        data: {
+          gatewayId,
+          action: 'HANGUP',
+          payload: JSON.stringify({ callId }),
+          status: 'PENDING'
+        }
+      });
+
+      // 2. Try socket emit (best-effort)
+      try {
+        const io = getIo();
+        const gatewayRoom = `gateway_${gatewayId}`;
+        io.to(gatewayRoom).emit('gateway:command', { 
+          command: 'HANGUP', 
+          callId,
+          timestamp: new Date().toISOString()
+        });
+      } catch (err) {
+        logger.warn('[Gateway Provider] Socket hangup emit failed, command queued for polling');
+      }
+    } else {
+      logger.warn(`[Gateway Provider] Could not find gateway for call ${callId}`);
+    }
   }
 
   async muteCall(callId: string, muted: boolean) {
@@ -82,6 +117,15 @@ export class GatewayProvider implements TelephonyService {
 
   async transferCall(callId: string, targetNumber: string) {
     logger.warn(`[Gateway Provider] Transfer of call ${callId} to ${targetNumber} not supported on gateway bridge`);
+  }
+
+  private async sendCommandToGateway(callId: string, command: string) {
+    try {
+      const io = getIo();
+      io.emit('gateway:command', { command, callId });
+    } catch (err) {
+      logger.error(`[Gateway Provider] Failed to send ${command} command`, err);
+    }
   }
 }
 

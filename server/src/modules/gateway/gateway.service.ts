@@ -98,25 +98,85 @@ export async function getPendingCommands(apiKey: string) {
 }
 
 /**
- * Update call session status
+ * Update call session status AND sync the main Call model
  */
 export async function updateCallStatus(apiKey: string, callId: string, status: string) {
   const device = await prisma.gatewayDevice.findUnique({ where: { apiKey } });
   if (!device) throw new Error('Invalid Gateway');
 
-  const session = await prisma.callSession.update({
-    where: { id: callId },
-    data: { 
-      status,
-      endedAt: status === 'ENDED' || status === 'FAILED' ? new Date() : undefined
-    }
-  });
+  // 1. Try to update CallSession (gateway-specific tracking)
+  let session;
+  try {
+    session = await prisma.callSession.update({
+      where: { id: callId },
+      data: { 
+        status,
+        endedAt: status === 'ENDED' || status === 'FAILED' ? new Date() : undefined
+      }
+    });
+  } catch (e) {
+    // CallSession might not exist if this callId is actually a Call.id
+    logger.warn(`[Gateway] CallSession ${callId} not found, checking Call model`);
+  }
 
-  // Broadcast to frontend
+  // 2. Also update the main Call model (CRM tracking)
+  // The callId could be the Call.id directly (passed as sessionId in the command)
+  try {
+    const existingCall = await prisma.call.findUnique({ where: { id: callId } });
+    if (existingCall) {
+      const mapStatus = (s: string) => {
+        switch (s) {
+          case 'RINGING': return 'RINGING';
+          case 'CONNECTED': case 'ANSWERED': return 'CONNECTED';
+          case 'ENDED': case 'FAILED': return 'ENDED';
+          default: return s;
+        }
+      };
+
+      const callStatus = mapStatus(status);
+      const updateData: any = { status: callStatus };
+
+      if (callStatus === 'CONNECTED' && !existingCall.startedAt) {
+        updateData.startedAt = new Date();
+      }
+      if (callStatus === 'ENDED') {
+        updateData.endedAt = new Date();
+        if (existingCall.startedAt) {
+          updateData.duration = Math.floor((Date.now() - existingCall.startedAt.getTime()) / 1000);
+        }
+      }
+
+      const updatedCall = await prisma.call.update({
+        where: { id: callId },
+        data: updateData,
+        include: { 
+          client: true, 
+          agent: { include: { user: { select: { name: true } } } }, 
+          disposition: true 
+        }
+      });
+
+      // Broadcast to all CRM users so Dialer/HUD updates
+      broadcast('call_updated', updatedCall);
+      
+      if (updatedCall.agent?.userId) {
+        const { emitToUser } = await import('../../services/notification.service.js');
+        emitToUser(updatedCall.agent.userId, 'call_updated', updatedCall);
+      }
+
+      logger.info(`[Gateway] Call ${callId} status synced to ${callStatus}`);
+    }
+  } catch (e) {
+    logger.warn(`[Gateway] Could not update Call model for ${callId}`, {
+      message: e instanceof Error ? e.message : String(e)
+    });
+  }
+
+  // 3. Broadcast gateway-level status update
   broadcast('call_status_updated', {
-    callId: session.id,
+    callId,
     status,
-    phoneNumber: session.phoneNumber
+    phoneNumber: session?.phoneNumber || ''
   });
 
   return session;
