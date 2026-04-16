@@ -69,7 +69,7 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
   });
 
   if (!result.success) {
-    logger.error(`[Call Service] Provider initiation failed: ${result.error}`, { callId: call.id });
+    logger.error(`[Call Service] Provider initiation failed: ${result.error || 'Unknown Error'}`, { callId: call.id });
     await prisma.call.update({
       where: { id: call.id },
       data: { status: 'FAILED' }
