@@ -30,11 +30,25 @@ export class GatewayProvider implements TelephonyService {
 
     logger.info(`[Gateway Provider] Emitting dial command to gateway ${line.gatewayId}`);
     
+    // 1. Emit via socket (Real-time)
     io.to(gatewayRoom).emit('gateway:command', {
       command: 'DIAL',
       phoneNumber: req.phoneNumber,
       callId: req.callId,
       timestamp: new Date().toISOString()
+    });
+
+    // 2. Persist to DB for Polling (Robust fallback required by Step 3 & 4)
+    await prisma.gatewayCommand.create({
+      data: {
+        gatewayId: line.gatewayId,
+        action: 'CALL',
+        payload: JSON.stringify({ 
+          phoneNumber: req.phoneNumber, 
+          sessionId: req.callId 
+        }),
+        status: 'PENDING'
+      }
     });
 
     return { 
@@ -52,7 +66,10 @@ export class GatewayProvider implements TelephonyService {
   }
 
   async endCall(callId: string) {
+    // 1. Socket Hangup
     getIo().emit('gateway:command', { command: 'HANGUP', callId });
+
+    // 2. Clear any pending dial commands for this gateway? Optional.
   }
 
   async muteCall(callId: string, muted: boolean) {

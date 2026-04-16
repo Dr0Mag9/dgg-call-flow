@@ -214,6 +214,25 @@ model TelephonyLine {
   updatedAt    DateTime @updatedAt
 }
 
+model CallSession {
+  id          String   @id @default(cuid())
+  phoneNumber String
+  agentId     String
+  gatewayId   String
+  status      String   @default("INITIATED")
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+}
+
+model GatewayCommand {
+  id          String   @id @default(cuid())
+  gatewayId   String
+  action      String   
+  payload     String?  
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+}
+
 model GatewayDevice {
   id        String   @id @default(cuid())
   name      String

@@ -16,15 +16,24 @@ import java.util.*
 import android.os.BatteryManager
 import android.telephony.TelephonyManager
 import android.telephony.SubscriptionManager
-import android.telephony.SignalStrength
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
-
+import java.net.HttpURLConnection
+import java.net.URL
+import java.io.OutputStreamWriter
+import java.io.InputStreamReader
+import java.io.BufferedReader
+import android.os.Handler
+import android.os.Looper
 
 class GatewayService : Service() {
 
     private var socket: Socket? = null
     private val CHANNEL_ID = "GatewayServiceChannel"
+    private var apiKey: String? = null
+    private var serverUrl: String? = null
+    private val pollerTimer = Timer()
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate() {
         super.onCreate()
@@ -32,8 +41,8 @@ class GatewayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val serverUrl = intent?.getStringExtra("SERVER_URL") ?: return START_NOT_STICKY
-        val apiKey = intent?.getStringExtra("API_KEY") ?: return START_NOT_STICKY
+        serverUrl = intent?.getStringExtra("SERVER_URL") ?: return START_NOT_STICKY
+        apiKey = intent?.getStringExtra("API_KEY") ?: return START_NOT_STICKY
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("CallFlow Gateway Active")
@@ -42,9 +51,45 @@ class GatewayService : Service() {
             .build()
 
         startForeground(1, notification)
-        connectToSocket(serverUrl, apiKey)
+        
+        // Use both Socket.io (Reactive) and HTTP Polling (Fallback/Robustness)
+        connectToSocket(serverUrl!!, apiKey!!)
+        startCommandPolling()
 
         return START_STICKY
+    }
+
+    private fun startCommandPolling() {
+        pollerTimer.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                pollCommands()
+            }
+        }, 5000, 3000) // Poll every 3 seconds
+    }
+
+    private fun pollCommands() {
+        val urlStr = "$serverUrl/api/gateway/commands?apiKey=$apiKey"
+        try {
+            val url = URL(urlStr)
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.connectTimeout = 5000
+            
+            if (conn.responseCode == 200) {
+                val reader = BufferedReader(InputStreamReader(conn.inputStream))
+                val response = reader.use { it.readText() }
+                val json = JSONObject(response)
+                
+                if (json.has("action") && json.getString("action") == "CALL") {
+                    mainHandler.post {
+                        handleCommand(json)
+                    }
+                }
+            }
+            conn.disconnect()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun connectToSocket(url: String, key: String) {
@@ -60,27 +105,15 @@ class GatewayService : Service() {
                     put("phoneNumber", phoneNumber)
                 }
                 socket?.emit("gateway:auth", authData)
-                sendStatusUpdate("Status: Authenticating...")
+                sendStatusUpdate("Status: Authenticated")
                 startHealthReporting()
             }
 
-            socket?.on("gateway:ready") {
-                sendStatusUpdate("Status: Connected")
-            }
-
-            socket?.on(Socket.EVENT_CONNECT_ERROR) {
-                sendStatusUpdate("Status: Connection Error")
-            }
-
-            socket?.on("gateway:error") { args ->
-                val data = args[0] as JSONObject
-                sendStatusUpdate("Status: ${data.optString("message", "Error")}")
-            }
-
             socket?.on("gateway:command") { args ->
-
                 val data = args[0] as JSONObject
-                handleCommand(data)
+                mainHandler.post {
+                    handleCommand(data)
+                }
             }
 
             socket?.connect()
@@ -89,20 +122,83 @@ class GatewayService : Service() {
         }
     }
 
+    private fun handleCommand(data: JSONObject) {
+        // Handle both Socket format ("command") and REST format ("action")
+        val action = if (data.has("action")) data.getString("action") else data.optString("command", "NONE")
+        
+        when (action) {
+            "CALL", "DIAL" -> {
+                val number = data.getString("phoneNumber")
+                val sessionId = data.optString("sessionId", "unknown")
+                dialNumber(number, sessionId)
+            }
+        }
+    }
+
+    private fun dialNumber(number: String, sessionId: String) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            sendStatusUpdate("Status: Error - No Call Permission")
+            return
+        }
+
+        try {
+            val intent = Intent(Intent.ACTION_CALL)
+            intent.data = Uri.parse("tel:$number")
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+
+            reportCallStatus(sessionId, "start")
+            sendStatusUpdate("Dialing: $number")
+            
+            // Log locally
+            val prefs = getSharedPreferences("GatewayLogs", Context.MODE_PRIVATE)
+            val logs = prefs.getString("history", "") ?: ""
+            val timestamp = java.text.SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+            prefs.edit().putString("history", "$number ($timestamp)|$logs").apply()
+            
+        } catch (e: Exception) {
+            reportCallStatus(sessionId, "end", "FAILED")
+            sendStatusUpdate("Status: Dialing Failed")
+        }
+    }
+
+    private fun reportCallStatus(callId: String, endpoint: String, status: String? = null) {
+        if (callId == "unknown") return
+
+        Thread {
+            try {
+                val url = URL("$serverUrl/api/gateway/call/$endpoint")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.doOutput = true
+                conn.setRequestProperty("Content-Type", "application/json")
+                
+                val body = JSONObject().apply {
+                    put("apiKey", apiKey)
+                    put("callId", callId)
+                    if (status != null) put("status", status)
+                }
+
+                OutputStreamWriter(conn.outputStream).use { it.write(body.toString()) }
+                conn.responseCode
+                conn.disconnect()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
+    }
+
     private fun startHealthReporting() {
         Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 val batteryLevel = getBatteryLevel()
-                val signalLevel = getSignalStrength()
                 val healthData = JSONObject().apply {
                     put("battery", batteryLevel)
-                    put("signal", signalLevel)
                     put("status", "ONLINE")
                 }
                 socket?.emit("gateway:health_update", healthData)
-
             }
-        }, 0, 60000) // Every 1 minute
+        }, 0, 60000)
     }
 
     private fun getBatteryLevel(): Int {
@@ -110,80 +206,21 @@ class GatewayService : Service() {
         return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
-    private fun getSignalStrength(): Int {
-        return try {
-            val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val signal = tm.signalStrength
-                signal?.level ?: 0 // Returns value from 0 to 4
-            } else {
-                0
-            }
-        } catch (e: Exception) {
-            0
-        }
-    }
-
     private fun getSimPhoneNumber(): String? {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED) {
             return null
         }
-
         return try {
             val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            var number = tm.line1Number
-            
-            if (number.isNullOrEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-                val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-                if (!activeSubscriptionInfoList.isNullOrEmpty()) {
-                    // Try to get number from first active SIM
-                    number = activeSubscriptionInfoList[0].number
-                }
-            }
-            
-            if (number.isNullOrEmpty()) null else number
+            tm.line1Number
         } catch (e: Exception) {
             null
         }
     }
 
-
-    private fun handleCommand(data: JSONObject) {
-        val command = data.getString("command")
-        when (command) {
-            "DIAL" -> {
-                val number = data.getString("phoneNumber")
-                dialNumber(number)
-            }
-            "HANGUP" -> {
-                // Implementation for hanging up varies by Android version
-                // Usually requires AccessibilityService or root for automated hangup
-            }
-        }
-    }
-
-    private fun dialNumber(number: String) {
-        val intent = Intent(Intent.ACTION_CALL)
-        intent.data = Uri.parse("tel:$number")
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-
-        // Log the call locally for history view
-        val prefs = getSharedPreferences("GatewayLogs", Context.MODE_PRIVATE)
-        val logs = prefs.getString("history", "") ?: ""
-        val timestamp = java.text.SimpleDateFormat("dd/MM HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
-        val newLogs = "$number ($timestamp)|$logs"
-        prefs.edit().putString("history", newLogs).apply()
-    }
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                CHANNEL_ID, "Gateway Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
+            val serviceChannel = NotificationChannel(CHANNEL_ID, "Gateway Service", NotificationManager.IMPORTANCE_LOW)
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(serviceChannel)
         }
@@ -195,13 +232,11 @@ class GatewayService : Service() {
         sendBroadcast(intent)
     }
 
-
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
-        sendStatusUpdate("Status: Disconnected")
+        pollerTimer.cancel()
         socket?.disconnect()
         super.onDestroy()
     }
-
 }

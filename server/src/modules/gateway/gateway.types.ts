@@ -1,18 +1,25 @@
-export interface ConnectRequest {
+export interface GatewayDevice {
+  id: string;
+  name: string;
   apiKey: string;
-  deviceName: string;
+  status: 'ONLINE' | 'OFFLINE';
+  lastSeen?: Date | null;
 }
 
-export interface HeartbeatRequest {
+export interface CallTriggerRequest {
   apiKey: string;
+  phoneNumber: string;
+  agentId: string;
 }
 
-export interface DisconnectRequest {
-  apiKey: string;
+export interface GatewayCommandResponse {
+  action: string;
+  phoneNumber?: string;
+  payload?: any;
 }
 
-export interface GatewayResponse {
-  success: boolean;
-  message: string;
-  data?: any;
+export interface CallStatusUpdate {
+  apiKey: string;
+  callId: string;
+  status: 'RINGING' | 'CONNECTED' | 'ENDED' | 'FAILED';
 }

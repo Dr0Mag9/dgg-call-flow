@@ -107,6 +107,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     });
 
+    newSocket.on('call_status_updated', (data: { callId: string, status: string }) => {
+      const { activeCall } = get();
+      if (activeCall && activeCall.id === data.callId) {
+        set({ activeCall: { ...activeCall, status: data.status } });
+      }
+    });
+
     set({ socket: newSocket });
   },
 
