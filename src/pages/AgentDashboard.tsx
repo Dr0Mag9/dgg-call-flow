@@ -97,30 +97,6 @@ export default function AgentDashboard() {
         </motion.div>
 
         <div className="xl:col-span-2 space-y-4">
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { label: "Volume", value: todayCalls.length, icon: TrendingUp, color: "text-gold" },
-              { label: "Success", value: "84%", icon: Zap, color: "text-gold-light" },
-              { label: "Revenue", value: "$32.8k", icon: Award, color: "text-gold" },
-            ].map((stat, i) => (
-              <motion.div 
-                key={stat.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                className="luxury-card p-4 flex items-center gap-4 group bg-[#0A1221]/40 border-gold/10 hover:border-gold/40 transition-all duration-500"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gold/5 border border-gold/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-gold/10 transition-all duration-500">
-                  <stat.icon className={`w-5 h-5 ${stat.color} drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]`} />
-                </div>
-                <div>
-                  <div className="text-[9px] font-black text-gold/40 uppercase tracking-[0.1em]">{stat.label}</div>
-                  <div className="text-xl font-black text-pearl tracking-tight italic">{stat.value}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
 
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
