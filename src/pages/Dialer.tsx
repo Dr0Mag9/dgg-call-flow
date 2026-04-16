@@ -69,6 +69,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
           <div className="text-[9px] font-black text-gold-light/20 mt-4 uppercase tracking-[0.3em] italic">Encrypted Satellite Uplink</div>
         </div>
         
+        <div className="p-8 bg-[#0A1221]/60 backdrop-blur-xl">
           {activeCall ? (
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
