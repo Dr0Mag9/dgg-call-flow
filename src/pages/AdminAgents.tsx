@@ -22,6 +22,8 @@ export default function AdminAgents() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addError, setAddError] = useState('');
+  const [editError, setEditError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const fetchAgents = () => {
     fetch('/api/admin/agents', {
@@ -89,6 +91,9 @@ export default function AdminAgents() {
     e.preventDefault();
     if (!selectedAgent) return;
     setIsSubmitting(true);
+    setEditError('');
+    setSuccessMsg('');
+
     try {
       const res = await fetch(`/api/admin/agents/${selectedAgent.id}`, {
         method: 'PUT',
@@ -104,12 +109,22 @@ export default function AdminAgents() {
           telephonyLineId: formData.telephonyLineId || null
         })
       });
+
+      const data = await res.json();
+      
       if (res.ok) {
-        setIsEditModalOpen(false);
+        setSuccessMsg('Unit synchronized successfully.');
+        setTimeout(() => {
+          setIsEditModalOpen(false);
+          setSuccessMsg('');
+        }, 1500);
         fetchAgents();
+      } else {
+        setEditError(data.error || 'Failed to update agent.');
       }
     } catch (err) {
       console.error(err);
+      setEditError('Communication Uplink Failure.');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,6 +162,8 @@ export default function AdminAgents() {
 
   const openEditModal = (agent: any) => {
     setSelectedAgent(agent);
+    setEditError('');
+    setSuccessMsg('');
     setFormData({
       name: agent.user.name,
       email: agent.user.email,
@@ -220,6 +237,10 @@ export default function AdminAgents() {
                       />
                       {agent.status}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
+                    <span className="text-gold-light/20">Weaponized Line</span>
+                    <span className="text-gold font-mono">{agent.telephonyLine?.number || 'NONE'}</span>
                   </div>
                   <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
                     <span className="text-gold-light/20">Extension</span>
@@ -360,6 +381,16 @@ export default function AdminAgents() {
                 </button>
               </div>
               <form onSubmit={handleEditAgent} className="p-8 space-y-6 bg-navy/20">
+                {editError && (
+                  <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                    SYNC ERROR: {editError}
+                  </motion.div>
+                )}
+                {successMsg && (
+                  <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-gold/10 border border-gold/20 text-gold px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-center">
+                    {successMsg}
+                  </motion.div>
+                )}
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Alias</label>
@@ -383,7 +414,15 @@ export default function AdminAgents() {
                     <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">Assigned Phone Line (Physical SIM)</label>
                     <select 
                       value={formData.telephonyLineId} 
-                      onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
+                      onChange={e => {
+                        const lineId = e.target.value;
+                        const line = telephonyLines.find(l => l.id === lineId);
+                        setFormData({
+                          ...formData, 
+                          telephonyLineId: lineId,
+                          assignedNumber: line ? line.number : formData.assignedNumber
+                        });
+                      }}
                       className="w-full bg-gold/10 border border-gold/40 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none"
                     >
                       <option value="">-- Select Airtel SIM Line --</option>
