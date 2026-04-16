@@ -38,13 +38,19 @@ echo "  🚀 CallFlow Deployment"
 echo "═══════════════════════════════════════════════════════════"
 echo ""
 
-# ─── Step 1: Pull latest code ────────────────────────────────────────────────
-echo "📥 Step 1/7: Pulling latest code from Git..."
+# ─── Step 1: Sync code ────────────────────────────────────────────────────────
+echo "📥 Step 1/7: Syncing code with GitHub..."
 cd "$APP_DIR"
-git pull --ff-only origin main 2>/dev/null || git pull --ff-only origin master 2>/dev/null || {
-  echo "⚠️  Git pull failed. Continuing with current code..."
-}
-echo "   ✅ Code updated"
+git fetch --all --quiet
+# Try main first, fallback to master
+if git show-ref --verify --quiet refs/remotes/origin/main; then
+  git reset --hard origin/main
+elif git show-ref --verify --quiet refs/remotes/origin/master; then
+  git reset --hard origin/master
+else
+  echo "⚠️  Could not find remote main or master branch. Using current state."
+fi
+echo "   ✅ Code synchronized"
 echo ""
 
 # ─── Step 2: Install dependencies ───────────────────────────────────────────
