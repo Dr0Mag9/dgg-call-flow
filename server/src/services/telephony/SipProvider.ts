@@ -1,7 +1,7 @@
-import { TelephonyService, CallRequest } from './TelephonyService.js';
+import { TelephonyService, CallRequest, TelephonyResult } from './TelephonyService.js';
 
 export class SipProvider implements TelephonyService {
-  async initiateOutboundCall(req: CallRequest) {
+  async initiateOutboundCall(req: CallRequest): Promise<TelephonyResult> {
     console.log(`[SIP Provider] Initiating call to ${req.phoneNumber} on line ${req.lineId}`);
     // In a real PBX integration (Asterisk ARI / FreeSWITCH ESL), you would initiate 
     // an originate command here so the PBX dials the destination and bridges the web extension.

@@ -1,10 +1,10 @@
-import { TelephonyService, CallRequest } from './TelephonyService.js';
+import { TelephonyService, CallRequest, TelephonyResult } from './TelephonyService.js';
 import { prisma } from '../../config/prisma.js';
 import { getIo } from '../../services/websocket.service.js';
 import { logger } from '../../utils/logger.js';
 
 export class GatewayProvider implements TelephonyService {
-  async initiateOutboundCall(req: CallRequest) {
+  async initiateOutboundCall(req: CallRequest): Promise<TelephonyResult> {
     logger.info(`[Gateway Provider] Preparing call to ${req.phoneNumber} on line ${req.lineId}`);
 
     const line = await prisma.telephonyLine.findUnique({

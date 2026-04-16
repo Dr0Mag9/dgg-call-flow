@@ -68,13 +68,13 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
     lineId: agent.telephonyLine.id
   });
 
-  if (!result.success) {
-    logger.error(`[Call Service] Provider initiation failed: ${result.error || 'Unknown Error'}`, { callId: call.id });
+  if (result.success === false) {
+    logger.error(`[Call Service] Provider initiation failed: ${result.error}`, { callId: call.id });
     await prisma.call.update({
       where: { id: call.id },
       data: { status: 'FAILED' }
     });
-    return { ok: false as const, error: (result as { error?: string }).error || 'Telephony provider failed to initiate call' };
+    return { ok: false as const, error: result.error || 'Telephony provider failed to initiate call' };
   }
 
   logger.info(`[Call Service] Provider success: ${result.externalId}`);
