@@ -63,7 +63,7 @@ export async function create(req: Request, res: Response) {
         matterType: body.matterType,
         source: body.source,
       },
-      { assignedAgentId },
+      { assignedAgentId: assignedAgentId ?? undefined },
     );
     broadcast('client_created', client);
     fireWebhooks('client_created', client).catch(() => undefined);
@@ -102,7 +102,10 @@ export async function addNote(req: Request, res: Response) {
   if (!agentId) {
     return sendError(res, 400, 'Could not resolve agent for note');
   }
-  const note = await clientsService.createNote(req.params.id, parsed.data, agentId);
+  const note = await clientsService.createNote(req.params.id, {
+    ...parsed.data,
+    callId: parsed.data.callId ?? undefined
+  }, agentId);
   broadcast('note_created', note);
   fireWebhooks('note_created', note).catch(() => undefined);
   return res.json(note);
@@ -118,7 +121,10 @@ export async function addTask(req: Request, res: Response) {
   if (!fallbackAgentId) {
     return sendError(res, 400, 'Could not resolve agent for task');
   }
-  const task = await clientsService.createTask(req.params.id, parsed.data, fallbackAgentId);
+  const task = await clientsService.createTask(req.params.id, {
+    ...parsed.data,
+    agentId: parsed.data.agentId ?? undefined
+  }, fallbackAgentId);
   broadcast('task_created', task);
   fireWebhooks('task_created', task).catch(() => undefined);
   return res.json(task);

@@ -42,7 +42,7 @@ export async function outbound(req: Request, res: Response) {
   const result = await callsService.createOutboundCall(
     req.user.userId,
     parsed.data.phoneNumber,
-    parsed.data.clientId,
+    parsed.data.clientId ?? undefined,
   );
   if (!result.ok) {
     sendError(res, 400, result.error);

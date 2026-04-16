@@ -98,7 +98,10 @@ export async function createAgent(req: Request, res: Response) {
     return sendError(res, 400, 'Invalid agent data: ' + parsed.error.issues.map(i => i.message).join(', '));
   }
   try {
-    const user = await adminService.createAgent(parsed.data);
+    const user = await adminService.createAgent({
+      ...parsed.data,
+      telephonyLineId: parsed.data.telephonyLineId ?? undefined
+    });
     return res.status(201).json(user);
   } catch (e: any) {
     logger.error('createAgent', { message: e instanceof Error ? e.message : String(e) });
