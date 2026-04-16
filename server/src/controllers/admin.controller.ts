@@ -10,7 +10,7 @@ const createAgentSchema = z.object({
   password: z.string().min(8).max(256),
   extension: z.string().max(32).optional(),
   assignedNumber: z.string().max(64).optional(),
-  telephonyLineId: z.string().uuid().optional(),
+  telephonyLineId: z.string().uuid().or(z.literal('')).nullable().optional(),
 });
 
 const updateAgentSchema = z.object({
@@ -18,14 +18,14 @@ const updateAgentSchema = z.object({
   email: z.string().email().optional(),
   extension: z.string().max(32).optional(),
   assignedNumber: z.string().max(64).optional(),
-  telephonyLineId: z.string().uuid().nullable().optional(),
+  telephonyLineId: z.string().uuid().or(z.literal('')).nullable().optional(),
 });
 
 const createLineSchema = z.object({
   number: z.string().min(1),
   providerType: z.enum(['SIP', 'GATEWAY']),
   providerRef: z.string().optional(),
-  gatewayId: z.string().uuid().optional().nullable(),
+  gatewayId: z.string().min(1).or(z.literal('')).optional().nullable(),
 });
 
 const gatewaySchema = z.object({

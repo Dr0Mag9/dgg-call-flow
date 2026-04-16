@@ -51,6 +51,8 @@ echo ""
 echo "📦 Step 2/7: Installing dependencies..."
 cd "$APP_DIR"
 npm ci --omit=dev 2>/dev/null || npm install
+npm prune --omit=dev
+
 cd "$SERVER_DIR"
 npm ci 2>/dev/null || npm install
 echo "   ✅ Dependencies installed"
@@ -68,23 +70,23 @@ if [ ! -f ".env" ]; then
 fi
 
 npx prisma generate
-npx prisma db push --accept-data-loss 2>/dev/null || npx prisma db push
+npx prisma db push --accept-data-loss
 echo "   ✅ Database schema synced"
 
 # Seed admin user (idempotent upsert, safe to run every deploy)
 npx tsx prisma/seed.ts 2>/dev/null && echo "   ✅ Admin seed complete" || echo "   ⚠️  Seed skipped (may already exist)"
 echo ""
 
-# ─── Step 4: Build frontend ─────────────────────────────────────────────────
 echo "🎨 Step 4/7: Building frontend (Vite)..."
 cd "$APP_DIR"
+rm -rf dist/
 npm run build
 echo "   ✅ Frontend built → dist/"
 echo ""
 
-# ─── Step 5: Build backend ──────────────────────────────────────────────────
 echo "⚙️  Step 5/7: Building backend (TypeScript)..."
 cd "$SERVER_DIR"
+rm -rf dist/
 npm run build
 echo "   ✅ Backend built → server/dist/"
 echo ""

@@ -6,7 +6,7 @@ import { logger } from '../utils/logger.js';
 
 const outboundSchema = z.object({
   phoneNumber: z.string().min(5).max(32),
-  clientId: z.string().uuid().optional(),
+  clientId: z.string().uuid().or(z.literal('')).nullable().optional(),
 });
 
 const inboundSchema = z.object({

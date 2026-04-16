@@ -15,14 +15,14 @@ const createClientSchema = z.object({
   company: z.string().max(200).optional(),
   matterType: z.string().max(120).optional(),
   source: z.string().max(120).optional(),
-  assignedAgentId: z.string().uuid().optional(),
+  assignedAgentId: z.string().uuid().or(z.literal('')).nullable().optional(),
 });
 
 const noteSchema = z.object({
   content: z.string().min(1).max(20000),
   noteType: z.string().max(64).optional(),
   isPrivate: z.boolean().optional(),
-  callId: z.string().uuid().optional(),
+  callId: z.string().uuid().or(z.literal('')).nullable().optional(),
 });
 
 const taskSchema = z.object({
@@ -30,7 +30,7 @@ const taskSchema = z.object({
   description: z.string().max(5000).optional(),
   dueAt: z.union([z.string().min(1), z.number()]),
   taskType: z.string().min(1).max(64),
-  agentId: z.string().uuid().optional(),
+  agentId: z.string().uuid().or(z.literal('')).nullable().optional(),
 });
 
 export async function list(_req: Request, res: Response) {
