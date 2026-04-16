@@ -29,6 +29,7 @@ interface AppState {
   incomingCall: Call | null;
   selectedClient: any | null;
   isClientDrawerOpen: boolean;
+  lineInfo: any | null;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   login: (token: string, user: User) => void;
@@ -37,6 +38,8 @@ interface AppState {
   setIncomingCall: (call: Call | null) => void;
   setSelectedClient: (client: any | null) => void;
   setClientDrawerOpen: (isOpen: boolean) => void;
+  setLineInfo: (info: any | null) => void;
+  fetchLineInfo: () => Promise<void>;
   connectSocket: () => void;
   disconnectSocket: () => void;
 }
@@ -49,6 +52,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   incomingCall: null,
   selectedClient: null,
   isClientDrawerOpen: false,
+  lineInfo: null,
 
   setUser: (user) => set({ user }),
   setToken: (token) => {
@@ -60,16 +64,36 @@ export const useAppStore = create<AppState>((set, get) => ({
     get().setToken(token);
     set({ user });
     get().connectSocket();
+    get().fetchLineInfo();
   },
   logout: () => {
     get().setToken(null);
-    set({ user: null, activeCall: null, incomingCall: null, selectedClient: null, isClientDrawerOpen: false });
+    set({ user: null, activeCall: null, incomingCall: null, selectedClient: null, isClientDrawerOpen: false, lineInfo: null });
     get().disconnectSocket();
   },
   setActiveCall: (call) => set({ activeCall: call }),
   setIncomingCall: (call) => set({ incomingCall: call }),
   setSelectedClient: (client) => set({ selectedClient: client }),
   setClientDrawerOpen: (isOpen) => set({ isClientDrawerOpen: isOpen }),
+  setLineInfo: (info) => set({ lineInfo: info }),
+
+  fetchLineInfo: async () => {
+    const { token } = get();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.agent?.telephonyLine) {
+        set({ lineInfo: data.agent.telephonyLine });
+      } else {
+        set({ lineInfo: null });
+      }
+    } catch (err) {
+      console.error('Fetch line info failed', err);
+    }
+  },
 
   connectSocket: () => {
     const { token, socket } = get();

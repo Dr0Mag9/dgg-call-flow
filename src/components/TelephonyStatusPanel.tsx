@@ -4,19 +4,12 @@ import { PhoneCall, Activity, Signal, Smartphone, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function TelephonyStatusPanel() {
-  const { user, token } = useAppStore();
-  const [lineInfo, setLineInfo] = useState<any>(null);
+  const { user, token, lineInfo, fetchLineInfo } = useAppStore();
 
   useEffect(() => {
-    fetch('/api/auth/me', {
-       headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.agent?.telephonyLine) {
-         setLineInfo(data.agent.telephonyLine);
-      }
-    });
+    if (!lineInfo) {
+      fetchLineInfo();
+    }
   }, [token]);
 
   return (

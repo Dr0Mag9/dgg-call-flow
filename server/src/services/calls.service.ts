@@ -58,6 +58,7 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
     include: { client: true, agent: { include: { user: { select: { name: true } } } }, disposition: true },
   });
 
+  logger.info(`[Call Service] Handoff to ${agent.telephonyLine.providerType} provider: ${call.id}`);
   const provider = agent.telephonyLine.providerType === 'GATEWAY' ? gatewayProvider : sipProvider;
   
   const result = await provider.initiateOutboundCall({
@@ -68,12 +69,15 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
   });
 
   if (!result.success) {
+    logger.error(`[Call Service] Provider initiation failed: ${result.error}`, { callId: call.id });
     await prisma.call.update({
       where: { id: call.id },
       data: { status: 'FAILED' }
     });
     return { ok: false as const, error: (result as { error?: string }).error || 'Telephony provider failed to initiate call' };
   }
+
+  logger.info(`[Call Service] Provider success: ${result.externalId}`);
 
   // Update call with provider ref
   const updatedCall = await prisma.call.update({

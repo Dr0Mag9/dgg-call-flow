@@ -5,12 +5,17 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   const [number, setNumber] = useState('');
-  const { token, activeCall } = useAppStore();
+  const [isDialing, setIsDialing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { token, activeCall, lineInfo } = useAppStore();
 
   const handleDial = async () => {
-    if (!number) return;
+    if (!number || isDialing) return;
+    setIsDialing(true);
+    setError(null);
+
     try {
-      await fetch('/api/calls/outbound', {
+      const res = await fetch('/api/calls/outbound', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -18,9 +23,21 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
         },
         body: JSON.stringify({ phoneNumber: number })
       });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        setError(data.error || 'Logical Link Failure');
+        setIsDialing(false);
+        return;
+      }
+
       setNumber('');
     } catch (err) {
+      setError('Network communication lost');
       console.error(err);
+    } finally {
+      setIsDialing(false);
     }
   };
 
@@ -55,18 +72,26 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
 
           <AnimatePresence mode="wait">
             <motion.div 
-              key={number || 'placeholder'}
+              key={number || (error ? 'error' : 'placeholder')}
               initial={{ y: 5, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="h-16 flex items-center justify-center"
+              className="h-16 flex flex-col items-center justify-center"
             >
-              <span className="text-5xl font-mono font-black tracking-[0.2em] gold-text-gradient drop-shadow-[0_0_20px_rgba(212,175,55,0.3)] italic">
-                {number || '---'}
-              </span>
+              {error ? (
+                <span className="text-xs font-black text-red-500 uppercase tracking-widest animate-pulse px-4 text-center">
+                  Protocol Error: {error}
+                </span>
+              ) : (
+                <span className="text-5xl font-mono font-black tracking-[0.2em] gold-text-gradient drop-shadow-[0_0_20px_rgba(212,175,55,0.3)] italic">
+                  {number || '---'}
+                </span>
+              )}
             </motion.div>
           </AnimatePresence>
           
-          <div className="text-[9px] font-black text-gold-light/20 mt-4 uppercase tracking-[0.3em] italic">Encrypted Satellite Uplink</div>
+          <div className="text-[9px] font-black text-gold-light/20 mt-4 uppercase tracking-[0.3em] italic">
+            {!lineInfo ? 'AUTHENTICATION REQUIRED IN ADMIN' : 'Encrypted Satellite Uplink'}
+          </div>
         </div>
         
         <div className="p-8 bg-[#0A1221]/60 backdrop-blur-xl">
@@ -158,14 +183,21 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.1, boxShadow: '0 0 30px rgba(212, 175, 55, 0.4)' }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={!(!number || !lineInfo || isDialing) ? { scale: 1.1, boxShadow: '0 0 30px rgba(212,175,55,0.4)' } : {}}
+                  whileTap={!(!number || !lineInfo || isDialing) ? { scale: 0.9 } : {}}
                   onClick={handleDial}
-                  disabled={!number}
+                  disabled={!number || !lineInfo || isDialing}
                   className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-deep text-navy flex items-center justify-center transition-all shadow-2xl relative group/call disabled:opacity-30 disabled:grayscale"
                 >
+                  {isDialing && (
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="absolute inset-0 border-2 border-navy/20 border-t-navy rounded-full"
+                    />
+                  )}
                   <div className="absolute inset-0 rounded-full bg-gold animate-ping opacity-10 pointer-events-none" />
-                  <Phone className="w-7 h-7 drop-shadow-md" />
+                  <Phone className={`w-7 h-7 drop-shadow-md ${isDialing ? 'opacity-20' : ''}`} />
                 </motion.button>
 
                 <div className="w-10 flex flex-col items-center gap-1.5">
