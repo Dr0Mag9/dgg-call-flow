@@ -2,12 +2,31 @@ import { prisma } from '../../config/prisma.js';
 import { broadcast } from '../../services/notification.service.js';
 import { logger } from '../../utils/logger.js';
 
-export async function connectGateway(apiKey: string, deviceName: string) {
+export async function connectGateway(apiKey: string, deviceName: string, phoneNumber?: string) {
   const device = await prisma.gatewayDevice.upsert({
     where: { apiKey },
     update: { status: 'ONLINE', lastSeen: new Date(), name: deviceName },
     create: { apiKey, name: deviceName, status: 'ONLINE', lastSeen: new Date() }
   });
+
+  // Automatically link to TelephonyLine if phone number matches
+  if (phoneNumber) {
+    const cleanNumber = phoneNumber.replace(/\D/g, '');
+    const lines = await prisma.telephonyLine.findMany({
+      where: {
+        providerType: 'GATEWAY',
+        number: { contains: cleanNumber }
+      }
+    });
+
+    if (lines.length > 0) {
+      await prisma.telephonyLine.update({
+        where: { id: lines[0].id },
+        data: { gatewayId: device.id }
+      });
+      logger.info(`[Gateway] Auto-linked device ${device.id} to line ${lines[0].number}`);
+    }
+  }
 
   broadcast('gateway_status_changed', { gatewayId: device.id, status: 'ONLINE' });
   return device;

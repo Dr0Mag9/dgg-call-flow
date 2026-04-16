@@ -5,12 +5,13 @@ import { sendError } from '../../utils/responses.js';
 export async function connect(req: Request, res: Response) {
   const apiKey = req.body.apiKey || req.headers['x-api-key'];
   const deviceName = req.body.deviceName || 'Android Device';
+  const phoneNumber = req.body.phoneNumber;
 
   if (!apiKey) {
     return sendError(res, 401, 'API Key required');
   }
 
-  const result = await gatewayService.connectGateway(apiKey, deviceName);
+  const result = await gatewayService.connectGateway(apiKey, deviceName, phoneNumber);
   if (!result) {
     return sendError(res, 401, 'Invalid API Key');
   }

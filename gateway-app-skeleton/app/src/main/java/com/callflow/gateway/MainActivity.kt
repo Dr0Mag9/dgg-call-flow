@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var etServerUrl: EditText
     private lateinit var etApiKey: EditText
+    private lateinit var etPhoneNumber: EditText
     private lateinit var btnStart: Button
     private lateinit var btnStop: Button
     private lateinit var tvStatus: TextView
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         etServerUrl = findViewById(R.id.etServerUrl)
         etApiKey = findViewById(R.id.etApiKey)
+        etPhoneNumber = findViewById(R.id.etPhoneNumber)
         btnStart = findViewById(R.id.btnStart)
         btnStop = findViewById(R.id.btnStop)
         tvStatus = findViewById(R.id.tvStatus)
@@ -74,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("GatewayPrefs", Context.MODE_PRIVATE)
         etServerUrl.setText(prefs.getString("server_url", ""))
         etApiKey.setText(prefs.getString("api_key", ""))
+        etPhoneNumber.setText(prefs.getString("manual_phone", ""))
 
         btnStart.setOnClickListener {
             if (checkPermissions()) {
@@ -108,6 +111,7 @@ class MainActivity : AppCompatActivity() {
     private fun saveAndStartService() {
         val url = etServerUrl.text.toString().trim()
         val key = etApiKey.text.toString().trim()
+        val phone = etPhoneNumber.text.toString().trim()
 
         if (url.isEmpty() || key.isEmpty()) {
             Toast.makeText(this, "Please enter all details", Toast.LENGTH_SHORT).show()
@@ -118,12 +122,14 @@ class MainActivity : AppCompatActivity() {
         prefs.edit().apply {
             putString("server_url", url)
             putString("api_key", key)
+            putString("manual_phone", phone)
             apply()
         }
 
         val intent = Intent(this, GatewayService::class.java)
         intent.putExtra("SERVER_URL", url)
         intent.putExtra("API_KEY", key)
+        intent.putExtra("MANUAL_PHONE", phone)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)

@@ -30,6 +30,7 @@ class GatewayService : Service() {
     private var socket: Socket? = null
     private val CHANNEL_ID = "GatewayServiceChannel"
     private var apiKey: String? = null
+    private var manualPhoneNumber: String? = null
     private var serverUrl: String? = null
     private val pollerTimer = Timer()
     private val healthTimer = Timer()
@@ -43,8 +44,11 @@ class GatewayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        serverUrl = intent?.getStringExtra("SERVER_URL") ?: return START_NOT_STICKY
-        apiKey = intent?.getStringExtra("API_KEY") ?: return START_NOT_STICKY
+        serverUrl = intent?.getStringExtra("SERVER_URL")
+        apiKey = intent?.getStringExtra("API_KEY")
+        manualPhoneNumber = intent?.getStringExtra("MANUAL_PHONE")
+        
+        if (serverUrl == null || apiKey == null) return START_NOT_STICKY
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("CallFlow Gateway Active")
@@ -81,6 +85,7 @@ class GatewayService : Service() {
                 val body = JSONObject().apply {
                     put("apiKey", apiKey)
                     put("deviceName", Build.MODEL)
+                    put("phoneNumber", manualPhoneNumber ?: getSimPhoneNumber() ?: "")
                 }
                 OutputStreamWriter(conn.outputStream).use { it.write(body.toString()) }
 
@@ -163,7 +168,7 @@ class GatewayService : Service() {
                 val phoneNumber = getSimPhoneNumber()
                 val authData = JSONObject().apply {
                     put("apiKey", key)
-                    put("phoneNumber", phoneNumber)
+                    put("phoneNumber", manualPhoneNumber ?: getSimPhoneNumber() ?: "")
                 }
                 socket?.emit("gateway:auth", authData)
                 sendStatusUpdate("Status: Online")
