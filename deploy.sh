@@ -79,6 +79,10 @@ npx prisma generate
 npx prisma db push --accept-data-loss
 echo "   ✅ Database schema synced"
 
+# Ensure port 3001 is open for direct gateway communication
+sudo ufw allow 3001/tcp 2>/dev/null || true
+echo "   ✅ Port 3001 opened in firewall"
+
 # Seed admin user (idempotent upsert, safe to run every deploy)
 npx tsx prisma/seed.ts 2>/dev/null && echo "   ✅ Admin seed complete" || echo "   ⚠️  Seed skipped (may already exist)"
 echo ""
@@ -144,12 +148,16 @@ server {
     }
 
     # WebSocket proxy → Node.js backend
-    location /socket.io/ {
+    # Fixed: No trailing slash on location for better Engine.IO matching
+    location /socket.io {
         proxy_pass http://127.0.0.1:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
     # SPA fallback — serves index.html for all frontend routes

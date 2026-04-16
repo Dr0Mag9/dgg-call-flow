@@ -52,12 +52,12 @@ export default function TelephonyStatusPanel() {
           <p className="text-[9px] font-black text-gold/40 uppercase tracking-[0.2em]">Telephony Link</p>
           <div className="flex items-center gap-2 justify-end mt-0.5">
             <motion.div 
-              animate={{ opacity: lineInfo ? [0.4, 1, 0.4] : 0.2 }}
+              animate={{ opacity: lineInfo?.gateway?.status === 'ONLINE' ? [0.4, 1, 0.4] : 0.2 }}
               transition={{ duration: 2, repeat: Infinity }}
-              className={`w-1.5 h-1.5 rounded-full ${lineInfo ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-600'}`} 
+              className={`w-1.5 h-1.5 rounded-full ${lineInfo?.gateway?.status === 'ONLINE' ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-600'}`} 
             />
-            <p className={`text-[10px] font-black uppercase tracking-widest ${lineInfo ? 'text-gold' : 'text-slate-500'}`}>
-              {lineInfo ? 'Operational' : 'Offline'}
+            <p className={`text-[10px] font-black uppercase tracking-widest ${lineInfo?.gateway?.status === 'ONLINE' ? 'text-gold' : 'text-slate-500'}`}>
+              {lineInfo?.gateway?.status === 'ONLINE' ? 'Operational' : 'Sim Offline'}
             </p>
           </div>
         </div>

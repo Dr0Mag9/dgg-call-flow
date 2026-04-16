@@ -12,6 +12,8 @@ export function initSocketIo(httpServer: HttpServer): Server {
     },
     path: '/socket.io',
     allowEIO3: true,
+    pingTimeout: 60000,
+    pingInterval: 25000,
   });
   return io;
 }

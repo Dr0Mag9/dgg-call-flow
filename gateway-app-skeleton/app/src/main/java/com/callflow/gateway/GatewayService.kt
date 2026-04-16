@@ -149,6 +149,8 @@ class GatewayService : Service() {
             opts.reconnection = true
             opts.reconnectionAttempts = 100
             opts.reconnectionDelay = 2000
+            opts.forceNew = true
+            opts.timeout = 30000
             
             // Explicitly set transports. v2.1.0 client with Node v4 usually needs EIO3 + specific transports
             opts.transports = arrayOf("polling", "websocket")
