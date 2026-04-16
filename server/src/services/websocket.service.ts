@@ -11,6 +11,7 @@ export function initSocketIo(httpServer: HttpServer): Server {
       methods: ['GET', 'POST'],
     },
     path: '/socket.io',
+    allowEIO3: true,
   });
   return io;
 }

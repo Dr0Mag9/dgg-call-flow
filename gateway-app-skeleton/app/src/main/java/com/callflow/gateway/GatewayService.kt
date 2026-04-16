@@ -23,6 +23,7 @@ import java.io.InputStreamReader
 import java.io.BufferedReader
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 
 class GatewayService : Service() {
 
@@ -143,13 +144,20 @@ class GatewayService : Service() {
     private fun connectToSocket(url: String, key: String) {
         try {
             val opts = IO.Options()
+            // Standard Socket.io path for Node.js
             opts.path = "/socket.io"
             opts.reconnection = true
-            opts.reconnectionAttempts = Integer.MAX_VALUE
+            opts.reconnectionAttempts = 100
             opts.reconnectionDelay = 2000
+            
+            // Explicitly set transports. v2.1.0 client with Node v4 usually needs EIO3 + specific transports
+            opts.transports = arrayOf("polling", "websocket")
+            
+            Log.d("Gateway", "[Socket] Connecting to $url with path ${opts.path}")
             socket = IO.socket(url, opts)
 
             socket?.on(Socket.EVENT_CONNECT) {
+                Log.d("Gateway", "[Socket] Connected to server")
                 val phoneNumber = getSimPhoneNumber()
                 val authData = JSONObject().apply {
                     put("apiKey", key)
@@ -160,11 +168,14 @@ class GatewayService : Service() {
             }
 
             socket?.on(Socket.EVENT_DISCONNECT) {
+                Log.d("Gateway", "[Socket] Disconnected")
                 sendStatusUpdate("Status: Reconnecting...")
             }
 
-            socket?.on(Socket.EVENT_CONNECT_ERROR) {
-                sendStatusUpdate("Status: Socket Error, using HTTP polling")
+            socket?.on(Socket.EVENT_CONNECT_ERROR) { args ->
+                val error = if (args.isNotEmpty()) args[0].toString() else "Unknown"
+                Log.e("Gateway", "[Socket] Connect Error: $error")
+                sendStatusUpdate("Status: Socket Error ($error), using Polling")
             }
 
             socket?.on("gateway:command") { args ->
@@ -222,7 +233,8 @@ class GatewayService : Service() {
             logCallLocally(number)
         } else {
             reportCallStatus(sessionId, "end", "FAILED")
-            sendStatusUpdate("Status: Dial Failed - Check permissions")
+            Log.e("Gateway", "[Call] Dial Failed - Check permissions")
+            sendStatusUpdate("Status: Dial Failed")
         }
     }
 
@@ -231,6 +243,7 @@ class GatewayService : Service() {
      */
     private fun handleHangupCommand(data: JSONObject) {
         val callId = data.optString("callId", data.optString("sessionId", currentCallId ?: ""))
+        Log.d("Gateway", "[Call] Ending call $callId")
         sendStatusUpdate("Ending call...")
 
         val success = CallController.endCall()
@@ -239,7 +252,8 @@ class GatewayService : Service() {
             sendStatusUpdate("Status: Call Ended")
             currentCallId = null
         } else {
-            sendStatusUpdate("Status: Hangup failed - call may have already ended")
+            Log.w("Gateway", "[Call] Hangup failed or call already ended")
+            sendStatusUpdate("Status: Call Already Ended")
             reportCallStatus(callId, "end", "ENDED")
             currentCallId = null
         }
