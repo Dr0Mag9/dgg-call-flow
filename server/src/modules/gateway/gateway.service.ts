@@ -40,7 +40,7 @@ export async function triggerCall(apiKey: string, phoneNumber: string, agentId: 
   }
 
   // 1. Create a CallSession
-  const session = await prisma.callSession.create({
+  const session = await (prisma as any).callSession.create({
     data: {
       phoneNumber,
       agentId,
@@ -50,7 +50,7 @@ export async function triggerCall(apiKey: string, phoneNumber: string, agentId: 
   });
 
   // 2. Queue a GatewayCommand for the Android app to poll
-  await prisma.gatewayCommand.create({
+  await (prisma as any).gatewayCommand.create({
     data: {
       gatewayId: device.id,
       action: 'CALL',
@@ -77,20 +77,20 @@ export async function getPendingCommands(apiKey: string) {
   const device = await prisma.gatewayDevice.findUnique({ where: { apiKey } });
   if (!device) return [];
 
-  const commands = await prisma.gatewayCommand.findMany({
+  const commands = await (prisma as any).gatewayCommand.findMany({
     where: { gatewayId: device.id, status: 'PENDING' },
     orderBy: { createdAt: 'asc' }
   });
 
   if (commands.length > 0) {
     // Mark as SENT (or delete) to prevent duplicate polling
-    await prisma.gatewayCommand.updateMany({
-      where: { id: { in: commands.map(c => c.id) } },
+    await (prisma as any).gatewayCommand.updateMany({
+      where: { id: { in: commands.map((c: any) => c.id) } },
       data: { status: 'SENT' }
     });
   }
 
-  return commands.map(c => ({
+  return commands.map((c: any) => ({
     id: c.id,
     action: c.action,
     ...(c.payload ? JSON.parse(c.payload) : {})
@@ -107,7 +107,7 @@ export async function updateCallStatus(apiKey: string, callId: string, status: s
   // 1. Try to update CallSession (gateway-specific tracking)
   let session;
   try {
-    session = await prisma.callSession.update({
+    session = await (prisma as any).callSession.update({
       where: { id: callId },
       data: { 
         status,

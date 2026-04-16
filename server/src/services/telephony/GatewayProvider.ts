@@ -24,7 +24,7 @@ export class GatewayProvider implements TelephonyService {
     const gatewayRoom = `gateway_${line.gatewayId}`;
 
     // 1. Always persist command for HTTP polling (robust delivery)
-    await prisma.gatewayCommand.create({
+    await (prisma as any).gatewayCommand.create({
       data: {
         gatewayId: line.gatewayId,
         action: 'CALL',
@@ -51,7 +51,9 @@ export class GatewayProvider implements TelephonyService {
         logger.info(`[Gateway Provider] No active sockets for gateway ${line.gatewayId}, relying on HTTP polling`);
       }
     } catch (err) {
-      logger.warn('[Gateway Provider] Socket emit failed, command queued for polling', err);
+      logger.warn('[Gateway Provider] Socket emit failed, command queued for polling', { 
+        message: err instanceof Error ? err.message : String(err) 
+      });
     }
 
     return { 
@@ -81,7 +83,7 @@ export class GatewayProvider implements TelephonyService {
 
     if (gatewayId) {
       // 1. Queue HANGUP for HTTP polling
-      await prisma.gatewayCommand.create({
+      await (prisma as any).gatewayCommand.create({
         data: {
           gatewayId,
           action: 'HANGUP',
@@ -124,7 +126,9 @@ export class GatewayProvider implements TelephonyService {
       const io = getIo();
       io.emit('gateway:command', { command, callId });
     } catch (err) {
-      logger.error(`[Gateway Provider] Failed to send ${command} command`, err);
+      logger.error(`[Gateway Provider] Failed to send ${command} command`, {
+        message: err instanceof Error ? err.message : String(err)
+      });
     }
   }
 }
