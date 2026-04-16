@@ -46,7 +46,15 @@ export async function getMe(userId: string) {
       role: true,
       status: true,
       isActive: true,
-      agent: true,
+      agent: {
+        include: {
+          telephonyLine: {
+            include: {
+              gateway: true
+            }
+          }
+        }
+      },
     },
   });
 }
