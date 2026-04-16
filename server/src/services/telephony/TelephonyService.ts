@@ -6,8 +6,12 @@ export interface CallRequest {
   providerRef?: string;
 }
 
+export type TelephonyResult = 
+  | { success: true; externalId: string }
+  | { success: false; error: string };
+
 export interface TelephonyService {
-  initiateOutboundCall(req: CallRequest): Promise<{ success: boolean; externalId?: string; error?: string }>;
+  initiateOutboundCall(req: CallRequest): Promise<TelephonyResult>;
   registerIncomingCall(payload: any): Promise<void>;
   answerCall(callId: string): Promise<void>;
   endCall(callId: string): Promise<void>;
