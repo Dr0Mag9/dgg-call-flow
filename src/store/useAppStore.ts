@@ -131,6 +131,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     });
 
+    newSocket.on('agent_telephony_updated', () => {
+      get().fetchLineInfo();
+    });
+
     newSocket.on('call_status_updated', (data: { callId: string, status: string }) => {
       const { activeCall } = get();
       if (activeCall && activeCall.id === data.callId) {

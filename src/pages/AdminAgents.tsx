@@ -300,18 +300,18 @@ export default function AdminAgents() {
                       <input type="text" value={formData.extension} onChange={e => setFormData({...formData, extension: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="101" />
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Direct Signal</label>
-                      <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="+1-555..." />
+                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIM Phone Number</label>
+                      <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="91564..." />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Global Asset Assignment</label>
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">Assigned Phone Line (Physical SIM)</label>
                     <select 
                       value={formData.telephonyLineId} 
                       onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
-                      className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none"
+                      className="w-full bg-gold/10 border border-gold/40 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none"
                     >
-                      <option value="">Awaiting Allocation</option>
+                      <option value="">-- Select Airtel SIM Line --</option>
                       {telephonyLines.map(line => (
                         <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
                       ))}

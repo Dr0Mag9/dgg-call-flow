@@ -113,7 +113,7 @@ export async function updateAgent(
   const agent = await prisma.agent.findUnique({ where: { id: agentId } });
   if (!agent) return null;
 
-  return prisma.agent.update({
+  const updated = await prisma.agent.update({
     where: { id: agentId },
     data: {
       extension: data.extension,
@@ -128,6 +128,13 @@ export async function updateAgent(
     },
     include: { user: true, telephonyLine: true },
   });
+
+  if (updated && updated.userId) {
+    const { emitToUser } = await import('./notification.service.js');
+    emitToUser(updated.userId, 'agent_telephony_updated', {});
+  }
+
+  return updated;
 }
 
 export async function toggleAgentStatus(agentId: string) {
