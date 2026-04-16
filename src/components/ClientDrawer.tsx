@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { X, Phone, Mail, Building, Star, Calendar, Clock, FileText, CheckCircle, Activity, CheckSquare, Send, Play } from 'lucide-react';
 import { format } from 'date-fns';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function ClientDrawer() {
   const { selectedClient, isClientDrawerOpen, setClientDrawerOpen, token, activeCall } = useAppStore();
@@ -179,10 +180,10 @@ export default function ClientDrawer() {
           <img src="/assets/@digitalgrowthgurus (1).jpg" className="absolute -right-4 -top-4 w-32 h-32 opacity-5 rotate-12 pointer-events-none group-hover:opacity-10 transition-opacity duration-1000" alt="" />
           <div className="flex gap-5 relative z-10">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-light via-gold to-gold-deep border border-gold/40 flex items-center justify-center text-navy text-2xl font-black shadow-[0_0_20px_rgba(212,175,55,0.4)]">
-              {selectedClient.name?.charAt(0) || '?'}
+              {selectedClient?.name?.charAt(0) || '?'}
             </div>
             <div>
-              <h2 className="text-xl font-black text-pearl tracking-tighter italic gold-text-gradient uppercase">{selectedClient.name}</h2>
+              <h2 className="text-xl font-black text-pearl tracking-tighter italic gold-text-gradient uppercase">{selectedClient?.name || 'Asset Profile'}</h2>
               <div className="flex items-center gap-4 mt-1 text-[10px] font-black uppercase tracking-widest text-gold-light/40">
                 <span className="flex items-center gap-1.5"><Building className="w-3.5 h-3.5 text-gold/60" /> {selectedClient.company || 'Private Asset'}</span>
                 <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-gold/10 border border-gold/20 text-gold shimmer-text"><Star className="w-3 h-3 fill-gold" /> Rank: {selectedClient.score}</span>

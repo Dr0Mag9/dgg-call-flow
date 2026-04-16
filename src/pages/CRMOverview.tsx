@@ -184,7 +184,7 @@ export default function CRMOverview() {
                         <div className="ml-4 truncate">
                           <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic uppercase">{client.name}</div>
                           <div className="text-[8px] text-gold-light/40 font-black flex items-center gap-1.5 mt-0.5 uppercase tracking-widest truncate max-w-[120px]">
-                            {client.company || 'Private Asset'}
+                            {client?.company || 'Private Asset'}
                           </div>
                         </div>
                       </div>
@@ -218,7 +218,7 @@ export default function CRMOverview() {
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-[10px] font-black text-gold">
-                          {(client.assignedAgent?.user?.name || 'U').charAt(0)}
+                          {client.assignedAgent?.user?.name?.[0] || 'U'}
                         </div>
                         <span className="text-[9px] font-black text-gold-light/60 uppercase tracking-widest">
                           {client.assignedAgent?.user?.name || 'ALLOCATED'}
