@@ -330,6 +330,81 @@ export default function AdminAgents() {
         )}
       </AnimatePresence>
 
+      {/* Edit Agent Modal */}
+      <AnimatePresence>
+        {isEditModalOpen && selectedAgent && (
+          <div className="fixed inset-0 flex items-center justify-center z-[100] p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsEditModalOpen(false)}
+              className="absolute inset-0 bg-navy/80 backdrop-blur-md" 
+            />
+            
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="luxury-card w-full max-w-xl overflow-hidden relative z-10 border-gold/30 shadow-[0_0_50px_rgba(212,175,55,0.15)]"
+            >
+              <div className="px-8 py-6 border-b border-gold/10 bg-gold/5 flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 bg-gold/10 rounded-xl border border-gold/20">
+                    <Edit className="w-5 h-5 text-gold" />
+                  </div>
+                  <h3 className="text-lg font-black text-pearl uppercase tracking-[0.2em]">Modify Unit Profile</h3>
+                </div>
+                <button onClick={() => setIsEditModalOpen(false)} className="p-2 rounded-full hover:bg-gold/10 text-gold-light/40 hover:text-gold transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <form onSubmit={handleEditAgent} className="p-8 space-y-6 bg-navy/20">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Alias</label>
+                    <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Digital ID (Email)</label>
+                    <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">Internal Line</label>
+                      <input type="text" value={formData.extension} onChange={e => setFormData({...formData, extension: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="101" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIM Phone Number</label>
+                      <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="91564..." />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">Assigned Phone Line (Physical SIM)</label>
+                    <select 
+                      value={formData.telephonyLineId} 
+                      onChange={e => setFormData({...formData, telephonyLineId: e.target.value})}
+                      className="w-full bg-gold/10 border border-gold/40 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all cursor-pointer appearance-none"
+                    >
+                      <option value="">-- Select Airtel SIM Line --</option>
+                      {telephonyLines.map(line => (
+                        <option key={line.id} value={line.id}>{line.number} ({line.providerType})</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="pt-6 flex justify-end gap-6 items-center">
+                  <button type="button" onClick={() => setIsEditModalOpen(false)} className="text-[10px] font-black text-gold-light/30 hover:text-gold-light uppercase tracking-widest transition-colors">Abort</button>
+                  <button type="submit" disabled={isSubmitting} className="luxury-button min-w-[160px] text-xs py-4 px-8">
+                    {isSubmitting ? 'Syncing...' : 'Update Unit'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Profile & Activity Drawer */}
       <AnimatePresence>
         {isProfileDrawerOpen && selectedAgent && (
