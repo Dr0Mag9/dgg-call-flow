@@ -33,12 +33,22 @@ export default function ClientDrawer() {
       fetch(`/api/clients/${selectedClient.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch client details');
+          return res.json();
+        })
         .then(data => {
-          setClientDetails(data);
+          if (data && !data.error) {
+            setClientDetails(data);
+          } else {
+            setClientDetails(null);
+          }
           setLoading(false);
         })
-        .catch(console.error);
+        .catch(err => {
+          console.error(err);
+          setLoading(false);
+        });
     }
   }, [selectedClient, isClientDrawerOpen, token]);
 
@@ -185,8 +195,8 @@ export default function ClientDrawer() {
             <div>
               <h2 className="text-xl font-black text-pearl tracking-tighter italic gold-text-gradient uppercase">{selectedClient?.name || 'Asset Profile'}</h2>
               <div className="flex items-center gap-4 mt-1 text-[10px] font-black uppercase tracking-widest text-gold-light/40">
-                <span className="flex items-center gap-1.5"><Building className="w-3.5 h-3.5 text-gold/60" /> {selectedClient.company || 'Private Asset'}</span>
-                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-gold/10 border border-gold/20 text-gold shimmer-text"><Star className="w-3 h-3 fill-gold" /> Rank: {selectedClient.score}</span>
+                <span className="flex items-center gap-1.5"><Building className="w-3.5 h-3.5 text-gold/60" /> {selectedClient?.company || 'Private Asset'}</span>
+                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-gold/10 border border-gold/20 text-gold shimmer-text"><Star className="w-3 h-3 fill-gold" /> Rank: {selectedClient?.score || 0}</span>
               </div>
             </div>
           </div>
@@ -267,10 +277,10 @@ export default function ClientDrawer() {
                       {[
                         { label: 'Coordinates (Phone)', value: clientDetails.phone },
                         { label: 'Digital Identity (Email)', value: clientDetails.email || '--' },
-                        { label: 'Regional Sector (City)', value: clientDetails.city || '--' },
-                        { label: 'Matter Category', value: clientDetails.matterType || '--' },
-                        { label: 'Acquisition Source', value: clientDetails.source || '--' },
-                        { label: 'Assigned Executor', value: clientDetails.assignedAgent?.user?.name || 'Unassigned' },
+                        { label: 'Regional Sector (City)', value: clientDetails?.city || '--' },
+                        { label: 'Matter Category', value: clientDetails?.matterType || '--' },
+                        { label: 'Acquisition Source', value: clientDetails?.source || '--' },
+                        { label: 'Assigned Executor', value: clientDetails?.assignedAgent?.user?.name || 'Unassigned' },
                       ].map((item) => (
                         <div key={item.label}>
                           <span className="block text-[8px] font-black text-gold-light/30 uppercase tracking-widest mb-1">{item.label}</span>
@@ -333,12 +343,12 @@ export default function ClientDrawer() {
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
                             <div className="w-5 h-5 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-[8px] font-black text-gold uppercase">
-                              {note.agent?.user?.name?.charAt(0) || '?'}
+                              {note.agent?.user?.name?.[0] || '?'}
                             </div>
                             <span className="text-[9px] font-black text-pearl/80 uppercase tracking-widest">{note.agent?.user?.name || 'NODE'}</span>
                             <span className="text-[8px] text-gold-light/20 font-black">• {note.createdAt && !isNaN(new Date(note.createdAt).getTime()) ? format(new Date(note.createdAt), 'MMM d, h:mm a') : 'Recent'}</span>
                           </div>
-                          <span className="text-[7px] px-1.5 py-0.5 bg-gold/5 border border-gold/10 rounded text-gold-light/40 uppercase tracking-[0.2em] font-black italic">{note.noteType}</span>
+                          <span className="text-[7px] px-1.5 py-0.5 bg-gold/5 border border-gold/10 rounded text-gold-light/40 uppercase tracking-[0.2em] font-black italic">{note.noteType || 'LOG'}</span>
                         </div>
                         <p className="text-[10px] text-pearl/70 leading-relaxed font-medium">{note.content}</p>
                       </div>

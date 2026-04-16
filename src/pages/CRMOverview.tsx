@@ -20,19 +20,28 @@ export default function CRMOverview() {
     fetch('/api/clients', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch clients');
+        return res.json();
+      })
       .then(data => {
-        setClients(data);
+        setClients(Array.isArray(data) ? data : []);
         setLoading(false);
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
 
     if (user?.role === 'ADMIN') {
       fetch('/api/admin/agents', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-        .then(res => res.json())
-        .then(data => setAgents(data))
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch agents');
+          return res.json();
+        })
+        .then(data => setAgents(Array.isArray(data) ? data : []))
         .catch(console.error);
     }
 
@@ -182,7 +191,7 @@ export default function CRMOverview() {
                           <span className="relative z-10 text-sm italic uppercase">{client.name?.charAt(0) || '?'}</span>
                         </div>
                         <div className="ml-4 truncate">
-                          <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic uppercase">{client.name}</div>
+                          <div className="text-sm font-black text-pearl group-hover:text-gold transition-colors tracking-tight italic uppercase">{client?.name || 'Unknown Asset'}</div>
                           <div className="text-[8px] text-gold-light/40 font-black flex items-center gap-1.5 mt-0.5 uppercase tracking-widest truncate max-w-[120px]">
                             {client?.company || 'Private Asset'}
                           </div>
@@ -191,7 +200,7 @@ export default function CRMOverview() {
                     </td>
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="text-xs font-bold text-pearl/90 flex items-center gap-2 group-hover:text-gold transition-colors">
-                        <Phone className="w-3.5 h-3.5 text-gold/60 shrink-0" /> {client.phone}
+                        <Phone className="w-3.5 h-3.5 text-gold/60 shrink-0" /> {client?.phone || '--'}
                       </div>
                       {client.email && (
                         <div className="text-[9px] text-gold-light/30 flex items-center gap-2 mt-1 font-black uppercase tracking-widest truncate max-w-[150px]">

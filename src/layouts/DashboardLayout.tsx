@@ -107,12 +107,12 @@ export default function DashboardLayout() {
         <div className="p-4 border-t border-gold/10 bg-navy/40 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-4 p-2.5 rounded-xl bg-gold/5 border border-gold/20 hover:border-gold/40 transition-all duration-500 group/profile relative">
             <img src="/assets/@digitalgrowthgurus (1).jpg" className="absolute -right-2 -bottom-2 w-12 h-12 opacity-5 scale-150 rotate-12 pointer-events-none group-hover:opacity-10 transition-opacity" alt="" />
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/30 to-gold/5 border border-gold/40 flex items-center justify-center font-black text-lg text-gold-light shadow-[0_0_10px_rgba(212,175,55,0.2)] group-hover/profile:scale-105 transition-transform z-10">
-              {user.name.charAt(0)}
+            <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/40 flex items-center justify-center text-[10px] font-black text-gold shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+              {user?.name?.[0] || 'A'}
             </div>
-            <div className="overflow-hidden z-10">
-              <div className="font-black text-xs truncate text-pearl tracking-tight uppercase">{user.name}</div>
-              <div className="text-[9px] uppercase tracking-[0.2em] text-gold-deep font-black mt-0.5">{user.role}</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-pearl truncate uppercase tracking-widest leading-none">{user?.name || 'Administrator'}</p>
+              <p className="text-[8px] font-black text-gold/60 truncate uppercase tracking-widest mt-0.5">{user?.role || 'System Node'}</p>
             </div>
           </div>
           <button
