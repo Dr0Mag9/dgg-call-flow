@@ -40,7 +40,6 @@ export default function App() {
           <Route path="agent/crm" element={<CRMOverview />} />
           <Route path="agent/dialer" element={<Dialer />} />
           <Route path="agent/history" element={<CallHistory />} />
-          <Route path="agent/settings" element={<Settings />} />
           <Route path="agent/tasks" element={<Tasks />} />
           <Route path="agent/library" element={<StudyLibrary />} />
         </Route>

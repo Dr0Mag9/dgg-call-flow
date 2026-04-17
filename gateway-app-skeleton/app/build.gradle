@@ -9,10 +9,23 @@ android {
 
     defaultConfig {
         applicationId "com.callflow.gateway"
-        minSdk 21
-        targetSdk 34
+        minSdk 29
+        targetSdk 33
         versionCode 1
         versionName "1.0"
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a'
+            universalApk true
+        }
     }
 
     buildTypes {

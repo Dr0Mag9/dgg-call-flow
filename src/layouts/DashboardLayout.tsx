@@ -41,7 +41,6 @@ export default function DashboardLayout() {
     { name: 'Dialer', href: '/agent/dialer', icon: Phone },
     { name: 'Study Library', href: '/agent/library', icon: BookOpen },
     { name: 'Call History', href: '/agent/history', icon: History },
-    { name: 'Settings', href: '/agent/settings', icon: Settings },
   ];
 
   const links = user.role === 'ADMIN' ? adminLinks : agentLinks;
@@ -159,9 +158,11 @@ export default function DashboardLayout() {
                 <span className="text-[8px] text-pearl/40 font-bold uppercase tracking-widest">Secured by DGG</span>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center text-gold shadow-lg">
-              <Settings className="w-4 h-4 animate-[spin_8s_linear_infinite]" />
-            </div>
+            {user.role === 'ADMIN' && (
+              <div className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center text-gold shadow-lg">
+                <Settings className="w-4 h-4 animate-[spin_8s_linear_infinite]" />
+              </div>
+            )}
           </div>
         </header>
 

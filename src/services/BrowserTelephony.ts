@@ -29,15 +29,11 @@ class BrowserTelephonyService {
     this.setupRemoteAudio();
     this.onStatusChange?.('CONNECTING');
 
-    // Try a few ports if 443 fails
-    const possibleUrls = [config.wssUrl];
-    if (config.wssUrl.includes(':443')) {
-      possibleUrls.push(config.wssUrl.replace(':443', ':16443'));
-      possibleUrls.push(config.wssUrl.replace(':443', ':8443'));
-    } else if (!config.wssUrl.includes(':')) {
-       possibleUrls.push(`${config.wssUrl}:443`);
-       possibleUrls.push(`${config.wssUrl}:16443`);
-    }
+    // Force Port 443 for Sip2Sip (most reliable for firewall traversal)
+    const possibleUrls = [
+      `wss://sip2sip.info:443`,
+      `wss://sipthor.net:443`
+    ];
 
     for (const url of possibleUrls) {
       try {

@@ -91,7 +91,11 @@ export async function triggerCall(apiKey: string, phoneNumber: string, agentId: 
     data: {
       gatewayId: device.id,
       action: 'CALL',
-      payload: JSON.stringify({ phoneNumber, sessionId: session.id }),
+      payload: JSON.stringify({ 
+        phoneNumber, 
+        sessionId: session.id,
+        simSlot: 0 // Force SIM 1 (0-indexed)
+      }),
       status: 'PENDING'
     }
   });
