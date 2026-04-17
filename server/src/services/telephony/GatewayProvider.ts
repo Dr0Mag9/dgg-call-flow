@@ -20,14 +20,6 @@ export class GatewayProvider implements TelephonyService {
       return { success: false, error: 'Target gateway device is offline' };
     }
 
-    // Normalize number for Indian Telecom (+91 prefix if missing)
-    let formattedNumber = req.phoneNumber.replace(/\D/g, '');
-    if (formattedNumber.length === 10) {
-      formattedNumber = `+91${formattedNumber}`;
-    } else if (formattedNumber.length === 12 && formattedNumber.startsWith('91')) {
-      formattedNumber = `+${formattedNumber}`;
-    }
-
     // Final Normalization for Indian Airtel Sims
     // Strips everything and ensures clean 10-digit or 91-prefix mode.
     let formattedNumber = req.phoneNumber.replace(/\D/g, '');

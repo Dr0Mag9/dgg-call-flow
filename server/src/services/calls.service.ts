@@ -1,5 +1,4 @@
 import { prisma } from '../config/prisma.js';
-import { env } from '../config/env.js';
 import { logger } from '../utils/logger.js';
 import { broadcast, emitToAdmins, emitToUser } from './notification.service.js';
 import { fireWebhooks } from './webhooks.service.js';
