@@ -32,15 +32,20 @@ class BrowserTelephonyService {
     this.setupRemoteAudio();
     this.onStatusChange?.('CONNECTING');
 
-    // DEEP PROXY NET: Diverse domains to bypass SNI-based filtering
+    // SSL Check: Browser requires secure context for voice
+    if (typeof window !== 'undefined' && !window.isSecureContext) {
+      console.error('[Deep Proxy] INSECURE CONTEXT DETECTED. Chrome will block audio hardware.');
+      this.onStatusChange?.('ERROR', 'SSL_NOT_TRUSTED');
+    }
+
+    // Production SIGNAL NET: Diversified paths for HTTPS environments
     const urls = [
       `wss://sip2sip.info:443`,
       `wss://sipthor.net:8443`,
       `wss://webrtc.antisip.com:443`,
       `wss://sip.linphone.org:443`,
-      `wss://proxy.sipthor.net:443`,
       `wss://edge.sip.audio:443`,
-      `wss://sip2sip.info:5061`
+      config.wssUrl.replace('ws://', 'wss://') // Ensure secure protocol
     ];
 
     try {
@@ -176,8 +181,7 @@ class BrowserTelephonyService {
 
     const session = new Inviter(this.userAgent, targetURI, {
       sessionDescriptionHandlerOptions: {
-        constraints: { audio: true, video: false },
-        iceTransportPolicy: 'relay' // Ensure call also forces relay
+        constraints: { audio: true, video: false }
       }
     });
 

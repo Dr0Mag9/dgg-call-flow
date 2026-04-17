@@ -92,6 +92,15 @@ export const useAppStore = create<AppState>()(
           const res = await fetch('/api/auth/me', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
+          
+          const contentType = res.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await res.text();
+            console.error('[API ERROR] Expected JSON but received HTML/Text. Backend might be down or Nginx misconfigured.', text.substring(0, 100));
+            set({ sipStatus: 'ERROR', sipError: 'BACKEND_OFFLINE_HTML' });
+            return;
+          }
+
           const data = await res.json();
           if (data.agent?.telephonyLine) {
             set({ lineInfo: data.agent.telephonyLine });

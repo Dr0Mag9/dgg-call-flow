@@ -25,6 +25,11 @@ export default function Login() {
         body: JSON.stringify({ email, password })
       });
 
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('System Connection Error: Backend returned an invalid response (HTML). Check Nginx proxy settings.');
+      }
+
       const data = await res.json();
 
       if (!res.ok) {
