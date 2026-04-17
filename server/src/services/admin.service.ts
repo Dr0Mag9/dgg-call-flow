@@ -98,7 +98,9 @@ export async function createAgent(data: {
         create: {
           extension,
           assignedNumber,
-          ...(data.telephonyLineId && { telephonyLineId: data.telephonyLineId }),
+          ...(data.telephonyLineId && { 
+            telephonyLine: { connect: { id: data.telephonyLineId } } 
+          }),
         },
       },
     },
@@ -119,7 +121,9 @@ export async function updateAgent(
       extension: data.extension?.trim() || null,
       assignedNumber: data.assignedNumber?.trim() || null,
       ...(data.telephonyLineId !== undefined && { 
-        telephonyLineId: (data.telephonyLineId === '' ? null : data.telephonyLineId) as any 
+        telephonyLine: data.telephonyLineId 
+          ? { connect: { id: data.telephonyLineId } } 
+          : { disconnect: true }
       }),
       user: {
         update: {

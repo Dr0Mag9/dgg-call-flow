@@ -20,11 +20,29 @@ export async function connectGateway(apiKey: string, deviceName: string, phoneNu
     });
 
     if (lines.length > 0) {
+      const line = lines[0];
       await prisma.telephonyLine.update({
-        where: { id: lines[0].id },
+        where: { id: line.id },
         data: { gatewayId: device.id }
       });
-      logger.info(`[Gateway] Auto-linked device ${device.id} to line ${lines[0].number}`);
+      logger.info(`[Gateway] Auto-linked device ${device.id} to line ${line.number}`);
+
+      // NEW: Also Auto-link the AGENT whose assignedNumber matches this phone
+      const agents = await prisma.agent.findMany({
+        where: { assignedNumber: { contains: cleanNumber } }
+      });
+
+      for (const agent of agents) {
+        await prisma.agent.update({
+          where: { id: agent.id },
+          data: { telephonyLineId: line.id }
+        });
+        
+        // Notify agent so their UI updates to "READY" instantly
+        const { emitToUser } = await import('../../services/notification.service.js');
+        emitToUser(agent.userId, 'agent_telephony_updated', { lineId: line.id });
+        logger.info(`[Gateway] Auto-assigned agent ${agent.id} to line ${line.number}`);
+      }
     }
   }
 
