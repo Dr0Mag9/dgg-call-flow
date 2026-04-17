@@ -20,29 +20,31 @@ export class GatewayProvider implements TelephonyService {
       return { success: false, error: 'Target gateway device is offline' };
     }
 
-    // Final Normalization for Indian Airtel Sims
-    // Strips everything and ensures clean 10-digit or 91-prefix mode.
-    let formattedNumber = req.phoneNumber.replace(/\D/g, '');
-    if (formattedNumber.length > 10 && formattedNumber.startsWith('91')) {
-      // Keep Indian country code but without the + for internal gateway processing if needed
-      // Most Gateways prefer "91899..." or "0899..."
-      formattedNumber = formattedNumber; 
-    } else if (formattedNumber.length === 10) {
-      formattedNumber = `91${formattedNumber}`;
-    }
+    // Triple-Format Normalization for Indian Telecom Compatibility
+    const rawDigits = req.phoneNumber.replace(/\D/g, '');
+    const tenDigits = rawDigits.length > 10 ? rawDigits.slice(-10) : rawDigits;
+    const prefixed91 = `91${tenDigits}`;
+    const local0 = `0${tenDigits}`;
 
     const io = getIo();
     const gatewayRoom = `gateway_${line.gatewayId}`;
+
+    const dialPayload = {
+      action: 'CALL',
+      command: 'DIAL', // Redundant for legacy support
+      phoneNumber: tenDigits, // Native 10 digits
+      fullNumber: prefixed91, // 91 Prefix
+      domesticNumber: local0, // 0 Prefix
+      sessionId: req.callId,
+      timestamp: new Date().toISOString()
+    };
 
     // 1. Always persist command for HTTP polling (robust delivery)
     await (prisma as any).gatewayCommand.create({
       data: {
         gatewayId: line.gatewayId,
         action: 'CALL',
-        payload: JSON.stringify({ 
-          phoneNumber: formattedNumber, 
-          sessionId: req.callId 
-        }),
+        payload: JSON.stringify(dialPayload),
         status: 'PENDING'
       }
     });
@@ -51,14 +53,14 @@ export class GatewayProvider implements TelephonyService {
     try {
       const socketsInRoom = await io.in(gatewayRoom).fetchSockets();
       if (socketsInRoom.length > 0) {
-        logger.info(`[Gateway Provider] Emitting call command to gateway ${line.gatewayId} via socket`);
-        io.to(gatewayRoom).emit('gateway:command', {
-          command: 'CALL', 
-          phoneNumber: formattedNumber,
-          callId: req.callId,
-          timestamp: new Date().toISOString()
-        });
+        logger.info(`[Gateway Provider] Emitting reinforced dial command to gateway ${line.gatewayId}`);
+        io.to(gatewayRoom).emit('gateway:command', dialPayload);
       } else {
+        logger.info(`[Gateway Provider] No active sockets, relying on HTTP polling with Triple-Format`);
+      }
+    } catch (err) {
+      logger.warn('[Gateway Provider] Signal emit failed, relying on polling backup');
+    }
         logger.info(`[Gateway Provider] No active sockets for gateway ${line.gatewayId}, relying on HTTP polling`);
       }
     } catch (err) {
