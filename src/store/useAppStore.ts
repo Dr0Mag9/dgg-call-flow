@@ -151,8 +151,14 @@ export const useAppStore = create<AppState>()(
         const { token, socket } = get();
         if (!token) return;
         if (socket) socket.disconnect();
-
-        const newSocket = io();
+        
+        // HARDENED SOCKET: Use polling fallback for production Nginx alignment
+        const newSocket = io({
+          transports: ['polling', 'websocket'],
+          reconnection: true,
+          reconnectionAttempts: 100,
+          timeout: 20000
+        });
         
         newSocket.on('connect', () => {
           newSocket.emit('authenticate', token);
@@ -209,9 +215,8 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ 
         user: state.user, 
-        token: state.token,
-        sipStatus: state.sipStatus,
-        sipError: state.sipError
+        token: state.token
+        // Nuclear Cleanup: Never persist sipStatus or sipError to avoid memory hangs
       }),
     }
   )
