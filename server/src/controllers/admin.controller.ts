@@ -121,9 +121,9 @@ export async function updateAgent(req: Request, res: Response) {
     const agent = await adminService.updateAgent(req.params.id, parsed.data);
     if (!agent) return sendError(res, 404, 'Agent not found');
     return res.json(agent);
-  } catch (e) {
-    logger.error('updateAgent', { message: e instanceof Error ? e.message : String(e) });
-    return sendError(res, 400, 'Failed to update agent');
+  } catch (e: any) {
+    logger.error('[Admin Controller] updateAgent Failure', { error: e.message, code: e.code });
+    return sendError(res, 400, `Protocol Sync Failure: ${e.message || 'Unknown Error'}`);
   }
 }
 
