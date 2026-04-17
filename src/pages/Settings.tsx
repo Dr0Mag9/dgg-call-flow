@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Globe, Plus, Trash2, Edit, Save, X, Cpu, PhoneCall, ShieldCheck, Zap, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Settings() {
   const { token, user } = useAppStore();

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Phone, PhoneIncoming, PhoneMissed, Clock, Search, Filter, Play, ArrowUpRight, ArrowDownLeft, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
-import { motion } from 'motion';
+import { motion } from 'framer-motion';
 
 export default function CallHistory() {
   const { token } = useAppStore();

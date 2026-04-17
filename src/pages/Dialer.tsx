@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Phone, Delete, Zap, Headphones, Volume2, Settings } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 
 export default function Dialer({ embedded = false }: { embedded?: boolean }) {

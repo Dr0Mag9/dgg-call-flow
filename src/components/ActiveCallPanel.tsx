@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { PhoneOff, MicOff, Mic, Pause, Play, User, ExternalLink, Zap, Activity } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { motion, AnimatePresence } from 'motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ActiveCallPanel() {
   const { activeCall, token, setSelectedClient, setClientDrawerOpen } = useAppStore();

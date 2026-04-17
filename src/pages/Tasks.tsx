@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { CheckSquare, Calendar, Clock, AlertCircle, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { format, isPast, isToday } from 'date-fns';
-import { motion, AnimatePresence } from 'motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Tasks() {
   const { token, setSelectedClient, setClientDrawerOpen } = useAppStore();

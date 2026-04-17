@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Users, PhoneIncoming, PhoneOutgoing, PhoneMissed, Activity, Star, TrendingUp, Shield, Zap, Sparkles } from 'lucide-react';
-import { motion } from 'motion';
+import { motion } from 'framer-motion';
 
 export default function AdminDashboard() {
   const { token } = useAppStore();

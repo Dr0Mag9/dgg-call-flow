@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { X, Phone, Mail, Building, Star, Calendar, Clock, FileText, CheckCircle, Activity, CheckSquare, Send, Play } from 'lucide-react';
 import { format } from 'date-fns';
-import { motion, AnimatePresence } from 'motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ClientDrawer() {
   const { selectedClient, isClientDrawerOpen, setClientDrawerOpen, token, activeCall } = useAppStore();

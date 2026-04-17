@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Phone, Smartphone, Plus, Trash2, Signal, Shield, Key, ExternalLink, Activity, Save, X, Sparkles, Zap, Cpu, Radio, ShieldCheck } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminTelephony() {
   const { token } = useAppStore();
