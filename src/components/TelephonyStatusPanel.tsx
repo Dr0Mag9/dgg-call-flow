@@ -41,18 +41,35 @@ export default function TelephonyStatusPanel() {
       </div>
       
       <div className="flex items-center gap-6 relative z-10">
-        <div className="text-right">
-          <p className="text-[9px] font-black text-gold/40 uppercase tracking-[0.2em]">Telephony Link</p>
-          <div className="flex items-center gap-2 justify-end mt-0.5">
-            <motion.div 
-              animate={{ opacity: (lineInfo && lineInfo.gateway?.status === 'ONLINE') ? [0.4, 1, 0.4] : 0.2 }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className={`w-1.5 h-1.5 rounded-full ${(!lineInfo) ? 'bg-red-500' : (lineInfo.gateway?.status === 'ONLINE' ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-600')}`} 
-            />
-            <p className={`text-[10px] font-black uppercase tracking-widest ${(!lineInfo) ? 'text-red-500' : (lineInfo.gateway?.status === 'ONLINE' ? 'text-gold' : 'text-slate-500')}`}>
-              {!lineInfo ? 'Assign Line in Admin' : (lineInfo.gateway?.status === 'ONLINE' ? 'Operational' : 'Sim Offline')}
-            </p>
+        <div className="text-right flex items-center gap-4">
+          <div className="flex flex-col items-end">
+            <p className="text-[9px] font-black text-gold/40 uppercase tracking-[0.2em]">Telephony Link</p>
+            <div className="flex items-center gap-2 justify-end mt-0.5">
+              <motion.div 
+                animate={{ opacity: (lineInfo && lineInfo.gateway?.status === 'ONLINE') ? [0.4, 1, 0.4] : 0.2 }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className={`w-1.5 h-1.5 rounded-full ${(!lineInfo) ? 'bg-red-500' : (lineInfo.gateway?.status === 'ONLINE' ? 'bg-gold shadow-[0_0_8px_#D4AF37]' : 'bg-slate-600')}`} 
+              />
+              <p className={`text-[10px] font-black uppercase tracking-widest ${(!lineInfo) ? 'text-red-500' : (lineInfo.gateway?.status === 'ONLINE' ? 'text-gold' : 'text-slate-500')}`}>
+                {!lineInfo ? 'Assign Line in Admin' : (lineInfo.gateway?.status === 'ONLINE' ? 'Operational' : 'Sim Offline')}
+              </p>
+            </div>
           </div>
+          
+          {/* REPAIR BUTTON */}
+          <motion.button 
+            whileHover={{ scale: 1.05, backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              // Re-trigger global line info check which triggers SIP connect in store
+              fetchLineInfo();
+              console.log('[UI] Bridge Repair Signal Sent');
+            }}
+            className="px-3 py-1.5 rounded-lg border border-gold/20 bg-gold/5 flex items-center gap-2 group/repair hover:border-gold/50 transition-all"
+          >
+            <Zap className="w-3 h-3 text-gold group-hover/repair:animate-pulse" />
+            <span className="text-[8px] font-black text-gold uppercase tracking-widest">Repair Bridge</span>
+          </motion.button>
         </div>
         <div className="p-2.5 rounded-xl bg-gold/5 border border-gold/10">
           <Signal className={`w-4 h-4 ${lineInfo ? 'text-gold' : 'text-slate-700'}`} />

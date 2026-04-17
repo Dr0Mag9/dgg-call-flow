@@ -29,27 +29,31 @@ class BrowserTelephonyService {
     this.setupRemoteAudio();
     this.onStatusChange?.('CONNECTING');
 
-    // Force Port 443 for Sip2Sip (most reliable for firewall traversal)
-    const possibleUrls = [
+    // Parallel Port Discovery: Try 443 and 8443 concurrently for best-case performance
+    const urls = [
       `wss://sip2sip.info:443`,
-      `wss://sipthor.net:443`
+      `wss://sipthor.net:443`,
+      `wss://sip2sip.info:8443`,
+      `wss://sipthor.net:8443`
     ];
 
-    for (const url of possibleUrls) {
-      try {
-        console.log(`[BrowserTelephony] Attempting connection to: ${url}`);
-        const success = await this.tryStartUA(url, config);
-        if (success) return;
-      } catch (err) {
-        console.warn(`[BrowserTelephony] Failed attempt to ${url}, trying next...`);
+    try {
+      // Use Promise.race to pick the first successful connection
+      const connectionAttempt = urls.map(url => this.tryStartUA(url, config));
+      await Promise.all(connectionAttempt);
+      
+      if (!this.isConnected) {
+        throw new Error('All signaling paths failed');
       }
+    } catch (err) {
+      console.error('[BrowserTelephony] Critical Connection Failure:', err);
+      this.onStatusChange?.('ERROR');
     }
-
-    console.error('[BrowserTelephony] All connection attempts failed');
-    this.onStatusChange?.('ERROR');
   }
 
   private async tryStartUA(url: string, config: any): Promise<boolean> {
+    if (this.isConnected) return true; // Already connected via another path
+
     const uri = UserAgent.makeURI(`sip:${config.extension}@${config.domain}`);
     if (!uri) throw new Error("Invalid SIP URI");
 
@@ -58,6 +62,9 @@ class BrowserTelephonyService {
       transportOptions: {
         server: url,
         traceSip: true,
+        // HEARTBEAT: Prevent firewall/NAT timeout (UK to India)
+        keepAliveInterval: 10,
+        connectionTimeout: 15, // 15 seconds for socket handshake
       },
       authorizationUsername: config.extension,
       authorizationPassword: config.password || '',
@@ -68,8 +75,7 @@ class BrowserTelephonyService {
         peerConnectionConfiguration: {
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' }
+            { urls: 'stun:stun1.l.google.com:19302' }
           ]
         }
       }
@@ -82,36 +88,31 @@ class BrowserTelephonyService {
 
       ua.delegate = {
         onConnect: () => {
-          console.log(`[BrowserTelephony] SIP Connected to ${url}`);
+          if (this.isConnected) { ua.stop(); return; } // Late winner
+          console.log(`[BrowserTelephony] SIP Established via ${url}`);
           this.userAgent = ua;
           this.isConnected = true;
           this.initRegisterer();
           if (!resolved) { resolved = true; resolve(true); }
         },
         onDisconnect: (error) => {
-          console.log(`[BrowserTelephony] SIP Disconnected from ${url}`, error);
           if (!resolved) { resolved = true; resolve(false); }
-        },
-        onInvite: (request) => {
-           console.log('[BrowserTelephony] Incoming call detected');
-           // Inbound calls not yet fully implemented in UI, but UA is ready
         }
       };
 
       ua.start().catch(err => {
-        console.warn(`[BrowserTelephony] UA start error for ${url}`, err);
         if (!resolved) { resolved = true; resolve(false); }
       });
 
-      // Timeout attempt
+      // High-latency timeout for international routes (UK to India)
       setTimeout(() => {
         if (!resolved) {
-          console.warn(`[BrowserTelephony] Connection attempt to ${url} timed out`);
-          ua.stop();
+          console.warn(`[BrowserTelephony] Parallel path ${url} timed out (20s)`);
+          if (!this.isConnected) ua.stop();
           resolved = true;
           resolve(false);
         }
-      }, 5000);
+      }, 20000);
     });
   }
 

@@ -1,125 +1,124 @@
 package com.callflow.gateway
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.Manifest
+import android.telephony.SubscriptionManager
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 
 object CallController {
 
     private var telecomManager: TelecomManager? = null
+    private var subscriptionManager: SubscriptionManager? = null
     private var context: Context? = null
 
     fun init(ctx: Context) {
         context = ctx
         telecomManager = ctx.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+        subscriptionManager = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
     }
 
     /**
-     * Place a phone call using ACTION_CALL intent.
-     * Includes extras to bypass SIM selection prompt.
+     * Place a phone call using TelecomManager.placeCall.
+     * This bypasses the SIM selection dialog by targeting a specific PhoneAccountHandle.
      */
     fun dial(phoneNumber: String, callId: String, simSlot: Int = -1): Boolean {
         val ctx = context ?: return false
+        val tm = telecomManager ?: return false
 
-        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) 
-            != PackageManager.PERMISSION_GRANTED) {
-            println("[CallController] ERROR: CALL_PHONE permission not granted")
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            println("[CallController] ERROR: Missing CALL_PHONE or READ_PHONE_STATE permissions")
             return false
         }
 
+        return try {
+            val uri = Uri.fromParts("tel", phoneNumber, null)
+            val extras = Bundle().apply {
+                putString("com.callflow.gateway.CALL_ID", callId)
+                if (simSlot >= 0) {
+                    val handle = getPhoneAccountHandleForSlot(simSlot)
+                    if (handle != null) {
+                        putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
+                        println("[CallController] Forcing PhoneAccountHandle for Slot $simSlot: ${handle.id}")
+                    } else {
+                        println("[CallController] WARNING: Could not find handle for slot $simSlot, falling back to default")
+                    }
+                }
+            }
+
+            tm.placeCall(uri, extras)
+            println("[CallController] placeCall triggered for $phoneNumber")
+            true
+        } catch (e: Exception) {
+            println("[CallController] placeCall failed: ${e.message}")
+            // Fallback to standard intent if placeCall fails
+            fallbackDial(ctx, phoneNumber, simSlot)
+        }
+    }
+
+    private fun getPhoneAccountHandleForSlot(slotIndex: Int): PhoneAccountHandle? {
+        val ctx = context ?: return null
+        val sm = subscriptionManager ?: return null
+        val tm = telecomManager ?: return null
+
+        try {
+            val subscriptions = sm.activeSubscriptionInfoList ?: return null
+            val subInfo = subscriptions.find { it.simSlotIndex == slotIndex } ?: return null
+            
+            val accounts = tm.getCallCapablePhoneAccounts()
+            // Match the ID or label of the account to the subscription identity
+            return accounts.find { it.id.contains(subInfo.subscriptionId.toString()) } 
+                   ?: accounts.find { it.id.contains(subInfo.iccId ?: "___") }
+                   ?: if (accounts.isNotEmpty() && slotIndex < accounts.size) accounts[slotIndex] else null
+        } catch (e: Exception) {
+            println("[CallController] Error resolving account handle: ${e.message}")
+        }
+        return null
+    }
+
+    private fun fallbackDial(ctx: Context, phoneNumber: String, simSlot: Int): Boolean {
         return try {
             val intent = Intent(Intent.ACTION_CALL).apply {
                 data = Uri.parse("tel:$phoneNumber")
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                
                 if (simSlot >= 0) {
-                    // Comprehensive list of extras for various manufacturers (Samsung, Xiaomi, ASUS, etc)
                     putExtra("com.android.phone.extra.slot", simSlot)
                     putExtra("phone_subscription", simSlot)
                     putExtra("sim_slot", simSlot)
-                    putExtra("subscription", simSlot)
-                    putExtra("extra_asus_dial_use_dualsim", true)
-                    putExtra("com.android.phone.force.slot", true)
-                    
-                    // Add modern subscription ID extra if possible (though we're using raw index here)
-                    putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", simSlot)
-                    
-                    println("[CallController] Enforcing SIM Slot: $simSlot with brute-force extras")
                 }
             }
             ctx.startActivity(intent)
-            println("[CallController] Dialing $phoneNumber (callId=$callId)")
             true
-        } catch (e: Exception) {
-            println("[CallController] Dial failed: ${e.message}")
-            false
-        }
+        } catch (e: Exception) { false }
     }
 
-    /**
-     * End the current active call.
-     * Uses TelecomManager.endCall() on API 28+ (Android 9+).
-     * Requires ANSWER_PHONE_CALLS permission.
-     */
     @Suppress("DEPRECATION")
     fun endCall(): Boolean {
         val ctx = context ?: return false
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            println("[CallController] endCall requires API 28+")
-            return false
-        }
-
-        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ANSWER_PHONE_CALLS)
-            != PackageManager.PERMISSION_GRANTED) {
-            println("[CallController] ERROR: ANSWER_PHONE_CALLS permission not granted")
-            return false
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) return false
 
         return try {
-            val tm = telecomManager ?: return false
-            val ended = tm.endCall()
-            println("[CallController] endCall() returned: $ended")
-            ended
-        } catch (e: Exception) {
-            println("[CallController] endCall failed: ${e.message}")
-            false
-        }
+            telecomManager?.endCall() ?: false
+        } catch (e: Exception) { false }
     }
 
-    /**
-     * Answer an incoming call.
-     * Uses TelecomManager.acceptRingingCall() on API 26+ (Android 8+).
-     * Requires ANSWER_PHONE_CALLS permission.
-     */
     @Suppress("DEPRECATION")
     fun answerCall(): Boolean {
         val ctx = context ?: return false
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            println("[CallController] answerCall requires API 26+")
-            return false
-        }
-
-        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ANSWER_PHONE_CALLS)
-            != PackageManager.PERMISSION_GRANTED) {
-            println("[CallController] ERROR: ANSWER_PHONE_CALLS permission not granted")
-            return false
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) return false
 
         return try {
-            val tm = telecomManager ?: return false
-            tm.acceptRingingCall()
-            println("[CallController] Answered ringing call")
+            telecomManager?.acceptRingingCall()
             true
-        } catch (e: Exception) {
-            println("[CallController] answerCall failed: ${e.message}")
-            false
-        }
+        } catch (e: Exception) { false }
     }
 }
