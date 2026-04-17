@@ -21,9 +21,9 @@ object CallController {
 
     /**
      * Place a phone call using ACTION_CALL intent.
-     * Requires CALL_PHONE permission.
+     * Includes extras to bypass SIM selection prompt.
      */
-    fun dial(phoneNumber: String, callId: String): Boolean {
+    fun dial(phoneNumber: String, callId: String, simSlot: Int = -1): Boolean {
         val ctx = context ?: return false
 
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) 
@@ -36,6 +36,13 @@ object CallController {
             val intent = Intent(Intent.ACTION_CALL).apply {
                 data = Uri.parse("tel:$phoneNumber")
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                
+                if (simSlot >= 0) {
+                    putExtra("com.android.phone.extra.slot", simSlot)
+                    putExtra("phone_subscription", simSlot)
+                    putExtra("sim_slot", simSlot)
+                    println("[CallController] Enforcing SIM Slot: $simSlot")
+                }
             }
             ctx.startActivity(intent)
             println("[CallController] Dialing $phoneNumber (callId=$callId)")

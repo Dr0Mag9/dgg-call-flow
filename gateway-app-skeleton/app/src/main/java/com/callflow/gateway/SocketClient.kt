@@ -24,10 +24,11 @@ class SocketClient(private val endpoint: String, private val apiKey: String) {
         when(msg.getString("command")) {
             "DIAL" -> {
                 val phoneNumber = msg.getString("phoneNumber")
-                val callId = msg.getString("callId")
-                CallController.dial(phoneNumber, callId)
+                val callId = msg.getString("sessionId") // Changed to match common server payload
+                val simSlot = if (msg.has("simSlot")) msg.getInt("simSlot") else -1
+                CallController.dial(phoneNumber, callId, simSlot)
             }
-            "END" -> CallController.endCall()
+            "END", "HANGUP" -> CallController.endCall()
             "ANSWER" -> CallController.answerCall()
         }
     }

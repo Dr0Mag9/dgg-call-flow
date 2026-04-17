@@ -36,6 +36,7 @@ export class GatewayProvider implements TelephonyService {
       fullNumber: prefixed91, // 91 Prefix
       domesticNumber: local0, // 0 Prefix
       sessionId: req.callId,
+      simSlot: 0, // Default to SIM 1 (0-indexed)
       timestamp: new Date().toISOString()
     };
 
