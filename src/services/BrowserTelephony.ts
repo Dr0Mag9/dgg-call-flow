@@ -57,24 +57,40 @@ class BrowserTelephonyService {
       url.startsWith('ws://') ? url.replace('ws://', 'wss://') : url
     );
 
+    // MULTI-NODE RACING: First winner locks the bridge
     try {
       this.isConnected = false;
       if (this.userAgent) {
-        await this.userAgent.stop();
+        await this.userAgent.stop().catch(() => {});
         this.userAgent = null;
       }
 
-      console.log(`[Deep Proxy] Aggressive Auto-Ignition across ${urls.length} nodes:`, urls);
-      const connectionAttempts = urls.map(url => this.tryStartUA(url, config));
+      console.log(`[Deep Proxy] RACING across ${urls.length} nodes:`, urls);
       
-      // Parallel Discovery: First one to respond wins
-      await Promise.all(connectionAttempts);
+      // Use Promise.any to resolve immediately when the FIRST node connects
+      // We wrap tryStartUA to return only on success
+      const raceAttempts = urls.map(url => new Promise<boolean>((resolve, reject) => {
+        this.tryStartUA(url, config).then(success => {
+          if (success) resolve(true);
+          // Don't reject yet, wait for others
+        });
+        // Timeout each individual attempt after 6 seconds
+        setTimeout(() => reject(new Error('Timeout')), 6000);
+      }));
+
+      try {
+        await Promise.any(raceAttempts);
+      } catch (e) {
+        // Only throws if ALL nodes failed
+        throw new Error('All signaling lanes blocked');
+      }
       
       if (!this.isConnected) {
         throw new Error('Signal blocked');
       }
     } catch (err) {
-      this.onStatusChange?.('ERROR', 'TUNNELING...');
+      console.error('[Deep Proxy] Racing Final Failure:', err);
+      this.onStatusChange?.('ERROR', 'RE-TUNNELING...');
       this.scheduleRetry();
     }
   }

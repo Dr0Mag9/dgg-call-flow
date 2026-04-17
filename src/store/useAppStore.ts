@@ -124,11 +124,15 @@ export const useAppStore = create<AppState>()(
             // HARDWARE HEALTH SCAN
             const health = browserTelephony.checkHealth();
             set({ hardwareHealth: health });
+            if (health !== 'OK') {
+              set({ sipStatus: 'ERROR', sipError: health });
+            }
 
             // AUTO-IGNITION WATCHDOG: Force connect if offline or stalled
             const { sipStatus } = get();
             if (sipStatus === 'OFFLINE' || sipStatus === 'ERROR') {
-              console.log('[Auto-Ignition] Starting voice bridge for:', extension);
+              console.log('[Auto-Ignition] Triggering Signal Race...');
+              set({ sipStatus: 'CONNECTING', sipError: 'RACING NODES...' });
               
               browserTelephony.setStatusCallback((status, extra) => {
                 set({ sipStatus: status, sipError: extra || null });
