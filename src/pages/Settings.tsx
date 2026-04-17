@@ -144,6 +144,7 @@ export default function Settings() {
                   <input 
                     disabled={!isAdmin} 
                     type={field.type} 
+                    id={field.key}
                     className="w-full bg-navy/40 border border-gold/10 rounded-xl p-2.5 text-xs text-pearl focus:ring-1 focus:ring-gold/30 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10 italic disabled:opacity-30" 
                     defaultValue={systemSettings[field.key] || ''} 
                     onBlur={(e) => updateSystemSetting(field.key, e.target.value)}
@@ -152,6 +153,26 @@ export default function Settings() {
                 </div>
               ))}
             </div>
+            
+            {isAdmin && (
+              <div className="mt-8 flex justify-end">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    const fields = ["sip_wss_url", "sip_domain", "main_business_number", "sip_default_password"];
+                    fields.forEach(f => {
+                      const input = document.getElementById(f) as HTMLInputElement;
+                      if (input) updateSystemSetting(f, input.value);
+                    });
+                    alert("Telephony Protocols Updated Successfully.");
+                  }}
+                  className="luxury-button flex items-center gap-3 text-[10px] py-3 px-8 border-gold shadow-[0_0_20px_rgba(212,175,55,0.2)]"
+                >
+                  <Save className="w-4 h-4" /> Save Telephony configuration
+                </motion.button>
+              </div>
+            )}
           </section>
 section
 

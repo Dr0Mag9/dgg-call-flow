@@ -11,6 +11,7 @@ const createAgentSchema = z.object({
   extension: z.string().max(32).optional(),
   assignedNumber: z.string().max(64).optional(),
   telephonyLineId: z.string().uuid().or(z.literal('')).nullable().optional(),
+  sipPassword: z.string().max(256).optional(),
 });
 
 const updateAgentSchema = z.object({
@@ -19,6 +20,7 @@ const updateAgentSchema = z.object({
   extension: z.string().max(32).optional(),
   assignedNumber: z.string().max(64).optional(),
   telephonyLineId: z.string().uuid().or(z.literal('')).nullable().optional(),
+  sipPassword: z.string().max(256).optional(),
 });
 
 const createLineSchema = z.object({

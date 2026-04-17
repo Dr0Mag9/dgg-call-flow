@@ -28,6 +28,7 @@ model Agent {
   assignedNumber  String?
   telephonyLineId String?
   telephonyLine   TelephonyLine?    @relation(fields: [telephonyLineId], references: [id])
+  sipPassword     String?
   status          String            @default("OFFLINE")
   lastSeenAt      DateTime          @default(now())
   calls           Call[]

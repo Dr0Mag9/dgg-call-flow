@@ -19,7 +19,7 @@ export default function AdminAgents() {
   const [agentActivity, setAgentActivity] = useState<{calls: any[], tasks: any[]}>({ calls: [], tasks: [] });
   
   // Forms
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '', sipPassword: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addError, setAddError] = useState('');
   const [editError, setEditError] = useState('');
@@ -74,7 +74,7 @@ export default function AdminAgents() {
       if (res.ok) {
         setIsAddModalOpen(false);
         setAddError('');
-        setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
+        setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '', sipPassword: '' });
         fetchAgents();
       } else {
         setAddError(data?.error || 'Failed to create agent.');
@@ -106,7 +106,8 @@ export default function AdminAgents() {
           email: formData.email,
           extension: formData.extension,
           assignedNumber: formData.assignedNumber,
-          telephonyLineId: formData.telephonyLineId || null
+          telephonyLineId: formData.telephonyLineId || null,
+          sipPassword: formData.sipPassword
         })
       });
 
@@ -170,7 +171,8 @@ export default function AdminAgents() {
       password: '',
       extension: agent.extension || '',
       assignedNumber: agent.assignedNumber || '',
-      telephonyLineId: agent.telephonyLineId || ''
+      telephonyLineId: agent.telephonyLineId || '',
+      sipPassword: agent.sipPassword || ''
     });
     setIsEditModalOpen(true);
   };
@@ -186,7 +188,7 @@ export default function AdminAgents() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => {
-            setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '' });
+            setFormData({ name: '', email: '', password: '', extension: '', assignedNumber: '', telephonyLineId: '', sipPassword: '' });
             setAddError('');
             setIsAddModalOpen(true);
           }}
@@ -326,6 +328,10 @@ export default function AdminAgents() {
                     </div>
                   </div>
                   <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">SIP Account Password (Separate from Login)</label>
+                    <input type="password" value={formData.sipPassword} onChange={e => setFormData({...formData, sipPassword: e.target.value})} className="w-full bg-gold/5 border border-gold/20 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/20" placeholder="Enter Sip2Sip Password" />
+                  </div>
+                  <div className="space-y-2">
                     <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">Assigned Phone Line (Physical SIM)</label>
                     <select 
                       value={formData.telephonyLineId} 
@@ -407,8 +413,12 @@ export default function AdminAgents() {
                     </div>
                     <div className="space-y-2">
                       <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1">SIM Phone Number</label>
-                      <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all" placeholder="91564..." />
+                      <input type="text" value={formData.assignedNumber} onChange={e => setFormData({...formData, assignedNumber: e.target.value})} className="w-full bg-navy/50 border border-gold/10 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/10" placeholder="91564..." />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">SIP Account Password</label>
+                    <input type="password" value={formData.sipPassword} onChange={e => setFormData({...formData, sipPassword: e.target.value})} className="w-full bg-gold/5 border border-gold/20 rounded-xl p-3.5 text-pearl focus:ring-2 focus:ring-gold/20 focus:border-gold/30 outline-none transition-all placeholder:text-gold-light/20" placeholder="Enter Sip2Sip Password" />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-[10px] font-black text-gold/40 uppercase tracking-widest ml-1 text-gold">Assigned Phone Line (Physical SIM)</label>

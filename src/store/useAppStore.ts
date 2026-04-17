@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
+import { browserTelephony } from '../services/BrowserTelephony';
 
 interface User {
   id: string;
@@ -87,6 +88,24 @@ export const useAppStore = create<AppState>((set, get) => ({
       const data = await res.json();
       if (data.agent?.telephonyLine) {
         set({ lineInfo: data.agent.telephonyLine });
+        
+        // Auto-Connect SIP Bridge for UK Agents
+        if (data.telephonyConfig?.sip_wss_url) {
+          const extension = data.agent.extension;
+          const password = data.agent.sipPassword || data.telephonyConfig.sip_default_password;
+          const domain = data.telephonyConfig.sip_domain;
+          const wssUrl = data.telephonyConfig.sip_wss_url;
+
+          if (extension && password) {
+            console.log(`[SIP Bridge] Initializing bridge for extension: ${extension}`);
+            browserTelephony.connect({
+              extension,
+              password,
+              domain,
+              wssUrl
+            }).catch(err => console.error('[SIP Bridge] Failed to establish audio link', err));
+          }
+        }
       } else {
         set({ lineInfo: null });
       }

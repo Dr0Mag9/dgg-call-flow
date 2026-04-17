@@ -81,6 +81,7 @@ export async function createAgent(data: {
   extension?: string;
   assignedNumber?: string;
   telephonyLineId?: string;
+  sipPassword?: string;
 }) {
   const passwordHash = await hashPassword(data.password);
   // Normalize optional fields: empty strings → undefined (stored as NULL)
@@ -98,6 +99,7 @@ export async function createAgent(data: {
         create: {
           extension,
           assignedNumber,
+          sipPassword: data.sipPassword?.trim() || undefined,
           ...(data.telephonyLineId && { 
             telephonyLine: { connect: { id: data.telephonyLineId } } 
           }),
@@ -110,7 +112,7 @@ export async function createAgent(data: {
 
 export async function updateAgent(
   agentId: string,
-  data: { name?: string; email?: string; extension?: string; assignedNumber?: string; telephonyLineId?: string | null },
+  data: { name?: string; email?: string; extension?: string; assignedNumber?: string; telephonyLineId?: string | null; sipPassword?: string },
 ) {
   const agent = await prisma.agent.findUnique({ where: { id: agentId } });
   if (!agent) return null;
@@ -120,6 +122,7 @@ export async function updateAgent(
     data: {
       extension: data.extension?.trim() || null,
       assignedNumber: data.assignedNumber?.trim() || null,
+      sipPassword: data.sipPassword?.trim() || null,
       ...(data.telephonyLineId !== undefined && { 
         telephonyLine: data.telephonyLineId 
           ? { connect: { id: data.telephonyLineId } } 

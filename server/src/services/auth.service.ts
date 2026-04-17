@@ -37,24 +37,39 @@ export async function login(email: string, password: string): Promise<LoginResul
 }
 
 export async function getMe(userId: string) {
-  return prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      isActive: true,
-      agent: {
-        include: {
-          telephonyLine: {
-            include: {
-              gateway: true
+  const [user, settings] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        isActive: true,
+        agent: {
+          include: {
+            telephonyLine: {
+              include: {
+                gateway: true
+              }
             }
           }
-        }
+        },
       },
-    },
-  });
+    }),
+    prisma.systemSetting.findMany({
+      where: { key: { in: ['sip_wss_url', 'sip_domain', 'sip_default_password'] } }
+    })
+  ]);
+
+  if (!user) return null;
+
+  const config: Record<string, string> = {};
+  settings.forEach(s => { config[s.key] = s.value; });
+
+  return {
+    ...user,
+    telephonyConfig: config
+  };
 }
