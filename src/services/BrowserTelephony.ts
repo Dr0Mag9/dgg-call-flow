@@ -44,13 +44,12 @@ class BrowserTelephonyService {
     // MULTI-NODE AUTOPILOT: Parse candidates from Admin settings
     const adminUrls = (config.wssUrl || '').split(',').map(u => u.trim()).filter(u => u.length > 0);
     const stealthUrls = [
-      `wss://69.62.79.9:443`,    // Raw IP Direct (PRIMARY)
-      `wss://69.62.79.9:16443`,  // Raw IP Alternative
+      `wss://proxy.sipthor.net:443`, 
+      `wss://69.62.79.9:8089`,       // Non-Nginx Port (Primary)
+      `wss://69.62.79.9:16443`,      // Non-Nginx Port (Alternative)
+      `wss://69.62.79.9:443`,        // Legacy Proxy
       `wss://sip2sip.info:443`,
-      `wss://sipthor.net:8443`,
-      `wss://webrtc.antisip.com:443`,
-      `wss://sip.linphone.org:443`,
-      `wss://edge.sip.audio:443`
+      `wss://sipthor.net:8443`
     ];
 
     // Merge and finalize discovery net: Ensure Raw IP is tried first
@@ -80,10 +79,15 @@ class BrowserTelephonyService {
     }
   }
 
+  public checkHealth(): string {
+    return this.getHardwareHealth();
+  }
+
   private getHardwareHealth(): string {
     if (typeof window === 'undefined') return 'ENV_ERROR';
     
-    if (!window.isSecureContext) {
+    // CRITICAL: Chrome blocks ALL microphones in non-secure (Raw IP) contexts
+    if (!window.isSecureContext && !window.location.hostname.includes('localhost')) {
       return 'SSL_INSECURE_CONTEXT';
     }
 

@@ -10,7 +10,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [hasHeadset, setHasHeadset] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
-  const { token, activeCall, lineInfo, sipStatus, sipError } = useAppStore();
+  const { token, activeCall, lineInfo, sipStatus, sipError, hardwareHealth } = useAppStore();
 
   // Hardware Sensing Logic
   useEffect(() => {
@@ -162,6 +162,27 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
           <div className="text-[9px] font-black text-gold-light/20 mt-4 uppercase tracking-[0.3em] italic">
             {!lineInfo ? 'AUTHENTICATION REQUIRED IN ADMIN' : 'Encrypted Satellite Uplink'}
           </div>
+
+          {/* HARDWARE DIAGNOSTIC OVERLAY */}
+          {hardwareHealth !== 'OK' && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 backdrop-blur-md"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Settings className="w-5 h-5 text-red-500 animate-spin-slow" />
+                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">
+                  Hardware Blocked: {hardwareHealth}
+                </span>
+                <p className="text-[8px] text-white/60 leading-relaxed uppercase">
+                  {hardwareHealth === 'SSL_INSECURE_CONTEXT' 
+                    ? 'CRITICAL: Chrome blocks audio on raw IPs. Use https://69.62.79.9.nip.io or enable the Chrome insecure-origin flag.'
+                    : 'PERMISSION DENIED: Click the lock icon in URL bar and Allow Microphone access.'}
+                </p>
+              </div>
+            </motion.div>
+          )}
         </div>
         
         <div className="p-8 bg-[#0A1221]/60 backdrop-blur-xl">

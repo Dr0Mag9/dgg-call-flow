@@ -34,6 +34,7 @@ interface AppState {
   lineInfo: any | null;
   sipStatus: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR';
   sipError: string | null;
+  hardwareHealth: string;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   login: (token: string, user: User) => void;
@@ -61,6 +62,7 @@ export const useAppStore = create<AppState>()(
       lineInfo: null,
       sipStatus: 'OFFLINE',
       sipError: null,
+      hardwareHealth: 'OK',
 
       setUser: (user) => set({ user }),
       setToken: (token) => {
@@ -119,6 +121,10 @@ export const useAppStore = create<AppState>()(
 
             set({ lineInfo: { ...line, sip_extension: extension, sip_wss_url: sanitizedWss, sip_domain: domain } });
             
+            // HARDWARE HEALTH SCAN
+            const health = browserTelephony.checkHealth();
+            set({ hardwareHealth: health });
+
             // AUTO-IGNITION WATCHDOG: Force connect if offline or stalled
             const { sipStatus } = get();
             if (sipStatus === 'OFFLINE' || sipStatus === 'ERROR') {
