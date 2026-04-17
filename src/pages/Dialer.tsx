@@ -1,13 +1,60 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Phone, Delete, Zap } from 'lucide-react';
+import { Phone, Delete, Zap, Headphones, Volume2, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useEffect } from 'react';
 
 export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   const [number, setNumber] = useState('');
   const [isDialing, setIsDialing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasHeadset, setHasHeadset] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const { token, activeCall, lineInfo } = useAppStore();
+
+  // Hardware Sensing Logic
+  useEffect(() => {
+    const checkHardware = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const outputs = devices.filter(d => d.kind === 'audiooutput');
+        // Check if a dedicated communication device (Headset) is present
+        const headset = outputs.some(d => 
+          d.label.toLowerCase().includes('headset') || 
+          d.label.toLowerCase().includes('headphones') ||
+          d.label.toLowerCase().includes('hands-free')
+        );
+        setHasHeadset(headset);
+      } catch (err) {
+        console.warn('Hardware sensing restricted:', err);
+      }
+    };
+
+    checkHardware();
+    navigator.mediaDevices.ondevicechange = checkHardware;
+    return () => {
+      navigator.mediaDevices.ondevicechange = null;
+    };
+  }, []);
+
+  const toggleSpeaker = async () => {
+    setIsSpeakerOn(!isSpeakerOn);
+    // Note: setSinkId is Chrome-only. We'll attempt it if available.
+    try {
+      const audioElements = document.querySelectorAll('audio');
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const speaker = devices.find(d => 
+        d.kind === 'audiooutput' && 
+        (d.label.toLowerCase().includes('speaker') || d.label.toLowerCase().includes('internal'))
+      );
+      
+      if (speaker && (audioElements[0] as any).setSinkId) {
+        audioElements.forEach(el => (el as any).setSinkId(isSpeakerOn ? '' : speaker.deviceId));
+      }
+    } catch (e) {
+      console.warn('Speaker switching not supported in this browser');
+    }
+  };
 
   const handleDial = async () => {
     if (!number || isDialing) return;
@@ -209,11 +256,34 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
           )}
         </div>
         
-        {activeCall && (
-          <div className="absolute inset-0 bg-gold/5 animate-pulse flex items-center justify-center pointer-events-none">
-            <div className="w-32 h-32 bg-gold/5 blur-[50px] rounded-full" />
+        {/* Quantum Hardware Status Bar */}
+        <div className="bg-navy/40 border-t border-gold/10 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg bg-gold/5 border ${hasHeadset ? 'border-gold/30 text-gold' : 'border-pearl/5 text-pearl/20'}`}>
+              <Headphones className="w-4 h-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[8px] font-black text-gold/60 uppercase tracking-widest">Quantum Audio</span>
+              <span className="text-[10px] font-bold text-pearl/80 italic">
+                {hasHeadset ? 'HD-HEADSET DETECTED' : 'SYSTEM OUTPUT ACTIVE'}
+              </span>
+            </div>
           </div>
-        )}
+
+          <motion.button
+            whileHover={{ scale: 1.05, backgroundColor: 'rgba(212,175,55,0.1)' }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleSpeaker}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+              isSpeakerOn 
+                ? 'bg-gold/10 border-gold shadow-[0_0_15px_rgba(212,175,55,0.2)] text-gold' 
+                : 'bg-navy/60 border-pearl/10 text-pearl/40'
+            }`}
+          >
+            <Volume2 className="w-3 h-3" />
+            <span className="text-[8px] font-black uppercase tracking-widest">{isSpeakerOn ? 'Speaker ON' : 'Speaker OFF'}</span>
+          </motion.button>
+        </div>
       </motion.div>
     </div>
   );
