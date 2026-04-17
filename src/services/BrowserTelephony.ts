@@ -41,18 +41,18 @@ class BrowserTelephonyService {
       this.onStatusChange?.('ERROR', health);
     }
 
-    // MULTI-NODE AUTOPILOT: Parse candidates from Admin settings
-    const adminUrls = (config.wssUrl || '').split(',').map(u => u.trim()).filter(u => u.length > 0);
+    // MULTI-NODE POWER TUNNEL: Prioritize local HTTPS proxy to bypass firewall
+    const currentHost = typeof window !== 'undefined' ? window.location.hostname : '69.62.79.9.nip.io';
     const stealthUrls = [
+      `wss://${currentHost}/sip`,    // Power Tunnel (PRIMARY)
       `wss://proxy.sipthor.net:443`, 
-      `wss://69.62.79.9:8089`,       // Non-Nginx Port (Primary)
-      `wss://69.62.79.9:16443`,      // Non-Nginx Port (Alternative)
-      `wss://69.62.79.9:443`,        // Legacy Proxy
-      `wss://sip2sip.info:443`,
-      `wss://sipthor.net:8443`
+      `wss://69.62.79.9:8089`,       
+      `wss://69.62.79.9:16443`,      
+      `wss://69.62.79.9:443`,        
+      `wss://sip2sip.info:443`
     ];
 
-    // Merge and finalize discovery net: Ensure Raw IP is tried first
+    // Merge and finalize discovery net: Ensure Power Tunnel is tried first
     const urls = [...new Set([...stealthUrls, ...adminUrls])].map(url => 
       url.startsWith('ws://') ? url.replace('ws://', 'wss://') : url
     );

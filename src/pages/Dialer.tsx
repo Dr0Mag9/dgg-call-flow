@@ -140,6 +140,17 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
             <span className="text-[10px] font-black tracking-[0.4em] uppercase text-gold-light/40 italic">Wealth Command Dial</span>
           </div>
 
+          {/* DIAGNOSTIC SIGNAL TAPE */}
+          <div className="mb-4 overflow-hidden h-4 flex items-center justify-center bg-black/20 rounded border border-white/5">
+            <motion.span 
+              animate={{ x: [200, -200] }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+              className="whitespace-nowrap text-[6px] font-mono text-gold-light/40 uppercase tracking-[0.2em]"
+            >
+              Signal: {sipStatus === 'LINKED' ? 'LOCKED' : (sipError || 'RACING NODES...')} | Uplink: {(lineInfo?.sip_wss_url || 'N/A').split(',')[0]} | HW: OK
+            </motion.span>
+          </div>
+
           <AnimatePresence mode="wait">
             <motion.div 
               key={number || (error ? 'error' : 'placeholder')}
