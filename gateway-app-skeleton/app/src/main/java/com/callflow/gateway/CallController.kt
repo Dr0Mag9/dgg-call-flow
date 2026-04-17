@@ -38,10 +38,18 @@ object CallController {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 
                 if (simSlot >= 0) {
+                    // Comprehensive list of extras for various manufacturers (Samsung, Xiaomi, ASUS, etc)
                     putExtra("com.android.phone.extra.slot", simSlot)
                     putExtra("phone_subscription", simSlot)
                     putExtra("sim_slot", simSlot)
-                    println("[CallController] Enforcing SIM Slot: $simSlot")
+                    putExtra("subscription", simSlot)
+                    putExtra("extra_asus_dial_use_dualsim", true)
+                    putExtra("com.android.phone.force.slot", true)
+                    
+                    // Add modern subscription ID extra if possible (though we're using raw index here)
+                    putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", simSlot)
+                    
+                    println("[CallController] Enforcing SIM Slot: $simSlot with brute-force extras")
                 }
             }
             ctx.startActivity(intent)

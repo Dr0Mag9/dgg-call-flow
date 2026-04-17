@@ -112,7 +112,9 @@ export const useAppStore = create<AppState>()(
                 }
 
                 browserTelephony.setStatusCallback((status) => {
-                  set({ sipStatus: status, sipError: status === 'ERROR' ? 'REGISTRATION_FAILED' : null });
+                  let error = null;
+                  if (status === 'ERROR') error = 'REGISTRATION_FAILED';
+                  set({ sipStatus: status, sipError: error });
                 });
 
                 browserTelephony.connect({

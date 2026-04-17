@@ -225,6 +225,7 @@ class GatewayService : Service() {
     private fun handleCallCommand(data: JSONObject) {
         val number = data.optString("phoneNumber", "")
         val sessionId = data.optString("sessionId", data.optString("callId", "unknown"))
+        val simSlot = if (data.has("simSlot")) data.getInt("simSlot") else -1
 
         if (number.isEmpty()) {
             sendStatusUpdate("Status: Error - No phone number")
@@ -234,7 +235,8 @@ class GatewayService : Service() {
         currentCallId = sessionId
         sendStatusUpdate("Dialing: $number")
 
-        val success = CallController.dial(number, sessionId)
+        // Enhanced dial with simSlot support
+        val success = CallController.dial(number, sessionId, simSlot)
         if (success) {
             reportCallStatus(sessionId, "start")
             logCallLocally(number)

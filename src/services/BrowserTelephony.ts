@@ -124,7 +124,7 @@ class BrowserTelephonyService {
     
     this.registerer = new Registerer(this.userAgent, { expires: 600 });
     this.registerer.stateChange.addListener((state: RegistererState) => {
-      console.log(`[BrowserTelephony] Registration: ${state}`);
+      console.log(`[BrowserTelephony] Registration State: ${state}`);
       if (state === RegistererState.Registered) {
         this.onStatusChange?.('LINKED');
       } else if (state === RegistererState.Unregistered || state === RegistererState.Terminated) {
@@ -132,7 +132,14 @@ class BrowserTelephonyService {
       }
     });
 
-    this.registerer.register();
+    // Attempt registration with error capture
+    this.registerer.register().catch(err => {
+      console.error('[BrowserTelephony] Registration Request Failed:', err);
+      // If we get a 401/403, it's usually credentials (username/password)
+      if (err.message?.includes('401') || err.message?.includes('403')) {
+        console.error('[BRIDGE DIAGNOSTIC] AUTHENTICATION FAILURE. Check Extension (Username) and Password.');
+      }
+    });
   }
 
   async initiateCall(phoneNumber: string, domain: string) {
