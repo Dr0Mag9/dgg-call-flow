@@ -18,8 +18,13 @@ export default function AgentDashboard() {
     })
       .then(res => res.json())
       .then(data => {
-        setAllCalls(data);
-        setCalls(data.slice(0, 5));
+        if (Array.isArray(data)) {
+          setAllCalls(data);
+          setCalls(data.slice(0, 5));
+        } else {
+          console.warn('[Dashboard] Unexpected calls data format:', data);
+          setAllCalls([]);
+        }
       })
       .catch(console.error);
 
@@ -27,7 +32,14 @@ export default function AgentDashboard() {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
-      .then(data => setTasks(data.filter((t: any) => t.status === 'PENDING').slice(0, 5)))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTasks(data.filter((t: any) => t.status === 'PENDING').slice(0, 5));
+        } else {
+          console.warn('[Dashboard] Unexpected tasks data format:', data);
+          setTasks([]);
+        }
+      })
       .catch(console.error);
   }, [token]);
 
@@ -38,7 +50,9 @@ export default function AgentDashboard() {
     }
   };
 
-  const todayCalls = allCalls.filter(c => new Date(c.startedAt) >= startOfDay(new Date()));
+  const todayCalls = Array.isArray(allCalls) 
+    ? allCalls.filter(c => c.startedAt && new Date(c.startedAt) >= startOfDay(new Date()))
+    : [];
 
   return (
     <div className="space-y-4 pb-4">

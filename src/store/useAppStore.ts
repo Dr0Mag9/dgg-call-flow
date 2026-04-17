@@ -103,6 +103,11 @@ export const useAppStore = create<AppState>((set, get) => ({
           if (extension && password) {
             console.log(`[SIP Bridge] Connecting extension: ${extension}`);
             
+            // Logic Check: If Sip2Sip is used, the extension usually matches the username (himani)
+            if (/^\d+$/.test(extension) && domain?.includes('sip2sip.info')) {
+              console.warn(`[BRIDGE WARNING] You are using a numeric extension "${extension}" with Sip2Sip. Ensure this is your actual Sip2Sip Username (like "himani"), not an internal line number.`);
+            }
+
             browserTelephony.setStatusCallback((status) => {
               set({ sipStatus: status, sipError: status === 'ERROR' ? 'REGISTRATION_FAILED' : null });
             });
@@ -113,12 +118,13 @@ export const useAppStore = create<AppState>((set, get) => ({
               domain,
               wssUrl
             }).catch(err => {
-              console.error('[SIP Bridge] Critical Error', err);
+              console.error('[SIP Bridge] Critical Connection Error', err);
               set({ sipStatus: 'ERROR', sipError: 'WSS_CONNECTION_FAILED' });
             });
           } else {
-            console.warn('[BRIDGE DIAGNOSTIC] Blocked: Extension or Password missing for agent');
-            set({ sipStatus: 'OFFLINE', sipError: 'MISSING_CREDENTIALS' });
+            const reason = !extension ? 'MISSING_EXTENSION' : 'MISSING_PASSWORD';
+            console.warn(`[BRIDGE DIAGNOSTIC] Blocked: ${reason} for agent`);
+            set({ sipStatus: 'OFFLINE', sipError: reason });
           }
         } else {
           console.warn('[BRIDGE DIAGNOSTIC] Blocked: WSS URL missing in System Settings');
