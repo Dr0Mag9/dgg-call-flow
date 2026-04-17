@@ -20,6 +20,14 @@ export class GatewayProvider implements TelephonyService {
       return { success: false, error: 'Target gateway device is offline' };
     }
 
+    // Normalize number for Indian Telecom (+91 prefix if missing)
+    let formattedNumber = req.phoneNumber.replace(/\D/g, '');
+    if (formattedNumber.length === 10) {
+      formattedNumber = `+91${formattedNumber}`;
+    } else if (formattedNumber.length === 12 && formattedNumber.startsWith('91')) {
+      formattedNumber = `+${formattedNumber}`;
+    }
+
     const io = getIo();
     const gatewayRoom = `gateway_${line.gatewayId}`;
 
@@ -29,7 +37,7 @@ export class GatewayProvider implements TelephonyService {
         gatewayId: line.gatewayId,
         action: 'CALL',
         payload: JSON.stringify({ 
-          phoneNumber: req.phoneNumber, 
+          phoneNumber: formattedNumber, 
           sessionId: req.callId 
         }),
         status: 'PENDING'
@@ -40,10 +48,10 @@ export class GatewayProvider implements TelephonyService {
     try {
       const socketsInRoom = await io.in(gatewayRoom).fetchSockets();
       if (socketsInRoom.length > 0) {
-        logger.info(`[Gateway Provider] Emitting dial command to gateway ${line.gatewayId} via socket`);
+        logger.info(`[Gateway Provider] Emitting call command to gateway ${line.gatewayId} via socket`);
         io.to(gatewayRoom).emit('gateway:command', {
-          command: 'DIAL',
-          phoneNumber: req.phoneNumber,
+          command: 'CALL', // Standardized to CALL
+          phoneNumber: formattedNumber,
           callId: req.callId,
           timestamp: new Date().toISOString()
         });
