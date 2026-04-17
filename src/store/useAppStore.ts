@@ -111,10 +111,8 @@ export const useAppStore = create<AppState>()(
                   console.warn(`[BRIDGE WARNING] You are using a numeric extension "${extension}" with Sip2Sip. Ensure this is your actual Sip2Sip Username (like "himani"), not an internal line number.`);
                 }
 
-                browserTelephony.setStatusCallback((status) => {
-                  let error = null;
-                  if (status === 'ERROR') error = 'REGISTRATION_FAILED';
-                  set({ sipStatus: status, sipError: error });
+                browserTelephony.setStatusCallback((status, extra) => {
+                  set({ sipStatus: status, sipError: extra || null });
                 });
 
                 browserTelephony.connect({

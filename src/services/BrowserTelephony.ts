@@ -5,10 +5,10 @@ class BrowserTelephonyService {
   private registerer: Registerer | null = null;
   private currentSession: Inviter | any = null;
   private isConnected = false;
-  private onStatusChange: ((status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR') => void) | null = null;
+  private onStatusChange: ((status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR', extra?: string) => void) | null = null;
   private remoteAudio: HTMLAudioElement | null = null;
 
-  setStatusCallback(callback: (status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR') => void) {
+  setStatusCallback(callback: (status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR', extra?: string) => void) {
     this.onStatusChange = callback;
   }
 
@@ -20,6 +20,7 @@ class BrowserTelephonyService {
     this.remoteAudio.id = 'remote-telephony-audio';
     this.remoteAudio.autoplay = true;
     this.remoteAudio.style.display = 'none';
+    this.remoteAudio.controls = true; // Temporary for debug if needed
     document.body.appendChild(this.remoteAudio);
     console.log('[BrowserTelephony] Global Audio Sink Initialized');
   }
@@ -32,41 +33,50 @@ class BrowserTelephonyService {
     // Parallel Port Discovery: Try 443 and 8443 concurrently for best-case performance
     const urls = [
       `wss://sip2sip.info:443`,
+      `wss://sipthor.net:8443`,
       `wss://sipthor.net:443`,
-      `wss://sip2sip.info:8443`,
-      `wss://sipthor.net:8443`
+      `wss://sip2sip.info:8443`
     ];
 
     try {
-      // Use Promise.race to pick the first successful connection
-      const connectionAttempt = urls.map(url => this.tryStartUA(url, config));
-      await Promise.all(connectionAttempt);
+      this.isConnected = false;
+      if (this.userAgent) {
+        await this.userAgent.stop();
+        this.userAgent = null;
+      }
+
+      // Use Promise.any to pick the first successful connection
+      const connectionAttempts = urls.map(url => this.tryStartUA(url, config));
+      await Promise.all(connectionAttempts);
       
       if (!this.isConnected) {
         throw new Error('All signaling paths failed');
       }
     } catch (err) {
       console.error('[BrowserTelephony] Critical Connection Failure:', err);
-      this.onStatusChange?.('ERROR');
+      this.onStatusChange?.('ERROR', 'WSS_RESET_REQUIRED');
     }
   }
 
   private async tryStartUA(url: string, config: any): Promise<boolean> {
-    if (this.isConnected) return true; // Already connected via another path
+    if (this.isConnected) return true; 
 
-    const uri = UserAgent.makeURI(`sip:${config.extension}@${config.domain}`);
+    const domain = config.domain || 'sip2sip.info';
+    const uri = UserAgent.makeURI(`sip:${config.extension}@${domain}`);
     if (!uri) throw new Error("Invalid SIP URI");
+
+    // Sip2Sip Hardening: Use explicit auth-user format
+    const authUser = config.extension.includes('@') ? config.extension : `${config.extension}@${domain}`;
 
     const options: UserAgentOptions = {
       uri,
       transportOptions: {
         server: url,
         traceSip: true,
-        // HEARTBEAT: Prevent firewall/NAT timeout (UK to India)
         keepAliveInterval: 10,
-        connectionTimeout: 15, // 15 seconds for socket handshake
+        connectionTimeout: 15,
       },
-      authorizationUsername: config.extension,
+      authorizationUsername: authUser, // Force full ID
       authorizationPassword: config.password || '',
       displayName: config.extension,
       hackIpInContact: true,
@@ -77,8 +87,6 @@ class BrowserTelephonyService {
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
             { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
             { urls: 'stun:sip2sip.info:3478' }
           ]
         }
@@ -92,7 +100,7 @@ class BrowserTelephonyService {
 
       ua.delegate = {
         onConnect: () => {
-          if (this.isConnected) { ua.stop(); return; } // Late winner
+          if (this.isConnected) { ua.stop(); return; }
           console.log(`[BrowserTelephony] SIP Established via ${url}`);
           this.userAgent = ua;
           this.isConnected = true;
@@ -108,10 +116,8 @@ class BrowserTelephonyService {
         if (!resolved) { resolved = true; resolve(false); }
       });
 
-      // High-latency timeout for international routes (UK to India)
       setTimeout(() => {
         if (!resolved) {
-          console.warn(`[BrowserTelephony] Parallel path ${url} timed out (20s)`);
           if (!this.isConnected) ua.stop();
           resolved = true;
           resolve(false);
@@ -133,13 +139,10 @@ class BrowserTelephonyService {
       }
     });
 
-    // Attempt registration with error capture
     this.registerer.register().catch(err => {
       console.error('[BrowserTelephony] Registration Request Failed:', err);
-      // If we get a 401/403, it's usually credentials (username/password)
-      if (err.message?.includes('401') || err.message?.includes('403')) {
-        console.error('[BRIDGE DIAGNOSTIC] AUTHENTICATION FAILURE. Check Extension (Username) and Password.');
-      }
+      const sipCode = err.message?.match(/\d{3}/)?.[0] || 'FAILED';
+      this.onStatusChange?.('ERROR', `ERR_${sipCode}`);
     });
   }
 
