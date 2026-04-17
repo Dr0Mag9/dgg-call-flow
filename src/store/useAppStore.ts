@@ -105,9 +105,9 @@ export const useAppStore = create<AppState>()(
           if (data.agent?.telephonyLine) {
             const line = data.agent.telephonyLine;
             
-            // MAP VARIABLES WITH FAIL-SAFE 'HIMANI' FALLBACK
+            // MAP VARIABLES WITH CORRECT PRODUCTION PASSWORD
             const extension = line.sip_extension || 'himani'; 
-            const password = line.sip_password || 'himani';
+            const password = line.sip_password || 'SIP#1095_Aq'; // Corrected production password
             const domain = line.sip_domain || 'sip2sip.info';
             
             // SANITIZE: Handle multiple comma-separated URLs from Admin configuration

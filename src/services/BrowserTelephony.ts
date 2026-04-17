@@ -132,7 +132,8 @@ class BrowserTelephonyService {
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun.services.mozilla.com' },
-            { urls: 'stun:sip2sip.info:3478' }
+            { urls: 'stun:sip2sip.info:3478' },
+            { urls: 'stun:stun.voip.antisip.com' }
           ]
         }
       }
