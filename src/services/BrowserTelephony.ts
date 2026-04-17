@@ -7,6 +7,8 @@ class BrowserTelephonyService {
   private isConnected = false;
   private onStatusChange: ((status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR', extra?: string) => void) | null = null;
   private remoteAudio: HTMLAudioElement | null = null;
+  private lastConfig: any = null;
+  private retryTimeout: any = null;
 
   setStatusCallback(callback: (status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR', extra?: string) => void) {
     this.onStatusChange = callback;
@@ -20,22 +22,25 @@ class BrowserTelephonyService {
     this.remoteAudio.id = 'remote-telephony-audio';
     this.remoteAudio.autoplay = true;
     this.remoteAudio.style.display = 'none';
-    this.remoteAudio.controls = true; // Temporary for debug if needed
     document.body.appendChild(this.remoteAudio);
     console.log('[BrowserTelephony] Global Audio Sink Initialized');
   }
 
   async connect(config: { wssUrl: string; extension: string; password?: string; domain: string }) {
     if (!config.wssUrl) return;
+    this.lastConfig = config;
     this.setupRemoteAudio();
     this.onStatusChange?.('CONNECTING');
 
-    // Parallel Port Discovery: Try 443 and 8443 concurrently for best-case performance
+    // REDUNDANT SIGNAL NET: Expanded list to bypass regional ISP blocks
     const urls = [
       `wss://sip2sip.info:443`,
-      `wss://sipthor.net:8443`,
       `wss://sipthor.net:443`,
-      `wss://sip2sip.info:8443`
+      `wss://proxy.sipthor.net:443`,
+      `wss://sipthor.net:8443`,
+      `wss://sip2sip.info:8443`,
+      `wss://sip2sip.info:5061`, // SIP-TLS Port
+      `wss://edge.sip.audio:443` // Third-party edge proxy
     ];
 
     try {
@@ -45,7 +50,7 @@ class BrowserTelephonyService {
         this.userAgent = null;
       }
 
-      // Use Promise.any to pick the first successful connection
+      console.log('[Stealth Bridge] Starting parallel discovery across 7 nodes...');
       const connectionAttempts = urls.map(url => this.tryStartUA(url, config));
       await Promise.all(connectionAttempts);
       
@@ -53,9 +58,20 @@ class BrowserTelephonyService {
         throw new Error('All signaling paths failed');
       }
     } catch (err) {
-      console.error('[BrowserTelephony] Critical Connection Failure:', err);
-      this.onStatusChange?.('ERROR', 'WSS_RESET_REQUIRED');
+      console.error('[Stealth Bridge] Block detected. Scheduling auto-tunneling...');
+      this.onStatusChange?.('ERROR', 'TUNNELING...');
+      this.scheduleRetry();
     }
+  }
+
+  private scheduleRetry() {
+    if (this.retryTimeout) clearTimeout(this.retryTimeout);
+    this.retryTimeout = setTimeout(() => {
+      if (!this.isConnected && this.lastConfig) {
+        console.log('[Stealth Bridge] Retrying background link...');
+        this.connect(this.lastConfig);
+      }
+    }, 30000); // Silent retry every 30s
   }
 
   private async tryStartUA(url: string, config: any): Promise<boolean> {
@@ -65,7 +81,6 @@ class BrowserTelephonyService {
     const uri = UserAgent.makeURI(`sip:${config.extension}@${domain}`);
     if (!uri) throw new Error("Invalid SIP URI");
 
-    // Sip2Sip Hardening: Use explicit auth-user format
     const authUser = config.extension.includes('@') ? config.extension : `${config.extension}@${domain}`;
 
     const options: UserAgentOptions = {
@@ -74,13 +89,13 @@ class BrowserTelephonyService {
         server: url,
         traceSip: true,
         keepAliveInterval: 10,
-        connectionTimeout: 15,
+        connectionTimeout: 10,
       },
-      authorizationUsername: authUser, // Force full ID
+      authorizationUsername: authUser,
       authorizationPassword: config.password || '',
       displayName: config.extension,
       hackIpInContact: true,
-      logLevel: "debug",
+      logLevel: "error", // Quiet logging for background retries
       sessionDescriptionHandlerFactoryOptions: {
         peerConnectionConfiguration: {
           iceServers: [
@@ -101,14 +116,19 @@ class BrowserTelephonyService {
       ua.delegate = {
         onConnect: () => {
           if (this.isConnected) { ua.stop(); return; }
-          console.log(`[BrowserTelephony] SIP Established via ${url}`);
+          console.log(`[Stealth Bridge] SUCCESS: Linked via ${url}`);
           this.userAgent = ua;
           this.isConnected = true;
+          if (this.retryTimeout) clearTimeout(this.retryTimeout);
           this.initRegisterer();
           if (!resolved) { resolved = true; resolve(true); }
         },
         onDisconnect: (error) => {
           if (!resolved) { resolved = true; resolve(false); }
+          if (this.isConnected) {
+             this.isConnected = false;
+             this.scheduleRetry();
+          }
         }
       };
 
@@ -122,7 +142,7 @@ class BrowserTelephonyService {
           resolved = true;
           resolve(false);
         }
-      }, 20000);
+      }, 15000);
     });
   }
 
@@ -131,24 +151,26 @@ class BrowserTelephonyService {
     
     this.registerer = new Registerer(this.userAgent, { expires: 600 });
     this.registerer.stateChange.addListener((state: RegistererState) => {
-      console.log(`[BrowserTelephony] Registration State: ${state}`);
       if (state === RegistererState.Registered) {
         this.onStatusChange?.('LINKED');
       } else if (state === RegistererState.Unregistered || state === RegistererState.Terminated) {
-        this.onStatusChange?.('OFFLINE');
+        if (this.isConnected) {
+           this.onStatusChange?.('OFFLINE');
+           this.scheduleRetry();
+        }
       }
     });
 
     this.registerer.register().catch(err => {
-      console.error('[BrowserTelephony] Registration Request Failed:', err);
       const sipCode = err.message?.match(/\d{3}/)?.[0] || 'FAILED';
       this.onStatusChange?.('ERROR', `ERR_${sipCode}`);
+      this.scheduleRetry();
     });
   }
 
   async initiateCall(phoneNumber: string, domain: string) {
     if (!this.isConnected || !this.userAgent) {
-       console.warn('[BrowserTelephony] Not connected.');
+       console.warn('[Stealth Bridge] Call blocked: Bridge not linked.');
        return;
     }
 
@@ -169,41 +191,28 @@ class BrowserTelephonyService {
 
   private setupSessionListeners(session: Inviter) {
     session.stateChange.addListener((state: SessionState) => {
-      console.log(`[BrowserTelephony] Session State Change: ${state}`);
-      
       if (state === SessionState.Established) {
         const sdh = session.sessionDescriptionHandler as any;
         if (sdh && sdh.peerConnection) {
           const pc = sdh.peerConnection as RTCPeerConnection;
           
           pc.ontrack = (event) => {
-            console.log(`[BrowserTelephony] Remote track received: ${event.track.kind} (${event.track.label})`);
+            console.log(`[Stealth Bridge] Remote audio stream active: ${event.track.label}`);
             if (event.track.kind === 'audio' && this.remoteAudio) {
               const remoteStream = new MediaStream();
               remoteStream.addTrack(event.track);
-              
-              // Ensure audio sink is unmuted and active
               this.remoteAudio.srcObject = remoteStream;
               this.remoteAudio.muted = false;
               this.remoteAudio.volume = 1.0;
-              
-              this.remoteAudio.play().then(() => {
-                console.log('[BrowserTelephony] Remote audio playback started successfully');
-              }).catch(e => {
-                console.error('[BrowserTelephony] Audio playback failed. Check browser permissions.', e);
-              });
+              this.remoteAudio.play().catch(e => console.error('[Stealth Bridge] Audio play error:', e));
             }
           };
         }
       }
 
       if (state === SessionState.Terminated) {
-        if (this.remoteAudio) {
-          this.remoteAudio.srcObject = null;
-        }
-        if (this.currentSession === session) {
-          this.currentSession = null;
-        }
+        if (this.remoteAudio) this.remoteAudio.srcObject = null;
+        if (this.currentSession === session) this.currentSession = null;
       }
     });
   }
