@@ -79,15 +79,6 @@ class BrowserTelephonyService {
       this.scheduleRetry();
     }
   }
-      
-      if (!this.isConnected) {
-        throw new Error('Signal blocked');
-      }
-    } catch (err) {
-      this.onStatusChange?.('ERROR', 'TUNNELING...');
-      this.scheduleRetry();
-    }
-  }
 
   private getHardwareHealth(): string {
     if (typeof window === 'undefined') return 'ENV_ERROR';
