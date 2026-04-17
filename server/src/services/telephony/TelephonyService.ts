@@ -3,6 +3,7 @@ export interface CallRequest {
   agentId: string;
   phoneNumber: string;
   lineId: string;
+  callbackNumber?: string;
   providerRef?: string;
 }
 

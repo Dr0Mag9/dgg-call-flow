@@ -128,7 +128,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
                     {activeCall.status === 'DIALING' && 'Securing Uplink...'}
                     {activeCall.status === 'RINGING' && 'Signal Transmitting...'}
                     {activeCall.status === 'CONNECTED' && 'Logic Link Established'}
-                    {activeCall.status === 'ENDED' && 'Protocol Terminated'}
+                    {activeCall.status === 'ENDED' && 'Uplink Terminated'}
                   </span>
                 </div>
               </div>

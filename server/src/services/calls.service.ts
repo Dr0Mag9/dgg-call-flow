@@ -65,7 +65,8 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
     callId: call.id,
     agentId: agent.id,
     phoneNumber: phoneNumber.trim(),
-    lineId: agent.telephonyLine.id
+    lineId: agent.telephonyLine.id,
+    callbackNumber: agent.assignedNumber || undefined
   });
 
   if (result.success === false) {
@@ -90,47 +91,7 @@ export async function createOutboundCall(userId: string, phoneNumber: string, cl
   emitToAdmins('call_created', updatedCall);
   fireWebhooks('call_started', updatedCall).catch(() => undefined);
 
-  // In a real integration, the provider events (SIP progression or Gateway WS events) 
-  // will handle the CONNECTED state transition. For mock flow, we retain the schedule out.
-  scheduleOutboundConnect(call.id, userId);
-
   return { ok: true as const, call: updatedCall };
-}
-
-function scheduleOutboundConnect(callId: string, userId: string) {
-  const ms = env.OUTBOUND_SIMULATE_CONNECT_MS;
-  if (ms <= 0) return;
-
-  cancelOutboundSimulation(callId);
-
-  const handle = setTimeout(() => {
-    outboundTimers.delete(callId);
-    void (async () => {
-      try {
-        const existing = await prisma.call.findUnique({ where: { id: callId } });
-        if (!existing || !['DIALING'].includes(existing.status)) return;
-
-        const connectedCall = await prisma.call.update({
-          where: { id: callId },
-          data: { status: 'CONNECTED' },
-          include: {
-            client: true,
-            agent: { include: { user: { select: { name: true } } } },
-            disposition: true,
-          },
-        });
-
-        emitToUser(userId, 'call_connected', connectedCall);
-        emitToAdmins('call_updated', connectedCall);
-        broadcast('call_updated', connectedCall);
-        fireWebhooks('call_connected', connectedCall).catch(() => undefined);
-      } catch (e) {
-        logger.error('Outbound simulation failed', { message: e instanceof Error ? e.message : String(e) });
-      }
-    })();
-  }, ms);
-
-  outboundTimers.set(callId, handle);
 }
 
 export async function createInboundCall(phoneNumber: string) {

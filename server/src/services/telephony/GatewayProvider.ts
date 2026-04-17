@@ -28,6 +28,17 @@ export class GatewayProvider implements TelephonyService {
       formattedNumber = `+${formattedNumber}`;
     }
 
+    // Final Normalization for Indian Airtel Sims
+    // Strips everything and ensures clean 10-digit or 91-prefix mode.
+    let formattedNumber = req.phoneNumber.replace(/\D/g, '');
+    if (formattedNumber.length > 10 && formattedNumber.startsWith('91')) {
+      // Keep Indian country code but without the + for internal gateway processing if needed
+      // Most Gateways prefer "91899..." or "0899..."
+      formattedNumber = formattedNumber; 
+    } else if (formattedNumber.length === 10) {
+      formattedNumber = `91${formattedNumber}`;
+    }
+
     const io = getIo();
     const gatewayRoom = `gateway_${line.gatewayId}`;
 
@@ -50,7 +61,7 @@ export class GatewayProvider implements TelephonyService {
       if (socketsInRoom.length > 0) {
         logger.info(`[Gateway Provider] Emitting call command to gateway ${line.gatewayId} via socket`);
         io.to(gatewayRoom).emit('gateway:command', {
-          command: 'CALL', // Standardized to CALL
+          command: 'CALL', 
           phoneNumber: formattedNumber,
           callId: req.callId,
           timestamp: new Date().toISOString()
