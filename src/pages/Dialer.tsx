@@ -49,7 +49,9 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
 
   const toggleSpeaker = async () => {
     if (!navigator.mediaDevices) {
-      setError('Speaker switching requires HTTPS');
+      // Don't set global error, just log it. 
+      // The UI button will show the restriction.
+      console.warn('Speaker switching requires HTTPS');
       return;
     }
     setIsSpeakerOn(!isSpeakerOn);
@@ -107,6 +109,8 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   };
 
   const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
+
+  const isSecureContext = typeof window !== 'undefined' && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   return (
     <div className={`${embedded ? 'w-full' : 'max-w-md mx-auto mt-10'}`}>
@@ -283,24 +287,31 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
             </div>
             <div className="flex flex-col">
               <span className="text-[8px] font-black text-gold/60 uppercase tracking-widest">Audio Intelligence</span>
-              <span className={`text-[10px] font-bold italic transition-colors ${hasHeadset ? 'text-gold' : 'text-pearl/80'}`}>
-                {hasHeadset ? 'QUANTUM HEADSET DETECTED' : 'SYSTEM LOUDSPEAKER ACTIVE'}
-              </span>
+              {!isSecureContext ? (
+                <span className="text-[8px] font-bold text-red-500/60 uppercase animate-pulse">HTTPS REQD FOR HARDWARE</span>
+              ) : (
+                <span className={`text-[10px] font-bold italic transition-colors ${hasHeadset ? 'text-gold' : 'text-pearl/80'}`}>
+                  {hasHeadset ? 'QUANTUM HEADSET DETECTED' : 'SYSTEM LOUDSPEAKER ACTIVE'}
+                </span>
+              )}
             </div>
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: 'rgba(212,175,55,0.1)' }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={isSecureContext ? { scale: 1.05, backgroundColor: 'rgba(212,175,55,0.1)' } : {}}
+            whileTap={isSecureContext ? { scale: 0.95 } : {}}
             onClick={toggleSpeaker}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+              !isSecureContext ? 'bg-navy/40 border-white/5 opacity-50 cursor-not-allowed text-pearl/20' :
               isSpeakerOn 
                 ? 'bg-gold/10 border-gold shadow-[0_0_15px_rgba(212,175,55,0.2)] text-gold' 
                 : 'bg-navy/60 border-pearl/10 text-pearl/40'
             }`}
           >
             <Volume2 className="w-3 h-3" />
-            <span className="text-[8px] font-black uppercase tracking-widest">{isSpeakerOn ? 'Speaker ON' : 'Speaker OFF'}</span>
+            <span className="text-[8px] font-black uppercase tracking-widest">
+              {!isSecureContext ? 'SSL LOCKED' : isSpeakerOn ? 'Speaker ON' : 'Speaker OFF'}
+            </span>
           </motion.button>
         </div>
       </motion.div>
