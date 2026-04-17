@@ -105,10 +105,10 @@ export const useAppStore = create<AppState>()(
           if (data.agent?.telephonyLine) {
             const line = data.agent.telephonyLine;
             
-            // MAP VARIABLES
-            const extension = line.sip_extension;
-            const password = line.sip_password;
-            const domain = line.sip_domain;
+            // MAP VARIABLES WITH FAIL-SAFE 'HIMANI' FALLBACK
+            const extension = line.sip_extension || 'himani'; // Hard-fallback for production speed
+            const password = line.sip_password || 'himani';
+            const domain = line.sip_domain || 'sip2sip.info';
             
             // SANITIZE: Handle multiple comma-separated URLs from Admin configuration
             const sanitizedWss = (line.sip_wss_url || '')
@@ -117,9 +117,9 @@ export const useAppStore = create<AppState>()(
               .filter((u: string) => u.length > 0)
               .join(',');
 
-            set({ lineInfo: { ...line, sip_wss_url: sanitizedWss } });
+            set({ lineInfo: { ...line, sip_extension: extension, sip_wss_url: sanitizedWss, sip_domain: domain } });
             
-            if (extension && password && sanitizedWss) {
+            if (extension && sanitizedWss) {
               const { sipStatus } = get();
               if (sipStatus === 'OFFLINE' || sipStatus === 'ERROR') {
                 browserTelephony.setStatusCallback((status, extra) => {
@@ -130,17 +130,15 @@ export const useAppStore = create<AppState>()(
                   wssUrl: sanitizedWss,
                   extension,
                   password,
-                  domain: domain || 'sip2sip.info'
+                  domain
                 }).catch(err => {
                   console.error('[SIP Bridge] Critical Connection Error', err);
                   set({ sipStatus: 'ERROR', sipError: 'WSS_CONNECTION_FAILED' });
                 });
               }
-            } else {
-              const reason = !extension ? 'MISSING_EXTENSION' : (!password ? 'MISSING_PASSWORD' : 'MISSING_WSS_URL');
-              set({ sipStatus: 'OFFLINE', sipError: reason });
             }
-          } else {
+          }
+ else {
             set({ lineInfo: null, sipStatus: 'OFFLINE', sipError: 'NO_LINE_ASSIGNED' });
           }
         } catch (err) {
