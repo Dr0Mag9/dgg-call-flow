@@ -116,9 +116,11 @@ export async function updateAgent(
   const updated = await prisma.agent.update({
     where: { id: agentId },
     data: {
-      extension: data.extension,
-      assignedNumber: data.assignedNumber,
-      ...(data.telephonyLineId !== undefined && { telephonyLineId: data.telephonyLineId as any }),
+      extension: data.extension?.trim() || null,
+      assignedNumber: data.assignedNumber?.trim() || null,
+      ...(data.telephonyLineId !== undefined && { 
+        telephonyLineId: (data.telephonyLineId === '' ? null : data.telephonyLineId) as any 
+      }),
       user: {
         update: {
           ...(data.name !== undefined && { name: data.name.trim() }),
