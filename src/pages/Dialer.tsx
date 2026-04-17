@@ -110,7 +110,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
 
   const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 
-  const isSecureContext = typeof window !== 'undefined' && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const isSecureContext = typeof window !== 'undefined' && (window.isSecureContext);
 
   return (
     <div className={`${embedded ? 'w-full' : 'max-w-md mx-auto mt-10'}`}>

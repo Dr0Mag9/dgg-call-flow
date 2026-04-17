@@ -75,7 +75,11 @@ class BrowserTelephonyService {
         peerConnectionConfiguration: {
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' },
+            { urls: 'stun:sip2sip.info:3478' }
           ]
         }
       }
@@ -170,12 +174,21 @@ class BrowserTelephonyService {
           const pc = sdh.peerConnection as RTCPeerConnection;
           
           pc.ontrack = (event) => {
-            console.log('[BrowserTelephony] Remote track received:', event.track.kind);
+            console.log(`[BrowserTelephony] Remote track received: ${event.track.kind} (${event.track.label})`);
             if (event.track.kind === 'audio' && this.remoteAudio) {
               const remoteStream = new MediaStream();
               remoteStream.addTrack(event.track);
+              
+              // Ensure audio sink is unmuted and active
               this.remoteAudio.srcObject = remoteStream;
-              this.remoteAudio.play().catch(e => console.error('[BrowserTelephony] Play error:', e));
+              this.remoteAudio.muted = false;
+              this.remoteAudio.volume = 1.0;
+              
+              this.remoteAudio.play().then(() => {
+                console.log('[BrowserTelephony] Remote audio playback started successfully');
+              }).catch(e => {
+                console.error('[BrowserTelephony] Audio playback failed. Check browser permissions.', e);
+              });
             }
           };
         }
