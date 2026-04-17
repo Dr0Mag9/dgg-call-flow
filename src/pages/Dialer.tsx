@@ -10,7 +10,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [hasHeadset, setHasHeadset] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
-  const { token, activeCall, lineInfo, sipStatus } = useAppStore();
+  const { token, activeCall, lineInfo, sipStatus, sipError } = useAppStore();
 
   // Hardware Sensing Logic
   useEffect(() => {
