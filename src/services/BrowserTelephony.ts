@@ -32,20 +32,23 @@ class BrowserTelephonyService {
     this.setupRemoteAudio();
     this.onStatusChange?.('CONNECTING');
 
-    // SSL Check: Browser requires secure context for voice
-    if (typeof window !== 'undefined' && !window.isSecureContext) {
-      console.error('[Deep Proxy] INSECURE CONTEXT DETECTED. Chrome will block audio hardware.');
-      this.onStatusChange?.('ERROR', 'SSL_NOT_TRUSTED');
+    // DEEP HARDWARE SCAN: Identify why audio is blocked
+    const health = this.getHardwareHealth();
+    if (health !== 'OK') {
+      console.warn(`[Deep Proxy] Hardware Alert: ${health}`);
+      this.onStatusChange?.('ERROR', health);
     }
 
-    // Production SIGNAL NET: Diversified paths for HTTPS environments
+    // IP PIERCING: Bypass DNS and SSL-SNI filters using raw nodes
     const urls = [
+      `wss://69.62.79.9:443`,    // Raw IP Direct
+      `wss://69.62.79.9:16443`,  // Raw IP Alternative
       `wss://sip2sip.info:443`,
       `wss://sipthor.net:8443`,
       `wss://webrtc.antisip.com:443`,
       `wss://sip.linphone.org:443`,
       `wss://edge.sip.audio:443`,
-      config.wssUrl.replace('ws://', 'wss://') // Ensure secure protocol
+      config.wssUrl.replace('ws://', 'wss://')
     ];
 
     try {
@@ -55,8 +58,7 @@ class BrowserTelephonyService {
         this.userAgent = null;
       }
 
-      console.log('[Deep Proxy] Hunting for open signaling door...');
-      // Cycle faster to find working path
+      console.log('[Deep Proxy] Piercing tunnels across 8 signaling nodes...');
       const connectionAttempts = urls.map(url => this.tryStartUA(url, config));
       await Promise.all(connectionAttempts);
       
@@ -67,6 +69,20 @@ class BrowserTelephonyService {
       this.onStatusChange?.('ERROR', 'TUNNELING...');
       this.scheduleRetry();
     }
+  }
+
+  private getHardwareHealth(): string {
+    if (typeof window === 'undefined') return 'ENV_ERROR';
+    
+    if (!window.isSecureContext) {
+      return 'SSL_INSECURE_CONTEXT';
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return 'BROWSER_MEDIA_BLOCKED';
+    }
+
+    return 'OK';
   }
 
   private scheduleRetry() {
