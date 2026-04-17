@@ -6,13 +6,27 @@ class BrowserTelephonyService {
   private currentSession: Inviter | any = null;
   private isConnected = false;
   private onStatusChange: ((status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR') => void) | null = null;
+  private remoteAudio: HTMLAudioElement | null = null;
 
   setStatusCallback(callback: (status: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR') => void) {
     this.onStatusChange = callback;
   }
 
+  private setupRemoteAudio() {
+    if (typeof window === 'undefined') return;
+    if (this.remoteAudio) return;
+    
+    this.remoteAudio = document.createElement('audio');
+    this.remoteAudio.id = 'remote-telephony-audio';
+    this.remoteAudio.autoplay = true;
+    this.remoteAudio.style.display = 'none';
+    document.body.appendChild(this.remoteAudio);
+    console.log('[BrowserTelephony] Global Audio Sink Initialized');
+  }
+
   async connect(config: { wssUrl: string; extension: string; password?: string; domain: string }) {
     if (!config.wssUrl) return;
+    this.setupRemoteAudio();
     this.onStatusChange?.('CONNECTING');
 
     // Try a few ports if 443 fails
@@ -56,7 +70,11 @@ class BrowserTelephonyService {
       logLevel: "debug",
       sessionDescriptionHandlerFactoryOptions: {
         peerConnectionConfiguration: {
-          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' }
+          ]
         }
       }
     };
@@ -77,6 +95,10 @@ class BrowserTelephonyService {
         onDisconnect: (error) => {
           console.log(`[BrowserTelephony] SIP Disconnected from ${url}`, error);
           if (!resolved) { resolved = true; resolve(false); }
+        },
+        onInvite: (request) => {
+           console.log('[BrowserTelephony] Incoming call detected');
+           // Inbound calls not yet fully implemented in UI, but UA is ready
         }
       };
 
@@ -122,13 +144,48 @@ class BrowserTelephonyService {
     const targetURI = UserAgent.makeURI(`sip:${phoneNumber}@${domain}`);
     if (!targetURI) throw new Error("Invalid target URI");
 
-    this.currentSession = new Inviter(this.userAgent, targetURI, {
+    const session = new Inviter(this.userAgent, targetURI, {
       sessionDescriptionHandlerOptions: {
         constraints: { audio: true, video: false }
       }
     });
 
-    await this.currentSession.invite();
+    this.currentSession = session;
+    this.setupSessionListeners(session);
+
+    await session.invite();
+  }
+
+  private setupSessionListeners(session: Inviter) {
+    session.stateChange.addListener((state: SessionState) => {
+      console.log(`[BrowserTelephony] Session State Change: ${state}`);
+      
+      if (state === SessionState.Established) {
+        const sdh = session.sessionDescriptionHandler as any;
+        if (sdh && sdh.peerConnection) {
+          const pc = sdh.peerConnection as RTCPeerConnection;
+          
+          pc.ontrack = (event) => {
+            console.log('[BrowserTelephony] Remote track received:', event.track.kind);
+            if (event.track.kind === 'audio' && this.remoteAudio) {
+              const remoteStream = new MediaStream();
+              remoteStream.addTrack(event.track);
+              this.remoteAudio.srcObject = remoteStream;
+              this.remoteAudio.play().catch(e => console.error('[BrowserTelephony] Play error:', e));
+            }
+          };
+        }
+      }
+
+      if (state === SessionState.Terminated) {
+        if (this.remoteAudio) {
+          this.remoteAudio.srcObject = null;
+        }
+        if (this.currentSession === session) {
+          this.currentSession = null;
+        }
+      }
+    });
   }
 
   async endCall() {

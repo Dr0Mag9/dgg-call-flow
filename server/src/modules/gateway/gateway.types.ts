@@ -10,6 +10,7 @@ export interface CallTriggerRequest {
   apiKey: string;
   phoneNumber: string;
   agentId: string;
+  simSlot?: number;
 }
 
 export interface GatewayCommandResponse {
@@ -22,4 +23,5 @@ export interface CallStatusUpdate {
   apiKey: string;
   callId: string;
   status: 'RINGING' | 'CONNECTED' | 'ENDED' | 'FAILED';
+  simSlot?: number;
 }
