@@ -31,6 +31,7 @@ interface AppState {
   selectedClient: any | null;
   isClientDrawerOpen: boolean;
   lineInfo: any | null;
+  sipStatus: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR';
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   login: (token: string, user: User) => void;
@@ -54,6 +55,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedClient: null,
   isClientDrawerOpen: false,
   lineInfo: null,
+  sipStatus: 'OFFLINE',
 
   setUser: (user) => set({ user }),
   setToken: (token) => {
@@ -98,16 +100,25 @@ export const useAppStore = create<AppState>((set, get) => ({
 
           if (extension && password) {
             console.log(`[SIP Bridge] Initializing bridge for extension: ${extension}`);
+            
+            // Set callback before connecting
+            browserTelephony.setStatusCallback((status) => {
+              set({ sipStatus: status });
+            });
+
             browserTelephony.connect({
               extension,
               password,
               domain,
               wssUrl
-            }).catch(err => console.error('[SIP Bridge] Failed to establish audio link', err));
+            }).catch(err => {
+              console.error('[SIP Bridge] Failed to establish audio link', err);
+              set({ sipStatus: 'ERROR' });
+            });
           }
         }
       } else {
-        set({ lineInfo: null });
+        set({ lineInfo: null, sipStatus: 'OFFLINE' });
       }
     } catch (err) {
       console.error('Fetch line info failed', err);

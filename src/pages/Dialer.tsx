@@ -10,7 +10,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [hasHeadset, setHasHeadset] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
-  const { token, activeCall, lineInfo } = useAppStore();
+  const { token, activeCall, lineInfo, sipStatus } = useAppStore();
 
   // Hardware Sensing Logic
   useEffect(() => {
@@ -116,13 +116,18 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
         className="luxury-card overflow-hidden group shadow-2xl shadow-gold/10 relative border-gold/30"
       >
         {/* Connectivity Bar */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-navy/80 flex items-center justify-between px-3 z-20">
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className={`w-0.5 h-2 rounded-full ${i <= 3 ? 'bg-gold' : 'bg-gold/20'}`} />
-            ))}
+        <div className="absolute top-0 inset-x-0 h-4 bg-navy/80 backdrop-blur-md flex items-center justify-between px-4 z-20 border-b border-gold/10">
+          <div className="flex gap-1.5 items-center">
+            <div className={`w-1.5 h-1.5 rounded-full ${
+              sipStatus === 'LINKED' ? 'bg-gold animate-pulse shadow-[0_0_10px_#D4AF37]' : 
+              sipStatus === 'CONNECTING' ? 'bg-blue-400 animate-spin' : 
+              sipStatus === 'ERROR' ? 'bg-red-500' : 'bg-slate-700'
+            }`} />
+            <span className="text-[7px] font-black text-gold uppercase tracking-[0.2em]">
+              Bridge: {sipStatus === 'LINKED' ? 'ONLINE' : sipStatus}
+            </span>
           </div>
-          <span className="text-[6px] font-black text-gold uppercase tracking-[0.2em] animate-pulse">Quantum Link: Active</span>
+          <span className="text-[7px] font-black text-gold/40 uppercase tracking-[0.2em]">Quantum Link: Active</span>
         </div>
 
         <div className="p-10 bg-gradient-to-b from-navy via-navy to-[#0A1221] text-center relative border-b border-gold/10">
@@ -277,9 +282,9 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
               <Headphones className="w-4 h-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[8px] font-black text-gold/60 uppercase tracking-widest">Quantum Audio</span>
-              <span className="text-[10px] font-bold text-pearl/80 italic">
-                {hasHeadset ? 'HD-HEADSET DETECTED' : 'SYSTEM OUTPUT ACTIVE'}
+              <span className="text-[8px] font-black text-gold/60 uppercase tracking-widest">Audio Intelligence</span>
+              <span className={`text-[10px] font-bold italic transition-colors ${hasHeadset ? 'text-gold' : 'text-pearl/80'}`}>
+                {hasHeadset ? 'QUANTUM HEADSET DETECTED' : 'SYSTEM LOUDSPEAKER ACTIVE'}
               </span>
             </div>
           </div>
