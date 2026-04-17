@@ -49,41 +49,40 @@ class BrowserTelephonyService {
     const stealthUrls = [
       localTunnel,                   // Forced Local Tunnel (PRIMARY)
       `wss://proxy.sipthor.net:443`, 
-      `wss://69.62.79.9:8089`,       
-      `wss://69.62.79.9:16443`,      
-      `wss://sip2sip.info:443`
+      `wss://sip2sip.info:443`,      // Emergency Direct Lane
+      `wss://69.62.79.9:8089`
     ];
 
     // Merge and finalize discovery net: Ensure Local Tunnel is ALWAYS tried first
-    const urls = [...new Set([localTunnel, ...stealthUrls, ...adminUrls])].map(url => 
+    const urls = [...new Set([localTunnel, ...stealthUrls, ...adminUrls])].filter(Boolean).map(url => 
       url.startsWith('ws://') ? url.replace('ws://', 'wss://') : url
     );
 
-    // MULTI-NODE RACING: First winner locks the bridge
+    // NUCLEAR RESET: Clear stale state before racing
     try {
       this.isConnected = false;
       if (this.userAgent) {
         await this.userAgent.stop().catch(() => {});
         this.userAgent = null;
       }
+      if (this.registerer) {
+        await this.registerer.unregister().catch(() => {});
+        this.registerer = null;
+      }
 
-      console.log(`[Deep Proxy] RACING across ${urls.length} nodes:`, urls);
+      console.log(`[Deep Proxy] NUCLEAR RESET: Racing nodes:`, urls);
       
       // Use Promise.any to resolve immediately when the FIRST node connects
-      // We wrap tryStartUA to return only on success
       const raceAttempts = urls.map(url => new Promise<boolean>((resolve, reject) => {
         this.tryStartUA(url, config).then(success => {
           if (success) resolve(true);
-          // Don't reject yet, wait for others
         });
-        // Timeout each individual attempt after 6 seconds
-        setTimeout(() => reject(new Error('Timeout')), 6000);
+        setTimeout(() => reject(new Error('Timeout')), 8000);
       }));
 
       try {
         await Promise.any(raceAttempts);
       } catch (e) {
-        // Only throws if ALL nodes failed
         throw new Error('All signaling lanes blocked');
       }
       
