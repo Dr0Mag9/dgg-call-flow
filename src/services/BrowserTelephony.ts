@@ -118,7 +118,7 @@ class BrowserTelephonyService {
         server: url,
         traceSip: true,
         keepAliveInterval: 10,
-        connectionTimeout: 8, // Rapid handshake
+        connectionTimeout: 10, // Increased for cross-continent signaling
       },
       authorizationUsername: authUser,
       authorizationPassword: config.password || '',
@@ -127,13 +127,16 @@ class BrowserTelephonyService {
       logLevel: "error",
       sessionDescriptionHandlerFactoryOptions: {
         peerConnectionConfiguration: {
-          // FORCE RELAY: Bypasses Indian ISP direct P2P blocks
-          iceTransportPolicy: 'relay',
+          iceTransportPolicy: 'relay', // FORCE RELAY: Ensures packets take the tunnel
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun.services.mozilla.com' },
             { urls: 'stun:sip2sip.info:3478' },
-            { urls: 'stun:stun.voip.antisip.com' }
+            { urls: 'stun:stun.voip.antisip.com' },
+            { urls: 'stun:stun.ekiga.net' },
+            { urls: 'stun:stun.ideasip.com' },
+            { urls: 'stun:stun.softjoys.com' },
+            { urls: 'stun:stun.voipbuster.com' }
           ]
         }
       }
@@ -194,7 +197,17 @@ class BrowserTelephonyService {
     });
 
     this.registerer.register().catch(err => {
-      this.onStatusChange?.('ERROR', 'RE-TUNNELING...');
+      // STEALTH DIAGNOSTICS: Extract specific SIP failure codes
+      const msg = err?.toString() || '';
+      console.error('[Deep Proxy] Registration Detailed Error:', msg);
+      
+      let errorLabel = 'RE-TUNNELING...';
+      if (msg.includes('401')) errorLabel = 'ERR_AUTH_401';
+      else if (msg.includes('403')) errorLabel = 'ERR_AUTH_403';
+      else if (msg.includes('408')) errorLabel = 'ERR_TIMEOUT_408';
+      else if (msg.includes('503')) errorLabel = 'ERR_SERVER_503';
+      
+      this.onStatusChange?.('ERROR', errorLabel);
       this.scheduleRetry();
     });
   }
