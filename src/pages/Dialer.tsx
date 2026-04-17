@@ -15,6 +15,12 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
   // Hardware Sensing Logic
   useEffect(() => {
     const checkHardware = async () => {
+      if (!navigator.mediaDevices) {
+        console.warn('Hardware sensing requires HTTPS/Secure Context');
+        setHasHeadset(false);
+        return;
+      }
+
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const outputs = devices.filter(d => d.kind === 'audiooutput');
@@ -31,13 +37,21 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
     };
 
     checkHardware();
-    navigator.mediaDevices.ondevicechange = checkHardware;
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.ondevicechange = checkHardware;
+    }
     return () => {
-      navigator.mediaDevices.ondevicechange = null;
+      if (navigator.mediaDevices) {
+        navigator.mediaDevices.ondevicechange = null;
+      }
     };
   }, []);
 
   const toggleSpeaker = async () => {
+    if (!navigator.mediaDevices) {
+      setError('Speaker switching requires HTTPS');
+      return;
+    }
     setIsSpeakerOn(!isSpeakerOn);
     // Note: setSinkId is Chrome-only. We'll attempt it if available.
     try {
