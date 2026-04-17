@@ -8,7 +8,7 @@ import IncomingCallModal from '../components/IncomingCallModal';
 import CallDispositionScreen from '../components/CallDispositionScreen';
 import ClientDrawer from '../components/ClientDrawer';
 import LuxuryBackground from '../components/LuxuryBackground';
-import { motion } from 'motion/react';
+import { motion } from 'motion';
 
 export default function DashboardLayout() {
   const { user, logout, connectSocket } = useAppStore();

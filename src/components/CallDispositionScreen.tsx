@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { CheckCircle2, XCircle, Clock, User, MessageSquare, Calendar, ChevronRight, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion';
 
 export default function CallDispositionScreen() {
   const { activeCall, setActiveCall, token } = useAppStore();

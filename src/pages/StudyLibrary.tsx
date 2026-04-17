@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { BookOpen, Search, FileText, Video, Link as LinkIcon, X, Sparkles, Download, Layers, Globe } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion';
 
 export default function StudyLibrary() {
   const { token } = useAppStore();

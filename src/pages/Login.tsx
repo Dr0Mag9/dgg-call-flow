@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { PhoneCall, Lock, Mail, ArrowRight } from 'lucide-react';
 import LuxuryBackground from '../components/LuxuryBackground';
-import { motion } from 'motion/react';
+import { motion } from 'motion';
 
 export default function Login() {
   const [email, setEmail] = useState('');

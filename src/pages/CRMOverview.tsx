@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { Search, Filter, Star, Phone, Mail, Building, MoreVertical, X, MapPin, Gavel, Plus, Sparkles, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion';
 
 export default function CRMOverview() {
   const { token, user, setSelectedClient, setClientDrawerOpen, socket } = useAppStore();

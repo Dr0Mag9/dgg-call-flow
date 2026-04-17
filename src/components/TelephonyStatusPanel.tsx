@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { PhoneCall, Activity, Signal, Smartphone, Zap } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'motion';
 
 export default function TelephonyStatusPanel() {
   const { user, token, lineInfo, fetchLineInfo } = useAppStore();

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { User, Phone, Circle, X, Edit, Power, Activity, PhoneIncoming, PhoneOutgoing, CheckSquare, Clock, Plus, ShieldCheck, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion';
 
 export default function AdminAgents() {
   const { token } = useAppStore();

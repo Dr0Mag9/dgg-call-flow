@@ -4,7 +4,7 @@ import { Phone, Clock, PhoneMissed, PhoneIncoming, CheckSquare, Calendar, Trendi
 import { format, startOfDay } from 'date-fns';
 import Dialer from './Dialer';
 import TelephonyStatusPanel from '../components/TelephonyStatusPanel';
-import { motion } from 'motion/react';
+import { motion } from 'motion';
 
 export default function AgentDashboard() {
   const { user, token, setSelectedClient, setClientDrawerOpen } = useAppStore();
