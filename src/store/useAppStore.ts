@@ -32,6 +32,7 @@ interface AppState {
   isClientDrawerOpen: boolean;
   lineInfo: any | null;
   sipStatus: 'OFFLINE' | 'CONNECTING' | 'LINKED' | 'ERROR';
+  sipError: string | null;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   login: (token: string, user: User) => void;
@@ -56,6 +57,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   isClientDrawerOpen: false,
   lineInfo: null,
   sipStatus: 'OFFLINE',
+  sipError: null,
 
   setUser: (user) => set({ user }),
   setToken: (token) => {
@@ -99,11 +101,10 @@ export const useAppStore = create<AppState>((set, get) => ({
           const wssUrl = data.telephonyConfig.sip_wss_url;
 
           if (extension && password) {
-            console.log(`[SIP Bridge] Initializing bridge for extension: ${extension}`);
+            console.log(`[SIP Bridge] Connecting extension: ${extension}`);
             
-            // Set callback before connecting
             browserTelephony.setStatusCallback((status) => {
-              set({ sipStatus: status });
+              set({ sipStatus: status, sipError: status === 'ERROR' ? 'REGISTRATION_FAILED' : null });
             });
 
             browserTelephony.connect({
@@ -112,13 +113,20 @@ export const useAppStore = create<AppState>((set, get) => ({
               domain,
               wssUrl
             }).catch(err => {
-              console.error('[SIP Bridge] Failed to establish audio link', err);
-              set({ sipStatus: 'ERROR' });
+              console.error('[SIP Bridge] Critical Error', err);
+              set({ sipStatus: 'ERROR', sipError: 'WSS_CONNECTION_FAILED' });
             });
+          } else {
+            console.warn('[BRIDGE DIAGNOSTIC] Blocked: Extension or Password missing for agent');
+            set({ sipStatus: 'OFFLINE', sipError: 'MISSING_CREDENTIALS' });
           }
+        } else {
+          console.warn('[BRIDGE DIAGNOSTIC] Blocked: WSS URL missing in System Settings');
+          set({ sipStatus: 'OFFLINE', sipError: 'MISSING_CONFIG' });
         }
       } else {
-        set({ lineInfo: null, sipStatus: 'OFFLINE' });
+        console.warn('[BRIDGE DIAGNOSTIC] Blocked: No Telephony Line assigned to Agent');
+        set({ lineInfo: null, sipStatus: 'OFFLINE', sipError: 'NO_LINE_ASSIGNED' });
       }
     } catch (err) {
       console.error('Fetch line info failed', err);

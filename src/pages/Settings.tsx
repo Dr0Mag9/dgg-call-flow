@@ -159,13 +159,17 @@ export default function Settings() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => {
+                  onClick={async () => {
                     const fields = ["sip_wss_url", "sip_domain", "main_business_number", "sip_default_password"];
-                    fields.forEach(f => {
+                    const updates = fields.map(f => {
                       const input = document.getElementById(f) as HTMLInputElement;
-                      if (input) updateSystemSetting(f, input.value);
+                      if (input) return updateSystemSetting(f, input.value);
+                      return Promise.resolve();
                     });
-                    alert("Telephony Protocols Updated Successfully.");
+                    
+                    await Promise.all(updates);
+                    fetchSystemSettings();
+                    alert("Telephony Protocols Synchronized Successfully.");
                   }}
                   className="luxury-button flex items-center gap-3 text-[10px] py-3 px-8 border-gold shadow-[0_0_20px_rgba(212,175,55,0.2)]"
                 >

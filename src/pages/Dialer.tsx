@@ -124,7 +124,7 @@ export default function Dialer({ embedded = false }: { embedded?: boolean }) {
               sipStatus === 'ERROR' ? 'bg-red-500' : 'bg-slate-700'
             }`} />
             <span className="text-[7px] font-black text-gold uppercase tracking-[0.2em]">
-              Bridge: {sipStatus === 'LINKED' ? 'ONLINE' : sipStatus}
+              Bridge: {sipStatus === 'LINKED' ? 'ONLINE' : (sipError || sipStatus)}
             </span>
           </div>
           <span className="text-[7px] font-black text-gold/40 uppercase tracking-[0.2em]">Quantum Link: Active</span>
