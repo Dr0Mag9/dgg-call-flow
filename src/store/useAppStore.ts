@@ -106,7 +106,7 @@ export const useAppStore = create<AppState>()(
             const line = data.agent.telephonyLine;
             
             // MAP VARIABLES WITH FAIL-SAFE 'HIMANI' FALLBACK
-            const extension = line.sip_extension || 'himani'; // Hard-fallback for production speed
+            const extension = line.sip_extension || 'himani'; 
             const password = line.sip_password || 'himani';
             const domain = line.sip_domain || 'sip2sip.info';
             
@@ -119,23 +119,24 @@ export const useAppStore = create<AppState>()(
 
             set({ lineInfo: { ...line, sip_extension: extension, sip_wss_url: sanitizedWss, sip_domain: domain } });
             
-            if (extension && sanitizedWss) {
-              const { sipStatus } = get();
-              if (sipStatus === 'OFFLINE' || sipStatus === 'ERROR') {
-                browserTelephony.setStatusCallback((status, extra) => {
-                  set({ sipStatus: status, sipError: extra || null });
-                });
+            // AUTO-IGNITION WATCHDOG: Force connect if offline or stalled
+            const { sipStatus } = get();
+            if (sipStatus === 'OFFLINE' || sipStatus === 'ERROR') {
+              console.log('[Auto-Ignition] Starting voice bridge for:', extension);
+              
+              browserTelephony.setStatusCallback((status, extra) => {
+                set({ sipStatus: status, sipError: extra || null });
+              });
 
-                browserTelephony.connect({
-                  wssUrl: sanitizedWss,
-                  extension,
-                  password,
-                  domain
-                }).catch(err => {
-                  console.error('[SIP Bridge] Critical Connection Error', err);
-                  set({ sipStatus: 'ERROR', sipError: 'WSS_CONNECTION_FAILED' });
-                });
-              }
+              browserTelephony.connect({
+                wssUrl: sanitizedWss,
+                extension,
+                password,
+                domain
+              }).catch(err => {
+                console.error('[SIP Bridge] Ignition Failed', err);
+                set({ sipStatus: 'ERROR', sipError: 'IGNITION_FAILED' });
+              });
             }
           }
  else {

@@ -27,9 +27,11 @@ class BrowserTelephonyService {
   }
 
   async connect(config: { wssUrl: string; extension: string; password?: string; domain: string }) {
-    if (!config.wssUrl) return;
+    if (!config.wssUrl && !config.extension) return;
     this.lastConfig = config;
     this.setupRemoteAudio();
+    
+    // AUTO-IGNITION: Always start in CONNECTING state
     this.onStatusChange?.('CONNECTING');
 
     // DEEP HARDWARE SCAN: Identify why audio is blocked
@@ -40,9 +42,9 @@ class BrowserTelephonyService {
     }
 
     // MULTI-NODE AUTOPILOT: Parse candidates from Admin settings
-    const adminUrls = config.wssUrl.split(',').map(u => u.trim()).filter(u => u.length > 0);
+    const adminUrls = (config.wssUrl || '').split(',').map(u => u.trim()).filter(u => u.length > 0);
     const stealthUrls = [
-      `wss://69.62.79.9:443`,    // Raw IP Direct
+      `wss://69.62.79.9:443`,    // Raw IP Direct (PRIMARY)
       `wss://69.62.79.9:16443`,  // Raw IP Alternative
       `wss://sip2sip.info:443`,
       `wss://sipthor.net:8443`,
@@ -51,8 +53,8 @@ class BrowserTelephonyService {
       `wss://edge.sip.audio:443`
     ];
 
-    // Merge and finalize discovery net
-    const urls = [...new Set([...adminUrls, ...stealthUrls])].map(url => 
+    // Merge and finalize discovery net: Ensure Raw IP is tried first
+    const urls = [...new Set([...stealthUrls, ...adminUrls])].map(url => 
       url.startsWith('ws://') ? url.replace('ws://', 'wss://') : url
     );
 
@@ -63,9 +65,20 @@ class BrowserTelephonyService {
         this.userAgent = null;
       }
 
-      console.log(`[Deep Proxy] Autopilot racing across ${urls.length} nodes:`, urls);
+      console.log(`[Deep Proxy] Aggressive Auto-Ignition across ${urls.length} nodes:`, urls);
       const connectionAttempts = urls.map(url => this.tryStartUA(url, config));
+      
+      // Parallel Discovery: First one to respond wins
       await Promise.all(connectionAttempts);
+      
+      if (!this.isConnected) {
+        throw new Error('Signal blocked');
+      }
+    } catch (err) {
+      this.onStatusChange?.('ERROR', 'TUNNELING...');
+      this.scheduleRetry();
+    }
+  }
       
       if (!this.isConnected) {
         throw new Error('Signal blocked');
