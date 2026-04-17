@@ -113,12 +113,10 @@ export const useAppStore = create<AppState>()(
             const domain = line.sip_domain || 'sip2sip.info';
             
             // SANITIZE: Handle multiple comma-separated URLs from Admin configuration
-            const sanitizedWss = (line.sip_wss_url || '')
-              .split(',')
-              .map((u: string) => u.trim())
-              .filter((u: string) => u.length > 0)
-              .join(',');
-
+            const currentHost = typeof window !== 'undefined' ? window.location.hostname : '69.62.79.9.nip.io';
+            const localTunnel = `wss://${currentHost}/sip`;
+            const sanitizedWss = [localTunnel, ...((line.sip_wss_url || '').split(','))].filter(Boolean).map(u => u.trim()).join(',');
+            
             set({ lineInfo: { ...line, sip_extension: extension, sip_wss_url: sanitizedWss, sip_domain: domain } });
             
             // HARDWARE HEALTH SCAN

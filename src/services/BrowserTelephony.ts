@@ -43,17 +43,19 @@ class BrowserTelephonyService {
 
     // MULTI-NODE POWER TUNNEL: Prioritize local HTTPS proxy to bypass firewall
     const currentHost = typeof window !== 'undefined' ? window.location.hostname : '69.62.79.9.nip.io';
+    const localTunnel = `wss://${currentHost}/sip`;
+    
+    const adminUrls = (config.wssUrl || '').split(',').map(u => u.trim()).filter(u => u.length > 0);
     const stealthUrls = [
-      `wss://${currentHost}/sip`,    // Power Tunnel (PRIMARY)
+      localTunnel,                   // Forced Local Tunnel (PRIMARY)
       `wss://proxy.sipthor.net:443`, 
       `wss://69.62.79.9:8089`,       
       `wss://69.62.79.9:16443`,      
-      `wss://69.62.79.9:443`,        
       `wss://sip2sip.info:443`
     ];
 
-    // Merge and finalize discovery net: Ensure Power Tunnel is tried first
-    const urls = [...new Set([...stealthUrls, ...adminUrls])].map(url => 
+    // Merge and finalize discovery net: Ensure Local Tunnel is ALWAYS tried first
+    const urls = [...new Set([localTunnel, ...stealthUrls, ...adminUrls])].map(url => 
       url.startsWith('ws://') ? url.replace('ws://', 'wss://') : url
     );
 
