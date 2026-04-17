@@ -59,12 +59,7 @@ export class GatewayProvider implements TelephonyService {
         logger.info(`[Gateway Provider] No active sockets, relying on HTTP polling with Triple-Format`);
       }
     } catch (err) {
-      logger.warn('[Gateway Provider] Signal emit failed, relying on polling backup');
-    }
-        logger.info(`[Gateway Provider] No active sockets for gateway ${line.gatewayId}, relying on HTTP polling`);
-      }
-    } catch (err) {
-      logger.warn('[Gateway Provider] Socket emit failed, command queued for polling', { 
+      logger.warn('[Gateway Provider] Signal emit failed, relying on polling backup', { 
         message: err instanceof Error ? err.message : String(err) 
       });
     }
