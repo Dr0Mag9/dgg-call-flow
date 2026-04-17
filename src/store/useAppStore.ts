@@ -103,51 +103,49 @@ export const useAppStore = create<AppState>()(
 
           const data = await res.json();
           if (data.agent?.telephonyLine) {
-            set({ lineInfo: data.agent.telephonyLine });
+            const line = data.agent.telephonyLine;
             
-            // Auto-Connect SIP Bridge for UK Agents
-            if (data.telephonyConfig?.sip_wss_url) {
-              const extension = data.agent.extension;
-              const password = data.agent.sipPassword || data.telephonyConfig.sip_default_password;
-              const domain = data.telephonyConfig.sip_domain;
-              const wssUrl = data.telephonyConfig.sip_wss_url;
+            // MAP VARIABLES
+            const extension = line.sip_extension;
+            const password = line.sip_password;
+            const domain = line.sip_domain;
+            
+            // SANITIZE: Handle multiple comma-separated URLs from Admin configuration
+            const sanitizedWss = (line.sip_wss_url || '')
+              .split(',')
+              .map((u: string) => u.trim())
+              .filter((u: string) => u.length > 0)
+              .join(',');
 
-              if (extension && password) {
-                console.log(`[SIP Bridge] Connecting extension: ${extension}`);
-                
-                // Logic Check: If Sip2Sip is used, the extension usually matches the username (himani)
-                if (/^\d+$/.test(extension) && domain?.includes('sip2sip.info')) {
-                  console.warn(`[BRIDGE WARNING] You are using a numeric extension "${extension}" with Sip2Sip. Ensure this is your actual Sip2Sip Username (like "himani"), not an internal line number.`);
-                }
-
+            set({ lineInfo: { ...line, sip_wss_url: sanitizedWss } });
+            
+            if (extension && password && sanitizedWss) {
+              const { sipStatus } = get();
+              if (sipStatus === 'OFFLINE' || sipStatus === 'ERROR') {
                 browserTelephony.setStatusCallback((status, extra) => {
                   set({ sipStatus: status, sipError: extra || null });
                 });
 
                 browserTelephony.connect({
+                  wssUrl: sanitizedWss,
                   extension,
                   password,
-                  domain,
-                  wssUrl
+                  domain: domain || 'sip2sip.info'
                 }).catch(err => {
                   console.error('[SIP Bridge] Critical Connection Error', err);
                   set({ sipStatus: 'ERROR', sipError: 'WSS_CONNECTION_FAILED' });
                 });
-              } else {
-                const reason = !extension ? 'MISSING_EXTENSION' : 'MISSING_PASSWORD';
-                console.warn(`[BRIDGE DIAGNOSTIC] Blocked: ${reason} for agent`);
-                set({ sipStatus: 'OFFLINE', sipError: reason });
               }
             } else {
-              console.warn('[BRIDGE DIAGNOSTIC] Blocked: WSS URL missing in System Settings');
-              set({ sipStatus: 'OFFLINE', sipError: 'MISSING_CONFIG' });
+              const reason = !extension ? 'MISSING_EXTENSION' : (!password ? 'MISSING_PASSWORD' : 'MISSING_WSS_URL');
+              set({ sipStatus: 'OFFLINE', sipError: reason });
             }
           } else {
-            console.warn('[BRIDGE DIAGNOSTIC] Blocked: No Telephony Line assigned to Agent');
             set({ lineInfo: null, sipStatus: 'OFFLINE', sipError: 'NO_LINE_ASSIGNED' });
           }
         } catch (err) {
           console.error('Fetch line info failed', err);
+          set({ sipStatus: 'ERROR', sipError: 'FETCH_FAILED' });
         }
       },
 

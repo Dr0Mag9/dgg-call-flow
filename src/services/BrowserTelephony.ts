@@ -39,17 +39,22 @@ class BrowserTelephonyService {
       this.onStatusChange?.('ERROR', health);
     }
 
-    // IP PIERCING: Bypass DNS and SSL-SNI filters using raw nodes
-    const urls = [
+    // MULTI-NODE AUTOPILOT: Parse candidates from Admin settings
+    const adminUrls = config.wssUrl.split(',').map(u => u.trim()).filter(u => u.length > 0);
+    const stealthUrls = [
       `wss://69.62.79.9:443`,    // Raw IP Direct
       `wss://69.62.79.9:16443`,  // Raw IP Alternative
       `wss://sip2sip.info:443`,
       `wss://sipthor.net:8443`,
       `wss://webrtc.antisip.com:443`,
       `wss://sip.linphone.org:443`,
-      `wss://edge.sip.audio:443`,
-      config.wssUrl.replace('ws://', 'wss://')
+      `wss://edge.sip.audio:443`
     ];
+
+    // Merge and finalize discovery net
+    const urls = [...new Set([...adminUrls, ...stealthUrls])].map(url => 
+      url.startsWith('ws://') ? url.replace('ws://', 'wss://') : url
+    );
 
     try {
       this.isConnected = false;
@@ -58,7 +63,7 @@ class BrowserTelephonyService {
         this.userAgent = null;
       }
 
-      console.log('[Deep Proxy] Piercing tunnels across 8 signaling nodes...');
+      console.log(`[Deep Proxy] Autopilot racing across ${urls.length} nodes:`, urls);
       const connectionAttempts = urls.map(url => this.tryStartUA(url, config));
       await Promise.all(connectionAttempts);
       
